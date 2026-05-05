@@ -25,7 +25,7 @@ class _SetupPageState extends ConsumerState<SetupPage> {
     await ref
         .read(authProvider.notifier)
         .connect(_urlController.text.trim());
-    if (mounted) context.go('/dashboard');
+    if (mounted) context.go('/home');
   }
 
   @override

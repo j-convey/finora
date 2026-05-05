@@ -45,11 +45,13 @@ class BudgetsPage extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),
+            tooltip: 'Settings',
             onPressed: () => context.push('/settings'),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'fab_budgets',
         onPressed: () => _showBudgetSheet(context, ref, existing: null),
         icon: const Icon(Icons.add),
         label: const Text('Add Budget'),

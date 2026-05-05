@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/providers/shell_index_provider.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../accounts/presentation/providers/accounts_provider.dart';
 import '../../../budgets/data/models/budget_model.dart';
@@ -35,7 +36,7 @@ class DashboardPage extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.bar_chart_outlined),
             tooltip: 'Reports',
-            onPressed: () => context.push('/dashboard/reports'),
+            onPressed: () => context.push('/reports'),
           ),
           IconButton(
             icon: const Icon(Icons.settings_outlined),
@@ -106,7 +107,7 @@ class DashboardPage extends ConsumerWidget {
             // ── Budget Snapshot ─────────────────────────────────
             _SectionHeader(
               title: 'Budgets',
-              onSeeAll: () => context.go('/budgets'),
+              onSeeAll: () => ref.read(shellIndexProvider.notifier).state = 3,
             ),
             const SizedBox(height: 8),
             ...budgets.take(3).map((b) => _BudgetRow(budget: b)),
@@ -115,7 +116,7 @@ class DashboardPage extends ConsumerWidget {
             // ── Recent Transactions ─────────────────────────────
             _SectionHeader(
               title: 'Recent Transactions',
-              onSeeAll: () => context.go('/transactions'),
+              onSeeAll: () => ref.read(shellIndexProvider.notifier).state = 1,
             ),
             const SizedBox(height: 8),
             ...transactions

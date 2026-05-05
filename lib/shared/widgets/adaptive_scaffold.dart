@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../app/providers/shell_index_provider.dart';
+import '../../features/dashboard/presentation/pages/dashboard_page.dart';
+import '../../features/transactions/presentation/pages/transactions_page.dart';
+import '../../features/accounts/presentation/pages/accounts_page.dart';
+import '../../features/budgets/presentation/pages/budgets_page.dart';
 
 class _Destination {
   const _Destination({
@@ -17,40 +24,48 @@ const _destinations = [
   _Destination(label: 'Transactions', icon: Icons.receipt_long_outlined, selectedIcon: Icons.receipt_long),
   _Destination(label: 'Accounts', icon: Icons.account_balance_wallet_outlined, selectedIcon: Icons.account_balance_wallet),
   _Destination(label: 'Budgets', icon: Icons.donut_large_outlined, selectedIcon: Icons.donut_large),
-  _Destination(label: 'AI Insights', icon: Icons.auto_awesome_outlined, selectedIcon: Icons.auto_awesome),
 ];
 
-/// Wraps the main [StatefulNavigationShell] with an adaptive nav layout:
-/// - Wide screens (≥ 600 px) → [NavigationRail] on the left
-/// - Narrow screens → [NavigationBar] at the bottom
-class AdaptiveScaffold extends StatelessWidget {
-  const AdaptiveScaffold({super.key, required this.navigationShell});
+/// Main shell widget. Uses [IndexedStack] for tab state preservation.
+/// All tab switching goes through [shellIndexProvider] — the router is only
+/// used for full-screen pushes (Settings, Reports), which always land on the
+/// single root navigator with no branch-navigator conflicts.
+class MainShell extends ConsumerWidget {
+  const MainShell({super.key});
 
-  final StatefulNavigationShell navigationShell;
-
-  void _onTap(int index) {
-    navigationShell.goBranch(
-      index,
-      initialLocation: index == navigationShell.currentIndex,
-    );
-  }
+  static const _pages = [
+    DashboardPage(),
+    TransactionsPage(),
+    AccountsPage(),
+    BudgetsPage(),
+  ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final index = ref.watch(shellIndexProvider);
+    void onTap(int i) => ref.read(shellIndexProvider.notifier).state = i;
+
+    final body = IndexedStack(index: index, children: _pages);
     final width = MediaQuery.sizeOf(context).width;
+
     return width >= 600
-        ? _WideLayout(shell: navigationShell, onTap: _onTap)
-        : _NarrowLayout(shell: navigationShell, onTap: _onTap);
+        ? _WideLayout(selectedIndex: index, onTap: onTap, body: body)
+        : _NarrowLayout(selectedIndex: index, onTap: onTap, body: body);
   }
 }
 
-// ── Wide layout ─────────────────────────────────────────────────────────────
+// ── Wide layout ──────────────────────────────────────────────────────────────
 
 class _WideLayout extends StatelessWidget {
-  const _WideLayout({required this.shell, required this.onTap});
+  const _WideLayout({
+    required this.selectedIndex,
+    required this.onTap,
+    required this.body,
+  });
 
-  final StatefulNavigationShell shell;
+  final int selectedIndex;
   final void Function(int) onTap;
+  final Widget body;
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +76,7 @@ class _WideLayout extends StatelessWidget {
       body: Row(
         children: [
           NavigationRail(
-            selectedIndex: shell.currentIndex,
+            selectedIndex: selectedIndex,
             onDestinationSelected: onTap,
             extended: extended,
             labelType: extended
@@ -103,7 +118,7 @@ class _WideLayout extends StatelessWidget {
                 .toList(),
           ),
           const VerticalDivider(thickness: 1, width: 1),
-          Expanded(child: shell),
+          Expanded(child: body),
         ],
       ),
     );
@@ -113,17 +128,22 @@ class _WideLayout extends StatelessWidget {
 // ── Narrow layout ────────────────────────────────────────────────────────────
 
 class _NarrowLayout extends StatelessWidget {
-  const _NarrowLayout({required this.shell, required this.onTap});
+  const _NarrowLayout({
+    required this.selectedIndex,
+    required this.onTap,
+    required this.body,
+  });
 
-  final StatefulNavigationShell shell;
+  final int selectedIndex;
   final void Function(int) onTap;
+  final Widget body;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: shell,
+      body: body,
       bottomNavigationBar: NavigationBar(
-        selectedIndex: shell.currentIndex,
+        selectedIndex: selectedIndex,
         onDestinationSelected: onTap,
         destinations: _destinations
             .map(
@@ -138,3 +158,4 @@ class _NarrowLayout extends StatelessWidget {
     );
   }
 }
+

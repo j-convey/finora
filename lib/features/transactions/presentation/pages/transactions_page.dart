@@ -62,6 +62,7 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'fab_transactions',
         onPressed: () => _showAddSheet(context),
         icon: const Icon(Icons.add),
         label: const Text('Add'),
