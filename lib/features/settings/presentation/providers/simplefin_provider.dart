@@ -1,0 +1,131 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../core/network/api_client.dart';
+
+enum SimplefinConnectionStatus { disconnected, connected, syncing, error }
+
+class SimplefinState {
+  const SimplefinState({
+    this.status = SimplefinConnectionStatus.disconnected,
+    this.connectedInstitutions = const [],
+    this.lastSyncedAt,
+    this.errorMessage,
+  });
+
+  final SimplefinConnectionStatus status;
+  final List<String> connectedInstitutions;
+  final DateTime? lastSyncedAt;
+  final String? errorMessage;
+
+  bool get isConnected => status == SimplefinConnectionStatus.connected ||
+      status == SimplefinConnectionStatus.syncing;
+
+  SimplefinState copyWith({
+    SimplefinConnectionStatus? status,
+    List<String>? connectedInstitutions,
+    DateTime? lastSyncedAt,
+    String? errorMessage,
+  }) =>
+      SimplefinState(
+        status: status ?? this.status,
+        connectedInstitutions:
+            connectedInstitutions ?? this.connectedInstitutions,
+        lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+        errorMessage: errorMessage,
+      );
+}
+
+class SimplefinNotifier extends StateNotifier<SimplefinState> {
+  SimplefinNotifier(this._ref) : super(const SimplefinState()) {
+    _loadStatus();
+  }
+
+  final Ref _ref;
+
+  /// Called on startup — asks the server if a SimpleFIN access URL is already
+  /// stored, so the UI can show the correct connected/disconnected state.
+  Future<void> _loadStatus() async {
+    try {
+      final dio = _ref.read(apiClientProvider);
+      final res = await dio.get<Map<String, dynamic>>('/api/simplefin/status');
+      final data = res.data!;
+      if (data['connected'] == true) {
+        state = state.copyWith(
+          status: SimplefinConnectionStatus.connected,
+          connectedInstitutions:
+              List<String>.from(data['institutions'] as List? ?? []),
+          lastSyncedAt: data['last_synced_at'] != null
+              ? DateTime.tryParse(data['last_synced_at'] as String)
+              : null,
+        );
+      }
+    } catch (_) {
+      // Server unreachable or not yet set up — stay disconnected, silently.
+    }
+  }
+
+  /// User pastes their one-time SimpleFIN setup token here.
+  /// The server exchanges it for a permanent access URL and stores it.
+  Future<void> connect(String setupToken) async {
+    state = state.copyWith(
+      status: SimplefinConnectionStatus.syncing,
+      errorMessage: null,
+    );
+    try {
+      final dio = _ref.read(apiClientProvider);
+      final res = await dio.post<Map<String, dynamic>>(
+        '/api/simplefin/connect',
+        data: {'setup_token': setupToken.trim()},
+      );
+      final data = res.data!;
+      state = state.copyWith(
+        status: SimplefinConnectionStatus.connected,
+        connectedInstitutions:
+            List<String>.from(data['institutions'] as List? ?? []),
+        lastSyncedAt: DateTime.now(),
+      );
+    } catch (e) {
+      state = state.copyWith(
+        status: SimplefinConnectionStatus.error,
+        errorMessage: e.toString(),
+      );
+      rethrow;
+    }
+  }
+
+  /// Triggers a fresh fetch from SimpleFIN via the server.
+  /// The server pulls new transactions/balances and they appear on next sync.
+  Future<void> fetchLatest() async {
+    state = state.copyWith(status: SimplefinConnectionStatus.syncing);
+    try {
+      final dio = _ref.read(apiClientProvider);
+      await dio.post<void>('/api/simplefin/fetch');
+      state = state.copyWith(
+        status: SimplefinConnectionStatus.connected,
+        lastSyncedAt: DateTime.now(),
+      );
+    } catch (e) {
+      state = state.copyWith(
+        status: SimplefinConnectionStatus.error,
+        errorMessage: e.toString(),
+      );
+      rethrow;
+    }
+  }
+
+  /// Removes the stored access URL from the server.
+  Future<void> disconnect() async {
+    try {
+      final dio = _ref.read(apiClientProvider);
+      await dio.delete<void>('/api/simplefin/disconnect');
+    } catch (_) {
+      // Best-effort
+    }
+    state = const SimplefinState();
+  }
+}
+
+final simplefinProvider =
+    StateNotifierProvider<SimplefinNotifier, SimplefinState>(
+  (ref) => SimplefinNotifier(ref),
+);
