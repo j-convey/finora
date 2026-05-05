@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../../app/providers/theme_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../transactions/presentation/providers/transactions_provider.dart';
 import '../../../accounts/presentation/providers/accounts_provider.dart';
@@ -114,17 +115,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
           // ── Appearance ───────────────────────────────────────
           _SectionHeader(title: 'Appearance'),
-          ListTile(
-            leading: const Icon(Icons.dark_mode_outlined),
-            title: const Text('Theme'),
-            subtitle: const Text('System default (dark)'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Theme switching coming soon')),
-              );
-            },
-          ),
+          _AppearanceTile(),
           const Divider(),
 
           // ── Data ─────────────────────────────────────────────
@@ -226,6 +217,58 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
             child: const Text('Clear'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Appearance tile ──────────────────────────────────────────────────────────
+
+class _AppearanceTile extends ConsumerWidget {
+  const _AppearanceTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final current = ref.watch(themeModeProvider);
+    final notifier = ref.read(themeModeProvider.notifier);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.palette_outlined, size: 20),
+              const SizedBox(width: 12),
+              Text('Theme', style: Theme.of(context).textTheme.titleMedium),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SegmentedButton<ThemeMode>(
+            segments: const [
+              ButtonSegment(
+                value: ThemeMode.light,
+                icon: Icon(Icons.light_mode_outlined),
+                label: Text('Light'),
+              ),
+              ButtonSegment(
+                value: ThemeMode.system,
+                icon: Icon(Icons.brightness_auto_outlined),
+                label: Text('System'),
+              ),
+              ButtonSegment(
+                value: ThemeMode.dark,
+                icon: Icon(Icons.dark_mode_outlined),
+                label: Text('Dark'),
+              ),
+            ],
+            selected: {current},
+            onSelectionChanged: (selection) =>
+                notifier.setMode(selection.first),
+            showSelectedIcon: false,
           ),
         ],
       ),
