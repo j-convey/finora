@@ -1,5 +1,7 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+import '../../features/accounts/data/models/account_model.dart';
 import '../../features/transactions/data/models/transaction_model.dart';
 
 class TransactionCard extends StatelessWidget {
@@ -7,10 +9,22 @@ class TransactionCard extends StatelessWidget {
     super.key,
     required this.transaction,
     this.onDismissed,
+    this.account,
+    this.onTap,
+    this.onCategoryTap,
   });
 
   final TransactionModel transaction;
   final VoidCallback? onDismissed;
+  final AccountModel? account;
+  final VoidCallback? onTap;
+  final VoidCallback? onCategoryTap;
+
+  static String _accountLabel(AccountModel a) {
+    final institution = a.institutionName?.isNotEmpty == true ? a.institutionName! : null;
+    final parts = [if (institution != null) institution, a.name];
+    return parts.join(' · ');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +44,7 @@ class TransactionCard extends StatelessWidget {
     final tile = Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
+        onTap: onTap,
         leading: CircleAvatar(
           backgroundColor: isIncome
               ? const Color(0xFF4CAF50).withAlpha(isPending ? 15 : 30)
@@ -74,10 +89,32 @@ class TransactionCard extends StatelessWidget {
             ],
           ],
         ),
-        subtitle: Text(
-          '${transaction.category} · ${TransactionCard.relativeDate(transaction.date)}',
-          style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
-        ),
+        subtitle: account != null
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _CategoryLine(
+                    transaction: transaction,
+                    onCategoryTap: onCategoryTap,
+                    style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                    primaryColor: cs.primary,
+                  ),
+                  Text(
+                    _accountLabel(account!),
+                    style: tt.labelSmall?.copyWith(
+                      color: cs.onSurfaceVariant.withAlpha(178),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              )
+            : _CategoryLine(
+                transaction: transaction,
+                onCategoryTap: onCategoryTap,
+                style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                primaryColor: cs.primary,
+              ),
         trailing: Text(
           '$amountPrefix\$${transaction.amount.toStringAsFixed(2)}',
           style: tt.bodyMedium?.copyWith(
@@ -113,5 +150,58 @@ class TransactionCard extends StatelessWidget {
     if (diff == 1) return 'Yesterday';
     if (diff < 7) return '$diff days ago';
     return '${date.month}/${date.day}/${date.year}';
+  }
+}
+
+/// Renders the "Category · Date" subtitle line, with the category portion
+/// optionally tappable for inline re-categorization.
+class _CategoryLine extends StatelessWidget {
+  const _CategoryLine({
+    required this.transaction,
+    required this.onCategoryTap,
+    required this.style,
+    required this.primaryColor,
+  });
+
+  final TransactionModel transaction;
+  final VoidCallback? onCategoryTap;
+  final TextStyle? style;
+  final Color primaryColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final dateText = ' · ${TransactionCard.relativeDate(transaction.date)}';
+
+    if (onCategoryTap == null) {
+      return Text('${transaction.category}$dateText', style: style);
+    }
+
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: transaction.category,
+            style: style?.copyWith(
+              color: primaryColor,
+              fontWeight: FontWeight.w600,
+              decoration: TextDecoration.underline,
+              decorationColor: primaryColor.withAlpha(120),
+            ),
+            recognizer: _tapRecognizer(onCategoryTap!),
+          ),
+          TextSpan(text: dateText, style: style),
+        ],
+      ),
+    );
+  }
+
+  // Lazy-import gesture recognizer only when needed
+  static _CategoryTapRecognizer _tapRecognizer(VoidCallback cb) =>
+      _CategoryTapRecognizer(cb);
+}
+
+class _CategoryTapRecognizer extends TapGestureRecognizer {
+  _CategoryTapRecognizer(VoidCallback cb) {
+    onTap = cb;
   }
 }

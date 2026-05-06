@@ -4,7 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/widgets/transaction_card.dart';
+import '../../../../shared/widgets/transaction_details_sheet.dart';
+import '../../../accounts/presentation/providers/accounts_provider.dart';
 import '../../../transactions/data/models/transaction_model.dart';
+import '../providers/categories_provider.dart';
 import '../providers/transactions_provider.dart';
 
 class TransactionsPage extends ConsumerStatefulWidget {
@@ -20,6 +23,7 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
   @override
   Widget build(BuildContext context) {
     final all = ref.watch(transactionsProvider);
+    final accountsById = {for (final a in ref.watch(accountsProvider)) a.id: a};
     final filtered = _query.isEmpty
         ? all
         : all
@@ -109,6 +113,9 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
                   ...entry.value.map(
                     (t) => TransactionCard(
                       transaction: t,
+                      account: t.accountId != null ? accountsById[t.accountId] : null,
+                      onTap: () => showTransactionDetails(context, ref, t),
+                      onCategoryTap: () => showCategoryPicker(context, ref, t),
                       onDismissed: () => ref
                           .read(transactionsProvider.notifier)
                           .removeTransaction(t.id),
@@ -173,13 +180,7 @@ class _AddTransactionSheetState extends ConsumerState<_AddTransactionSheet> {
   final _titleCtrl = TextEditingController();
   final _amountCtrl = TextEditingController();
   TransactionType _type = TransactionType.expense;
-  String _category = 'Groceries';
-
-  static const _categories = [
-    'Groceries', 'Dining', 'Transport', 'Entertainment',
-    'Utilities', 'Health', 'Shopping', 'Subscriptions',
-    'Rent', 'Travel', 'Income',
-  ];
+  String? _category;
 
   @override
   void dispose() {
@@ -191,13 +192,15 @@ class _AddTransactionSheetState extends ConsumerState<_AddTransactionSheet> {
   void _save() {
     final amount = double.tryParse(_amountCtrl.text);
     if (_titleCtrl.text.isEmpty || amount == null) return;
+    final categories = ref.read(categoriesProvider);
+    final selectedCategory = _category ?? (categories.isNotEmpty ? categories.first : 'Uncategorized');
     ref.read(transactionsProvider.notifier).addTransaction(
           TransactionModel(
             id: 'u${DateTime.now().millisecondsSinceEpoch}',
             title: _titleCtrl.text.trim(),
             amount: amount,
             type: _type,
-            category: _category,
+            category: selectedCategory,
             date: DateTime.now(),
           ),
         );
@@ -262,22 +265,26 @@ class _AddTransactionSheetState extends ConsumerState<_AddTransactionSheet> {
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
           ),
           const SizedBox(height: 12),
-          InputDecorator(
-            decoration: const InputDecoration(
-              labelText: 'Category',
-              border: OutlineInputBorder(),
-            ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: _category,
-                isDense: true,
-                items: _categories
-                    .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-                    .toList(),
-                onChanged: (v) => setState(() => _category = v!),
+          Consumer(builder: (context, ref, _) {
+            final categories = ref.watch(categoriesProvider);
+            final selected = _category ?? (categories.isNotEmpty ? categories.first : null);
+            return InputDecorator(
+              decoration: const InputDecoration(
+                labelText: 'Category',
+                border: OutlineInputBorder(),
               ),
-            ),
-          ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: selected,
+                  isDense: true,
+                  items: categories
+                      .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                      .toList(),
+                  onChanged: (v) => setState(() => _category = v),
+                ),
+              ),
+            );
+          }),
           const SizedBox(height: 20),
           FilledButton(
             onPressed: _save,
@@ -288,3 +295,4 @@ class _AddTransactionSheetState extends ConsumerState<_AddTransactionSheet> {
     );
   }
 }
+

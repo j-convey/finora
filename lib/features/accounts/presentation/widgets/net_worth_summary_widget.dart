@@ -40,15 +40,21 @@ class NetWorthSummaryWidget extends StatelessWidget {
                   size: 16,
                 ),
                 const SizedBox(width: 4),
-                Text(
-                  '${isPositive ? '+' : ''}${formatCurrency(history.netWorthChange)} (${isPositive ? '+' : ''}${history.netWorthChangePercentage.toStringAsFixed(1)}%)',
-                  style: tt.labelSmall?.copyWith(color: changeColor),
+                Flexible(
+                  child: Text(
+                    '${isPositive ? '+' : ''}${formatCurrency(history.netWorthChange)} (${isPositive ? '+' : ''}${history.netWorthChangePercentage.toStringAsFixed(1)}%)',
+                    style: tt.labelSmall?.copyWith(color: changeColor),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  '1 month change',
-                  style: tt.labelSmall
-                      ?.copyWith(color: cs.onPrimaryContainer.withAlpha(178)),
+                Flexible(
+                  child: Text(
+                    '1 month change',
+                    style: tt.labelSmall
+                        ?.copyWith(color: cs.onPrimaryContainer.withAlpha(178)),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),

@@ -61,6 +61,23 @@ class TransactionModel {
             : null,
       );
 
+  TransactionModel copyWith({String? category}) => TransactionModel(
+        id: id,
+        title: title,
+        amount: amount,
+        type: type,
+        category: category ?? this.category,
+        date: date,
+        accountId: accountId,
+        notes: notes,
+        originalDescription: originalDescription,
+        merchantName: merchantName,
+        providerTransactionId: providerTransactionId,
+        pending: pending,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+
   static TransactionType _typeFromString(String s) => switch (s) {
         'income' => TransactionType.income,
         'transfer' => TransactionType.transfer,

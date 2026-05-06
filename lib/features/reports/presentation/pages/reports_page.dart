@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/widgets/transaction_card.dart';
+import '../../../../shared/widgets/transaction_details_sheet.dart';
+import '../../../accounts/presentation/providers/accounts_provider.dart';
 import '../../../transactions/data/models/transaction_model.dart';
 import '../../data/models/report_period.dart';
 import '../../data/models/report_summary.dart';
@@ -264,7 +266,7 @@ class _LegendDot extends StatelessWidget {
 
 // ── Spending / Income tab ─────────────────────────────────────────────────────
 
-class _CategoryTab extends StatefulWidget {
+class _CategoryTab extends ConsumerStatefulWidget {
   const _CategoryTab({
     required this.categories,
     required this.total,
@@ -284,15 +286,16 @@ class _CategoryTab extends StatefulWidget {
   final int tab;
 
   @override
-  State<_CategoryTab> createState() => _CategoryTabState();
+  ConsumerState<_CategoryTab> createState() => _CategoryTabState();
 }
 
-class _CategoryTabState extends State<_CategoryTab> {
+class _CategoryTabState extends ConsumerState<_CategoryTab> {
   bool _showAllCategories = false;
 
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
+    final accountsById = {for (final a in ref.watch(accountsProvider)) a.id: a};
 
     final displayedCats = _showAllCategories
         ? widget.categories
@@ -357,7 +360,12 @@ class _CategoryTabState extends State<_CategoryTab> {
           ),
           const SizedBox(height: 8),
           ...widget.recentTransactions
-              .map((t) => TransactionCard(transaction: t)),
+              .map((t) => TransactionCard(
+                    transaction: t,
+                    account: t.accountId != null ? accountsById[t.accountId] : null,
+                    onTap: () => showTransactionDetails(context, ref, t),
+                    onCategoryTap: () => showCategoryPicker(context, ref, t),
+                  )),
         ],
       ],
     );

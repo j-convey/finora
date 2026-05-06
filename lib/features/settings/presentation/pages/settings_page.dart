@@ -5,9 +5,11 @@ import 'package:go_router/go_router.dart';
 import '../../../../../app/providers/theme_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../transactions/presentation/providers/transactions_provider.dart';
+import '../../../transactions/presentation/providers/categories_provider.dart';
 import '../../../accounts/presentation/providers/accounts_provider.dart';
 import '../../../budgets/presentation/providers/budgets_provider.dart';
 import '../providers/simplefin_provider.dart';
+import '../../../accounts/presentation/providers/net_worth_history_provider.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -174,6 +176,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         ref.read(transactionsProvider.notifier).sync(),
         ref.read(accountsProvider.notifier).sync(),
         ref.read(budgetsProvider.notifier).sync(),
+        ref.read(netWorthHistoryProvider.notifier).fetch(),
+        ref.read(categoriesProvider.notifier).sync(),
       ]);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -209,6 +213,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           FilledButton(
             onPressed: () {
               Navigator.pop(ctx);
+              ref.read(transactionsProvider.notifier).clear();
+              ref.read(accountsProvider.notifier).clear();
+              ref.read(budgetsProvider.notifier).clear();
+              ref.read(categoriesProvider.notifier).clear();
+              ref.read(netWorthHistoryProvider.notifier).clear();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Local data cleared')),
               );

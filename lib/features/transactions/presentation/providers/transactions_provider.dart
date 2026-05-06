@@ -23,6 +23,27 @@ class TransactionsNotifier extends StateNotifier<List<TransactionModel>> {
   void removeTransaction(String id) {
     state = state.where((t) => t.id != id).toList();
   }
+
+  void clear() {
+    state = [];
+  }
+
+  Future<void> updateCategory(String id, String category) async {
+    // Optimistic update
+    state = state
+        .map((t) => t.id == id ? t.copyWith(category: category) : t)
+        .toList();
+    try {
+      final dio = _ref.read(apiClientProvider);
+      await dio.patch<void>(
+        '/api/transactions/$id',
+        data: {'category': category},
+      );
+    } catch (_) {
+      // Revert on failure by re-syncing
+      await sync();
+    }
+  }
 }
 
 final transactionsProvider =

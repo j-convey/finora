@@ -116,11 +116,15 @@ class _AccountGroup extends StatelessWidget {
                     ],
                   ),
                 ),
-                Text(
-                  formatCurrency(total),
-                  style: tt.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: total < 0 ? const Color(0xFFEF5350) : cs.onSurface,
+                Flexible(
+                  child: Text(
+                    formatCurrency(total),
+                    style: tt.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: total < 0 ? const Color(0xFFEF5350) : cs.onSurface,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.end,
                   ),
                 ),
               ],

@@ -25,6 +25,10 @@ class NetWorthHistoryNotifier
       state = AsyncValue.error(e, st);
     }
   }
+
+  void clear() {
+    state = const AsyncValue.data(NetWorthHistory(entries: []));
+  }
 }
 
 final netWorthHistoryProvider =

@@ -8,6 +8,10 @@ class BudgetsNotifier extends StateNotifier<List<BudgetModel>> {
 
   final Ref _ref;
 
+  void clear() {
+    state = [];
+  }
+
   Future<void> sync() async {
     final dio = _ref.read(apiClientProvider);
     final response = await dio.get<List<dynamic>>('/api/budgets');

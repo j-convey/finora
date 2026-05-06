@@ -15,6 +15,10 @@ class AccountsNotifier extends StateNotifier<List<AccountModel>> {
         .map((j) => AccountModel.fromJson(j as Map<String, dynamic>))
         .toList();
   }
+
+  void clear() {
+    state = [];
+  }
 }
 
 final accountsProvider =

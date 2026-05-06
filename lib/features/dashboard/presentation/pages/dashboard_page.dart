@@ -4,16 +4,35 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/providers/shell_index_provider.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../accounts/data/models/account_model.dart';
 import '../../../accounts/presentation/providers/accounts_provider.dart';
 import '../../../budgets/presentation/providers/budgets_provider.dart';
 import '../../../transactions/data/models/transaction_model.dart';
+import '../../../transactions/presentation/providers/categories_provider.dart';
 import '../../../transactions/presentation/providers/transactions_provider.dart';
+import '../../../../shared/widgets/transaction_details_sheet.dart';
 
-class DashboardPage extends ConsumerWidget {
+class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends ConsumerState<DashboardPage> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(transactionsProvider.notifier).sync();
+      ref.read(accountsProvider.notifier).sync();
+      ref.read(budgetsProvider.notifier).sync();
+      ref.read(categoriesProvider.notifier).sync();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final accounts = ref.watch(accountsProvider);
     final transactions = ref.watch(transactionsProvider);
     final width = MediaQuery.sizeOf(context).width;
@@ -71,8 +90,10 @@ class DashboardPage extends ConsumerWidget {
 
     final netWorthCard = _NetWorthCard(netWorth: netWorth);
 
+    final accountsById = {for (final a in accounts) a.id: a};
     final transactionsCard = _RecentTransactionsCard(
       transactions: transactions.take(5).toList(),
+      accountsById: accountsById,
       onSeeAll: () => ref.read(shellIndexProvider.notifier).state = 1,
     );
 
@@ -657,10 +678,12 @@ class _NetWorthCard extends StatelessWidget {
 class _RecentTransactionsCard extends StatelessWidget {
   const _RecentTransactionsCard({
     required this.transactions,
+    required this.accountsById,
     required this.onSeeAll,
   });
 
   final List<TransactionModel> transactions;
+  final Map<String, AccountModel> accountsById;
   final VoidCallback onSeeAll;
 
   @override
@@ -699,7 +722,10 @@ class _RecentTransactionsCard extends StatelessWidget {
                 ),
               )
             else
-              ...transactions.map((t) => _TransactionRow(transaction: t)),
+              ...transactions.map((t) => _TransactionRow(
+                transaction: t,
+                account: t.accountId != null ? accountsById[t.accountId] : null,
+              )),
           ],
         ),
       ),
@@ -707,13 +733,20 @@ class _RecentTransactionsCard extends StatelessWidget {
   }
 }
 
-class _TransactionRow extends StatelessWidget {
-  const _TransactionRow({required this.transaction});
+class _TransactionRow extends ConsumerWidget {
+  const _TransactionRow({required this.transaction, this.account});
 
   final TransactionModel transaction;
+  final AccountModel? account;
+
+  static String _accountLabel(AccountModel a) {
+    final institution = a.institutionName?.isNotEmpty == true ? a.institutionName! : null;
+    final parts = [if (institution != null) institution, a.name];
+    return parts.join(' · ');
+  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
     final isIncome = transaction.isIncome;
@@ -721,46 +754,58 @@ class _TransactionRow extends StatelessWidget {
         transaction.pending ? cs.onSurfaceVariant : isIncome ? const Color(0xFF4CAF50) : cs.onSurface;
     final prefix = isIncome ? '+' : '-';
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 18,
-            backgroundColor: cs.surfaceContainerHighest,
-            child: Icon(
-              TransactionModel.iconForCategory(transaction.category),
-              size: 18,
-              color: cs.onSurfaceVariant,
+    return InkWell(
+      onTap: () => showTransactionDetails(context, ref, transaction),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 18,
+              backgroundColor: cs.surfaceContainerHighest,
+              child: Icon(
+                TransactionModel.iconForCategory(transaction.category),
+                size: 18,
+                color: cs.onSurfaceVariant,
+              ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  transaction.merchantName ?? transaction.title,
-                  style: tt.bodyMedium,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  transaction.category,
-                  style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
-                ),
-              ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    transaction.merchantName ?? transaction.title,
+                    style: tt.bodyMedium,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    transaction.category,
+                    style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                  ),
+                  if (account != null)
+                    Text(
+                      _accountLabel(account!),
+                      style: tt.labelSmall?.copyWith(
+                        color: cs.onSurfaceVariant.withAlpha(178),
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                ],
+              ),
             ),
-          ),
-          Text(
-            '$prefix${formatCurrency(transaction.amount)}',
-            style: tt.bodyMedium?.copyWith(
-              color: amountColor,
-              fontWeight: FontWeight.w600,
+            Text(
+              '$prefix${formatCurrency(transaction.amount)}',
+              style: tt.bodyMedium?.copyWith(
+                color: amountColor,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-          const SizedBox(width: 4),
-          Icon(Icons.chevron_right, size: 16, color: cs.onSurfaceVariant),
-        ],
+            const SizedBox(width: 4),
+            Icon(Icons.chevron_right, size: 16, color: cs.onSurfaceVariant),
+          ],
+        ),
       ),
     );
   }
