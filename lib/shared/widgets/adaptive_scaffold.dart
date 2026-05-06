@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/providers/shell_index_provider.dart';
+import '../../app/providers/sidebar_provider.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/transactions/presentation/pages/transactions_page.dart';
 import '../../features/accounts/presentation/pages/accounts_page.dart';
 import '../../features/budgets/presentation/pages/budgets_page.dart';
+import '../../features/reports/presentation/pages/reports_page.dart';
 
 class _Destination {
   const _Destination({
@@ -24,6 +26,7 @@ const _destinations = [
   _Destination(label: 'Transactions', icon: Icons.receipt_long_outlined, selectedIcon: Icons.receipt_long),
   _Destination(label: 'Accounts', icon: Icons.account_balance_wallet_outlined, selectedIcon: Icons.account_balance_wallet),
   _Destination(label: 'Budgets', icon: Icons.donut_large_outlined, selectedIcon: Icons.donut_large),
+  _Destination(label: 'Reports', icon: Icons.assessment_outlined, selectedIcon: Icons.assessment),
 ];
 
 /// Main shell widget. Uses [IndexedStack] for tab state preservation.
@@ -38,6 +41,7 @@ class MainShell extends ConsumerWidget {
     TransactionsPage(),
     AccountsPage(),
     BudgetsPage(),
+    ReportsPage(),
   ];
 
   @override
@@ -56,7 +60,7 @@ class MainShell extends ConsumerWidget {
 
 // ── Wide layout ──────────────────────────────────────────────────────────────
 
-class _WideLayout extends StatelessWidget {
+class _WideLayout extends ConsumerWidget {
   const _WideLayout({
     required this.selectedIndex,
     required this.onTap,
@@ -68,9 +72,9 @@ class _WideLayout extends StatelessWidget {
   final Widget body;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final sidebarExpanded = ref.watch(sidebarExpandedProvider);
     final cs = Theme.of(context).colorScheme;
-    final extended = MediaQuery.sizeOf(context).width >= 900;
 
     return Scaffold(
       body: Row(
@@ -78,13 +82,11 @@ class _WideLayout extends StatelessWidget {
           NavigationRail(
             selectedIndex: selectedIndex,
             onDestinationSelected: onTap,
-            extended: extended,
-            labelType: extended
-                ? NavigationRailLabelType.none
-                : NavigationRailLabelType.all,
+            extended: sidebarExpanded,
+            labelType: NavigationRailLabelType.none,
             leading: Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
-              child: extended
+              child: sidebarExpanded
                   ? Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -102,10 +104,26 @@ class _WideLayout extends StatelessWidget {
                     )
                   : Icon(Icons.account_balance, color: cs.primary, size: 26),
             ),
-            trailing: IconButton(
-              icon: const Icon(Icons.settings_outlined),
-              tooltip: 'Settings',
-              onPressed: () => context.push('/settings'),
+            trailing: Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(sidebarExpanded ? Icons.chevron_left : Icons.chevron_right),
+                    tooltip: sidebarExpanded ? 'Collapse sidebar' : 'Expand sidebar',
+                    onPressed: () {
+                      ref.read(sidebarExpandedProvider.notifier).state = !sidebarExpanded;
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  IconButton(
+                    icon: const Icon(Icons.settings_outlined),
+                    tooltip: 'Settings',
+                    onPressed: () => context.push('/settings'),
+                  ),
+                ],
+              ),
             ),
             destinations: _destinations
                 .map(

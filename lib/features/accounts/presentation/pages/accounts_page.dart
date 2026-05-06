@@ -2,185 +2,189 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/utils/currency_formatter.dart';
 import '../../data/models/account_model.dart';
 import '../providers/accounts_provider.dart';
+import '../providers/net_worth_history_provider.dart';
+import '../widgets/asset_liability_summary_panel.dart';
+import '../widgets/grouped_accounts_widget.dart';
+import '../widgets/net_worth_chart_widget.dart';
+import '../widgets/net_worth_summary_widget.dart';
 
-class AccountsPage extends ConsumerWidget {
+class AccountsPage extends ConsumerStatefulWidget {
   const AccountsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final accounts = ref.watch(accountsProvider);
-    final cs = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
+  ConsumerState<AccountsPage> createState() => _AccountsPageState();
+}
 
-    final netWorth = accounts.fold(0.0, (s, a) => s + a.balance);
-    final assets = accounts
-        .where((a) => a.balance > 0)
-        .fold(0.0, (s, a) => s + a.balance);
-    final liabilities = accounts
-        .where((a) => a.balance < 0)
-        .fold(0.0, (s, a) => s + a.balance.abs());
+class _AccountsPageState extends ConsumerState<AccountsPage> {
+  @override
+  void initState() {
+    super.initState();
+    // Load data on page initialization
+    Future.microtask(() {
+      ref.read(netWorthHistoryProvider.notifier).fetch();
+      ref.read(accountsProvider.notifier).sync();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final accountsList = ref.watch(accountsProvider);
+    final netWorthHistory = ref.watch(netWorthHistoryProvider);
+    final isMobile = MediaQuery.of(context).size.width < 800;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Accounts'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.refresh_outlined),
+            tooltip: 'Refresh all',
+            onPressed: () {
+              ref.read(accountsProvider.notifier).sync();
+              ref.read(netWorthHistoryProvider.notifier).fetch();
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.add_outlined),
+            tooltip: 'Add account',
+            onPressed: () {
+              // TODO: Navigate to add account page
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Add account feature coming soon')),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.settings_outlined),
             onPressed: () => context.push('/settings'),
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: isMobile
+          ? _buildMobileLayout(accountsList, netWorthHistory)
+          : _buildDesktopLayout(accountsList, netWorthHistory),
+    );
+  }
+
+  Widget _buildMobileLayout(
+    List<AccountModel> accounts,
+    AsyncValue<dynamic> netWorthHistory,
+  ) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Net worth summary
-          Card(
-            color: cs.primaryContainer,
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _NetWorthStat(
-                    label: 'Net Worth',
-                    value: formatCurrency(netWorth),
-                    valueColor: cs.onPrimaryContainer,
-                  ),
-                  _NetWorthStat(
-                    label: 'Assets',
-                    value: formatCurrency(assets),
-                    valueColor: const Color(0xFF4CAF50),
-                  ),
-                  _NetWorthStat(
-                    label: 'Liabilities',
-                    value: formatCurrency(liabilities),
-                    valueColor: const Color(0xFFEF5350),
-                  ),
-                ],
+          netWorthHistory.when(
+            data: (history) =>
+                NetWorthSummaryWidget(history: history),
+            loading: () => const Card(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ),
+            error: (e, st) => Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Center(
+                  child: Text('Error loading net worth: $e'),
+                ),
               ),
             ),
           ),
-          const SizedBox(height: 20),
-          Text('All Accounts', style: tt.titleMedium),
-          const SizedBox(height: 8),
-          ...accounts.map((a) => _AccountCard(account: a)),
+          const SizedBox(height: 16),
+          // Net worth chart
+          netWorthHistory.when(
+            data: (history) => NetWorthChartWidget(history: history),
+            loading: () => const Card(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ),
+            error: (e, st) => const SizedBox.shrink(),
+          ),
+          const SizedBox(height: 16),
+          // Grouped accounts
+          GroupedAccountsWidget(accounts: accounts),
         ],
       ),
     );
   }
-}
 
-class _NetWorthStat extends StatelessWidget {
-  const _NetWorthStat(
-      {required this.label, required this.value, required this.valueColor});
-  final String label;
-  final String value;
-  final Color valueColor;
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    final cs = Theme.of(context).colorScheme;
-    return Column(
-      children: [
-        Text(label,
-            style: tt.labelSmall
-                ?.copyWith(color: cs.onPrimaryContainer.withAlpha(178))),
-        const SizedBox(height: 4),
-        Text(value,
-            style: tt.titleSmall
-                ?.copyWith(color: valueColor, fontWeight: FontWeight.bold)),
-      ],
-    );
-  }
-}
-
-class _AccountCard extends StatelessWidget {
-  const _AccountCard({required this.account});
-  final AccountModel account;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
-    final isNegative = account.balance < 0;
-    final color = account.color ?? cs.primary;
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: color.withAlpha(30),
-              child: Icon(AccountModel.iconForType(account.type),
-                  color: color, size: 22),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
+  Widget _buildDesktopLayout(
+    List<AccountModel> accounts,
+    AsyncValue<dynamic> netWorthHistory,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Left column - main content
+          Expanded(
+            flex: 2,
+            child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(account.name,
-                      style: tt.bodyLarge
-                          ?.copyWith(fontWeight: FontWeight.w500)),
-                  Text(
-                    [
-                      AccountModel.labelForType(account.type),
-                      if (account.institutionName != null)
-                        account.institutionName!,
-                    ].join(' · '),
-                    style: tt.bodySmall
-                        ?.copyWith(color: cs.onSurfaceVariant),
-                  ),
-                  if (account.availableBalance != null &&
-                      (account.type == AccountType.checking ||
-                          account.type == AccountType.savings)) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      'Available: ${formatCurrency(account.availableBalance!)}',
-                      style: tt.labelSmall
-                          ?.copyWith(color: cs.onSurfaceVariant),
+                  // Net worth summary
+                  netWorthHistory.when(
+                    data: (history) =>
+                        NetWorthSummaryWidget(history: history),
+                    loading: () => const Card(
+                      child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
                     ),
-                  ],
+                    error: (e, st) => Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Center(
+                          child: Text('Error loading net worth: $e'),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Net worth chart
+                  netWorthHistory.when(
+                    data: (history) =>
+                        NetWorthChartWidget(history: history),
+                    loading: () => const Card(
+                      child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                    ),
+                    error: (e, st) => const SizedBox.shrink(),
+                  ),
+                  const SizedBox(height: 16),
+                  // Grouped accounts
+                  GroupedAccountsWidget(accounts: accounts),
                 ],
               ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  formatCurrency(account.balance),
-                  style: tt.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: isNegative
-                        ? const Color(0xFFEF5350)
-                        : cs.onSurface,
-                  ),
-                ),
-                if (account.updatedAt != null)
-                  Text(
-                    _relativeTime(account.updatedAt!),
-                    style: tt.labelSmall
-                        ?.copyWith(color: cs.onSurfaceVariant),
-                  ),
-              ],
+          ),
+          const SizedBox(width: 16),
+          // Right column - summary panel
+          SizedBox(
+            width: 300,
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child:
+                    AssetLiabilitySummaryPanel(accounts: accounts),
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
-  }
-
-  static String _relativeTime(DateTime dt) {
-    final diff = DateTime.now().difference(dt);
-    if (diff.inMinutes < 1) return 'just now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-    if (diff.inHours < 24) return '${diff.inHours}h ago';
-    return '${diff.inDays}d ago';
   }
 }
