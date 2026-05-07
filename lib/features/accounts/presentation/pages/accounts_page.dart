@@ -80,7 +80,10 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
           // Net worth summary
           netWorthHistory.when(
             data: (history) =>
-                NetWorthSummaryWidget(history: history),
+                NetWorthSummaryWidget(
+                  history: history,
+                  currentAccounts: accounts,
+                ),
             loading: () => const Card(
               child: Padding(
                 padding: EdgeInsets.all(20),
@@ -135,7 +138,10 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
                   // Net worth summary
                   netWorthHistory.when(
                     data: (history) =>
-                        NetWorthSummaryWidget(history: history),
+                        NetWorthSummaryWidget(
+                          history: history,
+                          currentAccounts: accounts,
+                        ),
                     loading: () => const Card(
                       child: Padding(
                         padding: EdgeInsets.all(20),

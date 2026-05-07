@@ -1,19 +1,36 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/utils/currency_formatter.dart';
+import '../../data/models/account_model.dart';
 import '../../data/models/net_worth_history_model.dart';
 
 class NetWorthSummaryWidget extends StatelessWidget {
-  const NetWorthSummaryWidget({required this.history, super.key});
+  const NetWorthSummaryWidget({
+    required this.history,
+    required this.currentAccounts,
+    super.key,
+  });
 
   final NetWorthHistory history;
+  final List<AccountModel> currentAccounts;
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
 
-    final isPositive = history.netWorthChange >= 0;
+    // Current net worth = sum of all account balances
+    final currentNetWorth = currentAccounts.fold(0.0, (s, a) => s + a.balance);
+    
+    // Previous net worth = first entry from history (for 1-month change)
+    final previousNetWorth = history.previousNetWorth;
+    
+    // Calculate change and percentage
+    final change = currentNetWorth - previousNetWorth;
+    final changePercentage = previousNetWorth != 0
+        ? (change / previousNetWorth.abs()) * 100
+        : 0.0;
+    final isPositive = change >= 0;
     final changeColor =
         isPositive ? const Color(0xFF4CAF50) : const Color(0xFFEF5350);
 
@@ -28,7 +45,7 @@ class NetWorthSummaryWidget extends StatelessWidget {
                 style: tt.labelSmall
                     ?.copyWith(color: cs.onPrimaryContainer.withAlpha(178))),
             const SizedBox(height: 8),
-            Text(formatCurrency(history.currentNetWorth),
+            Text(formatCurrency(currentNetWorth),
                 style: tt.headlineMedium
                     ?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
@@ -42,7 +59,7 @@ class NetWorthSummaryWidget extends StatelessWidget {
                 const SizedBox(width: 4),
                 Flexible(
                   child: Text(
-                    '${isPositive ? '+' : ''}${formatCurrency(history.netWorthChange)} (${isPositive ? '+' : ''}${history.netWorthChangePercentage.toStringAsFixed(1)}%)',
+                    '${isPositive ? '+' : ''}${formatCurrency(change)} (${isPositive ? '+' : ''}${changePercentage.toStringAsFixed(1)}%)',
                     style: tt.labelSmall?.copyWith(color: changeColor),
                     overflow: TextOverflow.ellipsis,
                   ),

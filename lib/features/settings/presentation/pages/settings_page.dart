@@ -9,6 +9,7 @@ import '../../../transactions/presentation/providers/transactions_provider.dart'
 import '../../../transactions/presentation/providers/categories_provider.dart';
 import '../../../accounts/presentation/providers/accounts_provider.dart';
 import '../../../budgets/presentation/providers/budgets_provider.dart';
+import '../../../subscriptions/presentation/providers/subscriptions_provider.dart';
 import '../providers/database_backup_provider.dart';
 import '../providers/simplefin_provider.dart';
 import '../../../accounts/presentation/providers/net_worth_history_provider.dart';
@@ -210,6 +211,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         ref.read(transactionsProvider.notifier).sync(),
         ref.read(accountsProvider.notifier).sync(),
         ref.read(budgetsProvider.notifier).sync(),
+        ref.read(subscriptionsProvider.notifier).sync(),
         ref.read(netWorthHistoryProvider.notifier).fetch(),
         ref.read(categoriesProvider.notifier).sync(),
       ]);
@@ -401,6 +403,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     ref.read(transactionsProvider.notifier).clear();
     ref.read(accountsProvider.notifier).clear();
     ref.read(budgetsProvider.notifier).clear();
+    ref.read(subscriptionsProvider.notifier).clear();
     ref.read(categoriesProvider.notifier).clear();
     ref.read(netWorthHistoryProvider.notifier).clear();
   }

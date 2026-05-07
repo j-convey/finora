@@ -8,6 +8,7 @@ import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/transactions/presentation/pages/transactions_page.dart';
 import '../../features/accounts/presentation/pages/accounts_page.dart';
 import '../../features/budgets/presentation/pages/budgets_page.dart';
+import '../../features/subscriptions/presentation/pages/subscriptions_page.dart';
 import '../../features/reports/presentation/pages/reports_page.dart';
 
 class _Destination {
@@ -26,6 +27,7 @@ const _destinations = [
   _Destination(label: 'Transactions', icon: Icons.receipt_long_outlined, selectedIcon: Icons.receipt_long),
   _Destination(label: 'Accounts', icon: Icons.account_balance_wallet_outlined, selectedIcon: Icons.account_balance_wallet),
   _Destination(label: 'Budgets', icon: Icons.donut_large_outlined, selectedIcon: Icons.donut_large),
+  _Destination(label: 'Subscriptions', icon: Icons.subscriptions_outlined, selectedIcon: Icons.subscriptions),
   _Destination(label: 'Reports', icon: Icons.assessment_outlined, selectedIcon: Icons.assessment),
 ];
 
@@ -41,6 +43,7 @@ class MainShell extends ConsumerWidget {
     TransactionsPage(),
     AccountsPage(),
     BudgetsPage(),
+    SubscriptionsPage(),
     ReportsPage(),
   ];
 

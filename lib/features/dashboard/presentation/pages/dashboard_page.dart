@@ -7,6 +7,7 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../accounts/data/models/account_model.dart';
 import '../../../accounts/presentation/providers/accounts_provider.dart';
 import '../../../budgets/presentation/providers/budgets_provider.dart';
+import '../../../subscriptions/presentation/providers/subscriptions_provider.dart';
 import '../../../transactions/data/models/transaction_model.dart';
 import '../../../transactions/presentation/providers/categories_provider.dart';
 import '../../../transactions/presentation/providers/transactions_provider.dart';
@@ -27,6 +28,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
       ref.read(transactionsProvider.notifier).sync();
       ref.read(accountsProvider.notifier).sync();
       ref.read(budgetsProvider.notifier).sync();
+      ref.read(subscriptionsProvider.notifier).sync();
       ref.read(categoriesProvider.notifier).sync();
     });
   }
