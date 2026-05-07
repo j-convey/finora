@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../providers/auth_provider.dart';
 
+enum _ServerState { idle, checking, ok, error }
+
+/// Single-screen auth page.
+///
+/// Layout:
+///   • Server URL field — on focus-lost, probes the server.
+///   • Once server is reachable: Email + Password fields appear.
+///   • If server has no users yet: "First Time Setup" button appears
+///     alongside the regular Sign In button.
 class SetupPage extends ConsumerStatefulWidget {
   const SetupPage({super.key});
 
@@ -12,27 +20,102 @@ class SetupPage extends ConsumerStatefulWidget {
 }
 
 class _SetupPageState extends ConsumerState<SetupPage> {
-  final _urlController =
-      TextEditingController(text: 'http://localhost:8080');
+  final _urlController = TextEditingController(text: 'http://localhost:8080');
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _urlFocus = FocusNode();
+
+  bool _obscurePassword = true;
+  _ServerState _serverState = _ServerState.idle;
+  bool? _serverHasUsers; // null = not probed yet
+
+  @override
+  void initState() {
+    super.initState();
+    _urlFocus.addListener(_onUrlFocusChange);
+
+    // If a server URL is already stored, probe it immediately.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final storedUrl = ref.read(authProvider).serverUrl;
+      if (storedUrl.isNotEmpty) {
+        _urlController.text = storedUrl;
+        _probeServer();
+      }
+    });
+  }
 
   @override
   void dispose() {
+    _urlFocus.removeListener(_onUrlFocusChange);
     _urlController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _urlFocus.dispose();
     super.dispose();
   }
 
-  Future<void> _connect() async {
-    await ref
-        .read(authProvider.notifier)
-        .connect(_urlController.text.trim());
-    if (mounted) context.go('/home');
+  void _onUrlFocusChange() {
+    if (!_urlFocus.hasFocus) {
+      _probeServer();
+    }
+  }
+
+  Future<void> _probeServer() async {
+    final url = _urlController.text.trim();
+    if (url.isEmpty) return;
+
+    setState(() {
+      _serverState = _ServerState.checking;
+      _serverHasUsers = null;
+    });
+
+    final result =
+        await ref.read(authProvider.notifier).probeServer(url);
+
+    if (!mounted) return;
+
+    if (result.reachable) {
+      // Save the confirmed URL so other providers can use it.
+      await ref.read(authProvider.notifier).setServerUrl(url);
+    }
+
+    setState(() {
+      _serverState = result.reachable ? _ServerState.ok : _ServerState.error;
+      _serverHasUsers = result.reachable ? result.hasUsers : null;
+    });
+  }
+
+  Future<void> _login() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    if (email.isEmpty || password.isEmpty) return;
+    ref.read(authProvider.notifier).clearError();
+    await ref.read(authProvider.notifier).login(
+          email: email,
+          password: password,
+        );
+    // Router redirect takes over on success.
+  }
+
+  Future<void> _register() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    if (email.isEmpty || password.isEmpty) return;
+    ref.read(authProvider.notifier).clearError();
+    await ref.read(authProvider.notifier).register(
+          email: email,
+          password: password,
+        );
+    // Router redirect takes over on success.
   }
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-    final isLoading = ref.watch(authProvider).isLoading;
+    final auth = ref.watch(authProvider);
+    final serverReady = _serverState == _ServerState.ok;
+    final isLoading = auth.isLoading || _serverState == _ServerState.checking;
 
     return Scaffold(
       body: Center(
@@ -44,9 +127,9 @@ class _SetupPageState extends ConsumerState<SetupPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Logo
-                Icon(Icons.account_balance, size: 72, color: cs.primary),
-                const SizedBox(height: 16),
+                // ── Logo ─────────────────────────────────────────
+                Icon(Icons.account_balance, size: 64, color: cs.primary),
+                const SizedBox(height: 12),
                 Text(
                   'Finora',
                   textAlign: TextAlign.center,
@@ -55,57 +138,122 @@ class _SetupPageState extends ConsumerState<SetupPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 Text(
-                  'Self-hosted personal finance intelligence',
+                  'Self-hosted personal finance',
                   textAlign: TextAlign.center,
-                  style:
-                      tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+                  style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
                 ),
-                const SizedBox(height: 48),
-                Text('Server URL', style: tt.titleSmall),
-                const SizedBox(height: 8),
+                const SizedBox(height: 40),
+
+                // ── Server URL ────────────────────────────────────
                 TextField(
                   controller: _urlController,
-                  enabled: !isLoading,
-                  decoration: const InputDecoration(
-                    hintText: 'http://localhost:3000',
-                    prefixIcon: Icon(Icons.link_outlined),
-                    border: OutlineInputBorder(),
+                  focusNode: _urlFocus,
+                  enabled: !auth.isLoading,
+                  decoration: InputDecoration(
+                    labelText: 'Server URL',
+                    hintText: 'http://192.168.1.100:8080',
+                    prefixIcon: const Icon(Icons.dns_outlined),
+                    border: const OutlineInputBorder(),
+                    suffixIcon: switch (_serverState) {
+                      _ServerState.checking => const Padding(
+                          padding: EdgeInsets.all(12),
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                      _ServerState.ok => Icon(Icons.check_circle,
+                          color: const Color(0xFF4CAF50)),
+                      _ServerState.error => Icon(Icons.error_outline,
+                          color: cs.error),
+                      _ServerState.idle => null,
+                    },
                   ),
                   keyboardType: TextInputType.url,
+                  onSubmitted: (_) => _probeServer(),
                 ),
-                const SizedBox(height: 16),
-                FilledButton(
-                  onPressed: isLoading ? null : _connect,
-                  child: isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                if (_serverState == _ServerState.error) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    'Cannot reach server. Check the URL and try again.',
+                    style: tt.bodySmall?.copyWith(color: cs.error),
+                  ),
+                ],
+
+                // ── Credentials — shown once server is reachable ──
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeOut,
+                  child: serverReady
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const SizedBox(height: 16),
+                            TextField(
+                              controller: _emailController,
+                              enabled: !isLoading,
+                              decoration: const InputDecoration(
+                                labelText: 'Email',
+                                prefixIcon: Icon(Icons.email_outlined),
+                                border: OutlineInputBorder(),
+                              ),
+                              keyboardType: TextInputType.emailAddress,
+                            ),
+                            const SizedBox(height: 12),
+                            TextField(
+                              controller: _passwordController,
+                              enabled: !isLoading,
+                              obscureText: _obscurePassword,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                prefixIcon: const Icon(Icons.lock_outline),
+                                border: const OutlineInputBorder(),
+                                suffixIcon: IconButton(
+                                  icon: Icon(_obscurePassword
+                                      ? Icons.visibility_outlined
+                                      : Icons.visibility_off_outlined),
+                                  onPressed: () => setState(() =>
+                                      _obscurePassword = !_obscurePassword),
+                                ),
+                              ),
+                              onSubmitted: (_) => _login(),
+                            ),
+                            if (auth.error != null) ...[
+                              const SizedBox(height: 8),
+                              Text(
+                                auth.error!,
+                                style:
+                                    tt.bodySmall?.copyWith(color: cs.error),
+                              ),
+                            ],
+                            const SizedBox(height: 20),
+                            FilledButton(
+                              onPressed: isLoading ? null : _login,
+                              child: isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2),
+                                    )
+                                  : const Text('Sign In'),
+                            ),
+                            // First-time setup button — only when no users exist
+                            if (_serverHasUsers == false) ...[
+                              const SizedBox(height: 12),
+                              OutlinedButton.icon(
+                                onPressed: isLoading ? null : _register,
+                                icon: const Icon(Icons.person_add_outlined),
+                                label: const Text(
+                                    'First Time Setup — Create Account'),
+                              ),
+                            ],
+                          ],
                         )
-                      : const Text('Connect to Server'),
-                ),
-                const SizedBox(height: 12),
-                OutlinedButton.icon(
-                  onPressed: isLoading ? null : _connect,
-                  icon: const Icon(Icons.science_outlined),
-                  label: const Text('Launch Demo Mode'),
-                ),
-                const SizedBox(height: 32),
-                Row(
-                  children: [
-                    Expanded(child: Divider(color: cs.outlineVariant)),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Text(
-                        'Demo mode uses mock data — no server needed',
-                        style: tt.bodySmall
-                            ?.copyWith(color: cs.onSurfaceVariant),
-                      ),
-                    ),
-                    Expanded(child: Divider(color: cs.outlineVariant)),
-                  ],
+                      : const SizedBox.shrink(),
                 ),
               ],
             ),

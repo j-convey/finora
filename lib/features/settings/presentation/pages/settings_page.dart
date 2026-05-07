@@ -22,23 +22,13 @@ class SettingsPage extends ConsumerStatefulWidget {
 }
 
 class _SettingsPageState extends ConsumerState<SettingsPage> {
-  late TextEditingController _urlCtrl;
   bool _isSyncing = false;
   bool _isResettingDatabase = false;
   bool _isExporting = false;
   bool _isImporting = false;
 
   @override
-  void initState() {
-    super.initState();
-    _urlCtrl = TextEditingController(
-      text: ref.read(authProvider).serverUrl,
-    );
-  }
-
-  @override
   void dispose() {
-    _urlCtrl.dispose();
     super.dispose();
   }
 
@@ -51,67 +41,38 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         children: [
-          // ── Server Connection ────────────────────────────────
-          _SectionHeader(title: 'Server Connection'),
+          // ── Account ──────────────────────────────────────────
+          _SectionHeader(title: 'Account'),
           ListTile(
             leading: Icon(
-              auth.isConnected ? Icons.cloud_done_outlined : Icons.cloud_off_outlined,
-              color: auth.isConnected ? const Color(0xFF4CAF50) : cs.error,
+              auth.isAuthenticated
+                  ? Icons.cloud_done_outlined
+                  : Icons.cloud_off_outlined,
+              color: auth.isAuthenticated ? const Color(0xFF4CAF50) : cs.error,
             ),
-            title: const Text('Status'),
+            title: Text(auth.user?.displayName ?? 'Not signed in'),
             subtitle: Text(
-              auth.isConnected
-                  ? 'Connected to ${auth.serverUrl}'
-                  : 'Not connected',
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: TextField(
-              controller: _urlCtrl,
-              decoration: const InputDecoration(
-                labelText: 'Server URL',
-                prefixIcon: Icon(Icons.link_outlined),
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.url,
+              auth.isAuthenticated
+                  ? auth.user?.email ?? auth.serverUrl
+                  : auth.serverUrl.isNotEmpty
+                      ? 'Server: ${auth.serverUrl}'
+                      : 'Not connected',
             ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () async {
-                      await ref
-                          .read(authProvider.notifier)
-                          .connect(_urlCtrl.text.trim());
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Reconnected successfully')),
-                        );
-                      }
-                    },
-                    child: const Text('Reconnect'),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: FilledButton(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: cs.errorContainer,
-                      foregroundColor: cs.onErrorContainer,
-                    ),
-                    onPressed: () {
-                      ref.read(authProvider.notifier).disconnect();
-                      context.go('/setup');
-                    },
-                    child: const Text('Disconnect'),
-                  ),
-                ),
-              ],
+            child: FilledButton.tonalIcon(
+              style: FilledButton.styleFrom(
+                backgroundColor: cs.errorContainer,
+                foregroundColor: cs.onErrorContainer,
+              ),
+              icon: const Icon(Icons.logout),
+              label: const Text('Sign Out'),
+              onPressed: () async {
+                _clearLocalCaches();
+                await ref.read(authProvider.notifier).logout();
+                if (context.mounted) context.go('/login');
+              },
             ),
           ),
           const Divider(),

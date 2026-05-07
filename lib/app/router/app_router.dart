@@ -1,17 +1,52 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/pages/setup_page.dart';
+import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/reports/presentation/pages/reports_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../shared/widgets/adaptive_scaffold.dart';
 
-/// All routes live on the single root navigator — no StatefulShellRoute,
-/// no branch navigators. This means context.push('/settings') from any
-/// page is unambiguous and can never freeze or corrupt tab state.
+/// A [ChangeNotifier] that pings GoRouter whenever [AuthStatus] changes.
+/// Using this as [GoRouter.refreshListenable] means the router is created
+/// *once* and re-evaluates its redirect — rather than being recreated from
+/// scratch — which reliably triggers navigation after login / logout.
+class _AuthStatusNotifier extends ChangeNotifier {
+  _AuthStatusNotifier(Ref ref) {
+    ref.listen<AuthStatus>(
+      authProvider.select((s) => s.status),
+      (_, __) => notifyListeners(),
+    );
+  }
+}
+
 final appRouterProvider = Provider<GoRouter>((ref) {
+  final notifier = _AuthStatusNotifier(ref);
+  ref.onDispose(notifier.dispose);
+
   return GoRouter(
     initialLocation: '/setup',
+    refreshListenable: notifier,
+    redirect: (context, state) {
+      final authState = ref.read(authProvider);
+      final loc = state.matchedLocation;
+
+      // Still initialising — don't redirect yet.
+      if (authState.status == AuthStatus.unknown) return null;
+
+      final isAuthRoute = loc == '/setup';
+
+      if (authState.status == AuthStatus.unauthenticated && !isAuthRoute) {
+        return '/setup';
+      }
+
+      if (authState.status == AuthStatus.authenticated && isAuthRoute) {
+        return '/home';
+      }
+
+      return null;
+    },
     routes: [
       GoRoute(
         path: '/setup',
@@ -32,3 +67,4 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+
