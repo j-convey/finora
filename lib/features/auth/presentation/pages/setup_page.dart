@@ -32,32 +32,23 @@ class _SetupPageState extends ConsumerState<SetupPage> {
   @override
   void initState() {
     super.initState();
-    _urlFocus.addListener(_onUrlFocusChange);
 
-    // If a server URL is already stored, probe it immediately.
+    // If a server URL is already stored, pre-fill the field.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final storedUrl = ref.read(authProvider).serverUrl;
       if (storedUrl.isNotEmpty) {
         _urlController.text = storedUrl;
-        _probeServer();
       }
     });
   }
 
   @override
   void dispose() {
-    _urlFocus.removeListener(_onUrlFocusChange);
     _urlController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _urlFocus.dispose();
     super.dispose();
-  }
-
-  void _onUrlFocusChange() {
-    if (!_urlFocus.hasFocus) {
-      _probeServer();
-    }
   }
 
   Future<void> _probeServer() async {
@@ -173,13 +164,28 @@ class _SetupPageState extends ConsumerState<SetupPage> {
                     },
                   ),
                   keyboardType: TextInputType.url,
-                  onSubmitted: (_) => _probeServer(),
                 ),
                 if (_serverState == _ServerState.error) ...[
                   const SizedBox(height: 6),
                   Text(
                     'Cannot reach server. Check the URL and try again.',
                     style: tt.bodySmall?.copyWith(color: cs.error),
+                  ),
+                ],
+                if (!serverReady && _urlController.text.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: isLoading ? null : _probeServer,
+                    icon: Icon(
+                      _serverState == _ServerState.checking
+                          ? Icons.hourglass_empty
+                          : Icons.check_circle_outline,
+                    ),
+                    label: Text(
+                      _serverState == _ServerState.checking
+                          ? 'Checking...'
+                          : 'Check Connection',
+                    ),
                   ),
                 ],
 

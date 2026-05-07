@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Allows HTTP (cleartext) traffic to any host.
+  Finora is a self-hosted app on a local network — HTTPS is not required
+  since traffic never leaves the user's LAN.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
