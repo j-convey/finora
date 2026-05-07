@@ -63,7 +63,7 @@ void showCategoryPicker(
 
 // ── Transaction Details Sheet ────────────────────────────────────────────────
 
-class TransactionDetailsSheet extends StatelessWidget {
+class TransactionDetailsSheet extends ConsumerStatefulWidget {
   const TransactionDetailsSheet({
     super.key,
     required this.transaction,
@@ -75,27 +75,60 @@ class TransactionDetailsSheet extends StatelessWidget {
   final AccountModel? account;
   final VoidCallback onChangeCategory;
 
+  @override
+  ConsumerState<TransactionDetailsSheet> createState() =>
+      _TransactionDetailsSheetState();
+}
+
+class _TransactionDetailsSheetState
+    extends ConsumerState<TransactionDetailsSheet> {
+  bool _editingNotes = false;
+  late final TextEditingController _notesController;
+
   static const _months = [
     '', 'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December',
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _notesController =
+        TextEditingController(text: widget.transaction.notes ?? '');
+  }
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
+  }
+
   String _formatFullDate(DateTime d) =>
       '${_months[d.month]} ${d.day}, ${d.year}';
 
   String? _accountLabel() {
+    final account = widget.account;
     if (account == null) return null;
-    final institution = account!.institutionName?.isNotEmpty == true
-        ? account!.institutionName!
+    final institution = account.institutionName?.isNotEmpty == true
+        ? account.institutionName!
         : null;
-    final parts = [if (institution != null) institution, account!.name];
+    final parts = [if (institution != null) institution, account.name];
     return parts.join(' · ');
+  }
+
+  void _saveNotes() {
+    final newNotes = _notesController.text.trim();
+    ref
+        .read(transactionsProvider.notifier)
+        .updateNotes(widget.transaction.id, newNotes);
+    setState(() => _editingNotes = false);
   }
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+    final transaction = widget.transaction;
     final isIncome = transaction.isIncome;
     final amountColor = transaction.pending
         ? cs.onSurfaceVariant
@@ -106,7 +139,14 @@ class TransactionDetailsSheet extends StatelessWidget {
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        padding: EdgeInsets.fromLTRB(
+          20,
+          16,
+          20,
+          _editingNotes
+              ? MediaQuery.of(context).viewInsets.bottom + 24
+              : 24,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -194,11 +234,93 @@ class TransactionDetailsSheet extends StatelessWidget {
               label: 'Status',
               value: transaction.pending ? 'Pending' : 'Cleared',
             ),
-            if (transaction.notes != null && transaction.notes!.isNotEmpty)
-              _DetailRow(label: 'Notes', value: transaction.notes!),
+            // ── Editable notes row ─────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: _editingNotes
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Notes',
+                          style: tt.labelMedium
+                              ?.copyWith(color: cs.onSurfaceVariant),
+                        ),
+                        const SizedBox(height: 6),
+                        TextField(
+                          controller: _notesController,
+                          autofocus: true,
+                          maxLines: null,
+                          textCapitalization: TextCapitalization.sentences,
+                          decoration: InputDecoration(
+                            hintText: 'Add a note…',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                _notesController.text =
+                                    widget.transaction.notes ?? '';
+                                setState(() => _editingNotes = false);
+                              },
+                              child: const Text('Cancel'),
+                            ),
+                            const SizedBox(width: 8),
+                            FilledButton(
+                              onPressed: _saveNotes,
+                              child: const Text('Save'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    )
+                  : InkWell(
+                      borderRadius: BorderRadius.circular(6),
+                      onTap: () => setState(() => _editingNotes = true),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: 130,
+                            child: Text(
+                              'Notes',
+                              style: tt.labelMedium
+                                  ?.copyWith(color: cs.onSurfaceVariant),
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              transaction.notes?.isNotEmpty == true
+                                  ? transaction.notes!
+                                  : 'Tap to add a note…',
+                              style: tt.bodyMedium?.copyWith(
+                                color: transaction.notes?.isNotEmpty == true
+                                    ? null
+                                    : cs.onSurfaceVariant,
+                                fontStyle:
+                                    transaction.notes?.isNotEmpty == true
+                                        ? null
+                                        : FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                          Icon(Icons.edit_outlined,
+                              size: 16, color: cs.onSurfaceVariant),
+                        ],
+                      ),
+                    ),
+            ),
             const SizedBox(height: 20),
             FilledButton.icon(
-              onPressed: onChangeCategory,
+              onPressed: widget.onChangeCategory,
               icon: const Icon(Icons.label_outline),
               label: const Text('Change Category'),
             ),

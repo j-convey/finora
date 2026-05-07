@@ -44,6 +44,23 @@ class TransactionsNotifier extends StateNotifier<List<TransactionModel>> {
       await sync();
     }
   }
+
+  Future<void> updateNotes(String id, String notes) async {
+    // Optimistic update
+    state = state
+        .map((t) => t.id == id ? t.copyWith(notes: notes) : t)
+        .toList();
+    try {
+      final dio = _ref.read(apiClientProvider);
+      await dio.patch<void>(
+        '/api/transactions/$id',
+        data: {'notes': notes},
+      );
+    } catch (_) {
+      // Revert on failure by re-syncing
+      await sync();
+    }
+  }
 }
 
 final transactionsProvider =

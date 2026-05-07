@@ -11,6 +11,7 @@ import '../../data/models/report_summary.dart';
 import '../providers/reports_provider.dart';
 import '../widgets/cash_flow_chart.dart';
 import '../widgets/category_legend_tile.dart';
+import '../widgets/category_transactions_sheet.dart';
 import '../widgets/donut_chart.dart';
 import '../widgets/report_summary_card.dart';
 
@@ -292,6 +293,17 @@ class _CategoryTab extends ConsumerStatefulWidget {
 class _CategoryTabState extends ConsumerState<_CategoryTab> {
   bool _showAllCategories = false;
 
+  void _showCategorySheet(BuildContext context, ReportCategory category) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => CategoryTransactionsSheet(
+        category: category,
+        isExpense: widget.tab == 1,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
@@ -312,6 +324,7 @@ class _CategoryTabState extends ConsumerState<_CategoryTab> {
               categories: widget.categories,
               total: widget.total,
               centerLabel: widget.centerLabel,
+              onSliceTapped: (cat) => _showCategorySheet(context, cat),
             ),
           ),
         ),

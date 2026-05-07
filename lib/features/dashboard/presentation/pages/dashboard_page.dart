@@ -42,7 +42,6 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
 
     // Spending sparkline — daily cumulative expense totals this month
     final now = DateTime.now();
-    final daysInMonth = DateUtils.getDaysInMonth(now.year, now.month);
 
     // Filter all summaries to the current month so header totals and chart
     // Y-axis always show the same data set.
@@ -60,22 +59,6 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             t.date.year == now.year &&
             t.date.month == now.month)
         .fold(0.0, (s, t) => s + t.amount);
-    final dailySpend = List<double>.filled(daysInMonth, 0);
-    for (final t in transactions) {
-      if (t.isExpense &&
-          !t.pending &&
-          t.date.year == now.year &&
-          t.date.month == now.month) {
-        dailySpend[t.date.day - 1] += t.amount;
-      }
-    }
-    // Build cumulative
-    final cumulativeSpend = <double>[];
-    double running = 0;
-    for (final d in dailySpend) {
-      running += d;
-      cumulativeSpend.add(running);
-    }
 
     final budgetCard = _BudgetCard(
       income: monthIncome,
@@ -83,10 +66,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
       onSeeAll: () => ref.read(shellIndexProvider.notifier).state = 3,
     );
 
-    final spendingCard = _SpendingCard(
-      totalSpend: monthExpenses,
-      dailyCumulative: cumulativeSpend,
-    );
+    final spendingCard = const _SpendingCard();
 
     final netWorthCard = _NetWorthCard(netWorth: netWorth);
 
@@ -340,13 +320,21 @@ class _BudgetRow extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              '${formatCurrency(amount)} ${positive ? 'earned' : 'spent'}',
-              style: tt.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+            Flexible(
+              child: Text(
+                '${formatCurrency(amount)} ${positive ? 'earned' : 'spent'}',
+                style: tt.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-            Text(
-              '${formatCurrency(remaining)} remaining',
-              style: tt.bodySmall?.copyWith(color: const Color(0xFF4CAF50)),
+            const SizedBox(width: 4),
+            Flexible(
+              child: Text(
+                '${formatCurrency(remaining)} remaining',
+                style: tt.bodySmall?.copyWith(color: const Color(0xFF4CAF50)),
+                textAlign: TextAlign.end,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),
@@ -357,19 +345,127 @@ class _BudgetRow extends StatelessWidget {
 
 // ── Spending card ─────────────────────────────────────────────────────────────
 
-class _SpendingCard extends StatelessWidget {
-  const _SpendingCard({
-    required this.totalSpend,
-    required this.dailyCumulative,
-  });
+enum _SpendingPeriod { thisMonth, quarter, year }
 
-  final double totalSpend;
-  final List<double> dailyCumulative;
+class _SpendingCard extends ConsumerStatefulWidget {
+  const _SpendingCard();
+
+  @override
+  ConsumerState<_SpendingCard> createState() => _SpendingCardState();
+}
+
+class _SpendingCardState extends ConsumerState<_SpendingCard> {
+  _SpendingPeriod _period = _SpendingPeriod.thisMonth;
+
+  static const _periodLabels = {
+    _SpendingPeriod.thisMonth: 'This month',
+    _SpendingPeriod.quarter: 'This quarter',
+    _SpendingPeriod.year: 'This year',
+  };
+
+  static const _monthAbbr = [
+    '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+
+  // ── Data builders ────────────────────────────────────────────────────────
+
+  /// Returns (chartData, totalSpend, xLabelBuilder) for the current period.
+  (List<double>, double, String? Function(int)) _buildChartData(
+    List txns,
+  ) {
+    final now = DateTime.now();
+
+    switch (_period) {
+      case _SpendingPeriod.thisMonth:
+        final daysInMonth = DateUtils.getDaysInMonth(now.year, now.month);
+        final daily = List<double>.filled(daysInMonth, 0);
+        for (final t in txns) {
+          if (t.isExpense &&
+              !t.pending &&
+              t.date.year == now.year &&
+              t.date.month == now.month) {
+            daily[t.date.day - 1] += t.amount;
+          }
+        }
+        // Cumulative
+        double running = 0;
+        final cumulative = <double>[];
+        for (final d in daily) {
+          running += d;
+          cumulative.add(running);
+        }
+        // Trim trailing zeros past today
+        final today = now.day;
+        final trimmed = cumulative.sublist(0, today.clamp(1, cumulative.length));
+
+        String? labelBuilder(int i) {
+          final day = i + 1;
+          if (day == 1 || day % 7 == 0 || day == today) {
+            return '${_monthAbbr[now.month]} $day';
+          }
+          return null;
+        }
+
+        return (trimmed, running, labelBuilder);
+
+      case _SpendingPeriod.quarter:
+        // Last 3 calendar months including current
+        final months = List.generate(3, (i) {
+          final offset = 2 - i;
+          var m = now.month - offset;
+          var y = now.year;
+          while (m <= 0) {
+            m += 12;
+            y -= 1;
+          }
+          return (y, m);
+        });
+
+        final totals = <double>[];
+        double total = 0;
+        for (final (y, m) in months) {
+          double sum = 0;
+          for (final t in txns) {
+            if (t.isExpense && !t.pending && t.date.year == y && t.date.month == m) {
+              sum += t.amount;
+            }
+          }
+          totals.add(sum);
+          total += sum;
+        }
+
+        String? labelBuilder(int i) => _monthAbbr[months[i].$2];
+        return (totals, total, labelBuilder);
+
+      case _SpendingPeriod.year:
+        // Jan through current month this year
+        final totals = <double>[];
+        double total = 0;
+        for (int m = 1; m <= now.month; m++) {
+          double sum = 0;
+          for (final t in txns) {
+            if (t.isExpense && !t.pending && t.date.year == now.year && t.date.month == m) {
+              sum += t.amount;
+            }
+          }
+          totals.add(sum);
+          total += sum;
+        }
+        String? labelBuilder(int i) => _monthAbbr[i + 1];
+        return (totals, total, labelBuilder);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+    final transactions = ref.watch(transactionsProvider);
+
+    final (chartData, totalSpend, labelBuilder) = _buildChartData(transactions);
+
+    final subtitleSuffix = _periodLabels[_period]!.toLowerCase();
 
     return Card(
       child: Padding(
@@ -379,37 +475,61 @@ class _SpendingCard extends StatelessWidget {
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Spending', style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-                    Text(
-                      '${formatCurrency(totalSpend)} this month',
-                      style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Spending',
+                          style: tt.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold)),
+                      Text(
+                        '${formatCurrency(totalSpend)} $subtitleSuffix',
+                        style: tt.bodySmall
+                            ?.copyWith(color: cs.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                ),
+                PopupMenuButton<_SpendingPeriod>(
+                  initialValue: _period,
+                  onSelected: (p) => setState(() => _period = p),
+                  itemBuilder: (_) => _SpendingPeriod.values
+                      .map((p) => PopupMenuItem(
+                            value: p,
+                            child: Text(_periodLabels[p]!),
+                          ))
+                      .toList(),
+                  child: Chip(
+                    label: Text(
+                      _periodLabels[_period]!,
+                      style: const TextStyle(fontSize: 12),
                     ),
-                  ],
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 20),
             SizedBox(
               height: 160,
-              child: dailyCumulative.isEmpty
+              child: chartData.isEmpty ||
+                      chartData.every((v) => v == 0)
                   ? Center(
-                      child: Text('No spending data',
-                          style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
+                      child: Text(
+                        'No spending data',
+                        style: tt.bodySmall
+                            ?.copyWith(color: cs.onSurfaceVariant),
+                      ),
                     )
                   : _LineChart(
-                      data: dailyCumulative,
+                      data: chartData,
                       lineColor: cs.primary,
                       fillColor: cs.primary.withAlpha(40),
                       labelColor: cs.onSurfaceVariant,
-                      xLabelBuilder: (i) {
-                        // Label every ~7 days
-                        final day = i + 1;
-                        return day == 1 || day % 7 == 0 ? 'Day $day' : null;
-                      },
+                      xLabelBuilder: labelBuilder,
                     ),
             ),
           ],

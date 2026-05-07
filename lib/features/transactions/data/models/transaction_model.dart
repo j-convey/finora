@@ -45,7 +45,7 @@ class TransactionModel {
         title: json['title'] as String,
         amount: (json['amount'] as num).toDouble(),
         type: _typeFromString(json['type'] as String),
-        category: json['category'] as String,
+        category: (json['category'] as String?) ?? 'Uncategorized',
         date: DateTime.parse(json['date'] as String),
         accountId: json['account_id'] as String?,
         notes: json['notes'] as String?,
@@ -61,7 +61,7 @@ class TransactionModel {
             : null,
       );
 
-  TransactionModel copyWith({String? category}) => TransactionModel(
+  TransactionModel copyWith({String? category, String? notes}) => TransactionModel(
         id: id,
         title: title,
         amount: amount,
@@ -69,7 +69,7 @@ class TransactionModel {
         category: category ?? this.category,
         date: date,
         accountId: accountId,
-        notes: notes,
+        notes: notes ?? this.notes,
         originalDescription: originalDescription,
         merchantName: merchantName,
         providerTransactionId: providerTransactionId,

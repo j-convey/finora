@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../app/providers/theme_provider.dart';
+import '../../../../core/network/api_client.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../transactions/presentation/providers/transactions_provider.dart';
 import '../../../transactions/presentation/providers/categories_provider.dart';
 import '../../../accounts/presentation/providers/accounts_provider.dart';
 import '../../../budgets/presentation/providers/budgets_provider.dart';
+import '../providers/database_backup_provider.dart';
 import '../providers/simplefin_provider.dart';
 import '../../../accounts/presentation/providers/net_worth_history_provider.dart';
 
@@ -21,6 +23,9 @@ class SettingsPage extends ConsumerStatefulWidget {
 class _SettingsPageState extends ConsumerState<SettingsPage> {
   late TextEditingController _urlCtrl;
   bool _isSyncing = false;
+  bool _isResettingDatabase = false;
+  bool _isExporting = false;
+  bool _isImporting = false;
 
   @override
   void initState() {
@@ -134,20 +139,49 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             onTap: _isSyncing ? null : _syncAll,
           ),
           ListTile(
-            leading: const Icon(Icons.download_outlined),
-            title: const Text('Export Data'),
-            subtitle: const Text('Export as CSV or JSON'),
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Export coming soon')),
-              );
-            },
+            leading: _isExporting
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.upload_file_outlined),
+            title: const Text('Export Backup'),
+            subtitle: const Text('Save a full database snapshot as JSON'),
+            onTap: _isExporting ? null : () => _exportDatabase(context),
+          ),
+          ListTile(
+            leading: _isImporting
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.download_outlined),
+            title: const Text('Import Backup'),
+            subtitle: const Text('Restore a previously exported JSON backup'),
+            onTap: _isImporting ? null : () => _confirmImport(context),
           ),
           ListTile(
             leading: Icon(Icons.delete_forever_outlined, color: cs.error),
             title: Text('Clear Local Data',
                 style: TextStyle(color: cs.error)),
             onTap: () => _confirmClear(context),
+          ),
+          ListTile(
+            leading: _isResettingDatabase
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Icon(Icons.warning_amber_outlined, color: cs.error),
+            title: Text(
+              'Reset Server Database',
+              style: TextStyle(color: cs.error),
+            ),
+            subtitle: const Text('Deletes all server data (admin endpoint)'),
+            onTap: _isResettingDatabase ? null : () => _confirmServerReset(context),
           ),
           const Divider(),
 
@@ -198,6 +232,81 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     }
   }
 
+  Future<void> _exportDatabase(BuildContext context) async {
+    setState(() => _isExporting = true);
+    try {
+      await ref.read(databaseBackupProvider.notifier).exportDatabase();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Backup exported successfully')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Export failed: ${e.toString()}'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isExporting = false);
+    }
+  }
+
+  void _confirmImport(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Import Backup?'),
+        content: const Text(
+          'This will replace all server data (accounts, transactions, budgets) '
+          'with the contents of the selected backup file. This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await _importDatabase();
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: const Text('Import'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _importDatabase() async {
+    setState(() => _isImporting = true);
+    try {
+      await ref.read(databaseBackupProvider.notifier).importDatabase();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Backup imported successfully')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Import failed: ${e.toString()}'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isImporting = false);
+    }
+  }
+
   void _confirmClear(BuildContext context) {
     showDialog(
       context: context,
@@ -213,11 +322,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           FilledButton(
             onPressed: () {
               Navigator.pop(ctx);
-              ref.read(transactionsProvider.notifier).clear();
-              ref.read(accountsProvider.notifier).clear();
-              ref.read(budgetsProvider.notifier).clear();
-              ref.read(categoriesProvider.notifier).clear();
-              ref.read(netWorthHistoryProvider.notifier).clear();
+              _clearLocalCaches();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Local data cleared')),
               );
@@ -230,6 +335,74 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         ],
       ),
     );
+  }
+
+  void _confirmServerReset(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Reset Server Database?'),
+        content: const Text(
+          'This will permanently delete all data on the server via /api/admin/reset-database. Continue?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await _resetServerDatabase();
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: const Text('Reset Database'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _resetServerDatabase() async {
+    setState(() => _isResettingDatabase = true);
+    try {
+      final dio = ref.read(apiClientProvider);
+      final response = await dio.post<Map<String, dynamic>>(
+        '/api/admin/reset-database',
+      );
+
+      _clearLocalCaches();
+
+      if (!mounted) return;
+      final message = response.data?['message'] as String?;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message ?? 'Server database reset complete'),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Database reset failed: ${e.toString()}'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isResettingDatabase = false);
+      }
+    }
+  }
+
+  void _clearLocalCaches() {
+    ref.read(transactionsProvider.notifier).clear();
+    ref.read(accountsProvider.notifier).clear();
+    ref.read(budgetsProvider.notifier).clear();
+    ref.read(categoriesProvider.notifier).clear();
+    ref.read(netWorthHistoryProvider.notifier).clear();
   }
 }
 

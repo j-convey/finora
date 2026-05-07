@@ -9,26 +9,88 @@ import '../../data/models/report_summary.dart';
 /// Shows a thick ring segmented by [categories], with the [total] and
 /// [centerLabel] printed in the centre hole. A compact legend sits to the
 /// right, listing the top 7 categories with colour, name, amount, and %.
-class DonutChart extends StatelessWidget {
+///
+/// Tapping a slice highlights it (dims all others) and fires [onSliceTapped]
+/// with the corresponding [ReportCategory]. Tapping the same slice or the
+/// hole deselects it.
+class DonutChart extends StatefulWidget {
   const DonutChart({
     super.key,
     required this.categories,
     required this.total,
     required this.centerLabel,
+    this.onSliceTapped,
   });
 
   final List<ReportCategory> categories;
   final double total;
 
-  /// Label shown below the total in the centre hole, e.g. "Total".
+  /// Label shown below the total in the centre hole, e.g. "Expenses".
   final String centerLabel;
+
+  /// Called when the user taps a slice. Passes the tapped [ReportCategory].
+  final void Function(ReportCategory)? onSliceTapped;
+
+  @override
+  State<DonutChart> createState() => _DonutChartState();
+}
+
+class _DonutChartState extends State<DonutChart> {
+  int? _selectedIndex;
+
+  @override
+  void didUpdateWidget(DonutChart old) {
+    super.didUpdateWidget(old);
+    // Clear selection when the data set changes (e.g. period switch).
+    if (old.categories != widget.categories) _selectedIndex = null;
+  }
+
+  /// Returns the index of the slice at [localPosition] within an area of
+  /// [constraints], or null if the tap is in the hole or outside the ring.
+  int? _hitTest(Offset localPosition, BoxConstraints constraints) {
+    final cx = constraints.maxWidth / 2;
+    final cy = constraints.maxHeight / 2;
+    final outerR = math.min(cx, cy) - 6;
+    final innerR = outerR * 0.58;
+
+    final dx = localPosition.dx - cx;
+    final dy = localPosition.dy - cy;
+    final dist = math.sqrt(dx * dx + dy * dy);
+
+    if (dist < innerR || dist > outerR) return null;
+
+    // Normalize angle so 0 = top, increasing clockwise — matches painter.
+    var angle = math.atan2(dy, dx) + math.pi / 2;
+    if (angle < 0) angle += 2 * math.pi;
+
+    final total =
+        widget.categories.fold(0.0, (s, c) => s + c.amount);
+    if (total <= 0) return null;
+
+    var startAngle = 0.0;
+    for (int i = 0; i < widget.categories.length; i++) {
+      final sweep =
+          (widget.categories[i].amount / total) * 2 * math.pi;
+      if (angle >= startAngle && angle < startAngle + sweep) return i;
+      startAngle += sweep;
+    }
+    return null;
+  }
+
+  void _handleTap(Offset localPosition, BoxConstraints constraints) {
+    final idx = _hitTest(localPosition, constraints);
+    setState(() => _selectedIndex = idx);
+    if (idx != null) {
+      widget.onSliceTapped?.call(widget.categories[idx]);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
 
-    if (categories.isEmpty) {
+    if (widget.categories.isEmpty) {
       return SizedBox(
         height: 220,
         child: Center(
@@ -40,7 +102,8 @@ class DonutChart extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 'No data for this period',
-                style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+                style:
+                    tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
               ),
             ],
           ),
@@ -53,28 +116,41 @@ class DonutChart extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // ── Donut ─────────────────────────────────────────────────────
+          // ── Interactive donut ──────────────────────────────────────────
           Expanded(
             flex: 4,
-            child: CustomPaint(
-              painter: _DonutPainter(categories: categories),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _compact(total),
-                      style: tt.titleMedium
-                          ?.copyWith(fontWeight: FontWeight.bold),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return GestureDetector(
+                  onTapDown: (details) =>
+                      _handleTap(details.localPosition, constraints),
+                  child: CustomPaint(
+                    size: Size(
+                        constraints.maxWidth, constraints.maxHeight),
+                    painter: _DonutPainter(
+                      categories: widget.categories,
+                      selectedIndex: _selectedIndex,
                     ),
-                    Text(
-                      centerLabel,
-                      style: tt.labelSmall
-                          ?.copyWith(color: cs.onSurfaceVariant),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _compact(widget.total),
+                            style: tt.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            widget.centerLabel,
+                            style: tt.labelSmall
+                                ?.copyWith(color: cs.onSurfaceVariant),
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             ),
           ),
 
@@ -86,11 +162,12 @@ class DonutChart extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: categories
+                children: widget.categories
                     .take(7)
                     .map(
                       (c) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 3.5),
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 3.5),
                         child: Row(
                           children: [
                             Container(
@@ -139,9 +216,12 @@ class DonutChart extends StatelessWidget {
 // ── Painter ───────────────────────────────────────────────────────────────────
 
 class _DonutPainter extends CustomPainter {
-  _DonutPainter({required this.categories});
+  _DonutPainter({required this.categories, this.selectedIndex});
 
   final List<ReportCategory> categories;
+
+  /// Index of the currently selected slice, or null for no selection.
+  final int? selectedIndex;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -159,15 +239,19 @@ class _DonutPainter extends CustomPainter {
     const gap = 0.014;
     var startAngle = -math.pi / 2;
 
-    for (final cat in categories) {
+    for (int i = 0; i < categories.length; i++) {
+      final cat = categories[i];
       final sweep = (cat.amount / total) * 2 * math.pi;
+      final isSelected = selectedIndex == i;
+      final isDimmed = selectedIndex != null && !isSelected;
+
       canvas.drawArc(
         Rect.fromCircle(center: Offset(cx, cy), radius: drawR),
         startAngle + gap / 2,
         math.max(0.0, sweep - gap),
         false,
         Paint()
-          ..color = cat.color
+          ..color = isDimmed ? cat.color.withAlpha(70) : cat.color
           ..style = PaintingStyle.stroke
           ..strokeWidth = strokeW
           ..strokeCap = StrokeCap.butt,
@@ -177,5 +261,6 @@ class _DonutPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_DonutPainter old) => old.categories != categories;
+  bool shouldRepaint(_DonutPainter old) =>
+      old.categories != categories || old.selectedIndex != selectedIndex;
 }
