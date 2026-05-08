@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app/app.dart';
 import 'app/providers/theme_provider.dart';
+import 'core/services/notification_service.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
 
 void main() async {
@@ -13,6 +14,7 @@ void main() async {
   //  • The correct theme is applied immediately (no flash).
   //  • The router redirect lands on the right screen without flickering.
   final prefs = await SharedPreferences.getInstance();
+  await NotificationService.init();
 
   final container = ProviderContainer(
     overrides: [

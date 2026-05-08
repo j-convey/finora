@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/providers/hide_amounts_provider.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../data/models/report_summary.dart';
 
@@ -8,15 +10,16 @@ import '../../data/models/report_summary.dart';
 /// Shows a coloured dot, the category name, a percentage progress bar,
 /// the percentage value, and the formatted currency amount — matching the
 /// style shown in the Monarch-style spending breakdown.
-class CategoryLegendTile extends StatelessWidget {
+class CategoryLegendTile extends ConsumerWidget {
   const CategoryLegendTile({super.key, required this.category});
 
   final ReportCategory category;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+    final hidden = ref.watch(hideAmountsProvider);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 7),
@@ -49,7 +52,7 @@ class CategoryLegendTile extends StatelessWidget {
               SizedBox(
                 width: 80,
                 child: Text(
-                  formatCurrency(category.amount),
+                  hidden ? '••••••' : formatCurrency(category.amount),
                   textAlign: TextAlign.right,
                   style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
                 ),
@@ -69,3 +72,4 @@ class CategoryLegendTile extends StatelessWidget {
     );
   }
 }
+

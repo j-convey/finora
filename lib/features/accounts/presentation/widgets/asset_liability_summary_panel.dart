@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/providers/hide_amounts_provider.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../shared/widgets/masked_amount.dart';
 import '../../data/models/account_model.dart';
 
-class AssetLiabilitySummaryPanel extends StatelessWidget {
+class AssetLiabilitySummaryPanel extends ConsumerWidget {
   const AssetLiabilitySummaryPanel({required this.accounts, super.key});
 
   final List<AccountModel> accounts;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+    final hidden = ref.watch(hideAmountsProvider);
 
     final assets = accounts
         .where((a) => a.balance > 0)
@@ -86,7 +90,7 @@ class AssetLiabilitySummaryPanel extends StatelessWidget {
               children: [
                 Text('Total Assets', style: tt.labelMedium),
                 Text(
-                  formatCurrency(assets),
+                  hidden ? '••••••' : formatCurrency(assets),
                   style: tt.labelMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: const Color(0xFF4CAF50),
@@ -136,7 +140,7 @@ class AssetLiabilitySummaryPanel extends StatelessWidget {
               children: [
                 Text('Total Liabilities', style: tt.labelMedium),
                 Text(
-                  formatCurrency(liabilities),
+                  hidden ? '••••••' : formatCurrency(liabilities),
                   style: tt.labelMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: const Color(0xFFEF5350),
@@ -231,8 +235,8 @@ class _AssetTypeItem extends StatelessWidget {
             '${AccountModel.labelForType(type)} ${percent.toStringAsFixed(0)}%',
             style: tt.labelSmall,
           ),
-          Text(
-            formatCurrency(amount),
+          MaskedAmount(
+            amount,
             style: tt.labelSmall?.copyWith(fontWeight: FontWeight.bold),
           ),
         ],
@@ -266,8 +270,8 @@ class _LiabilityTypeItem extends StatelessWidget {
             '${AccountModel.labelForType(type)} ${percent.toStringAsFixed(0)}%',
             style: tt.labelSmall,
           ),
-          Text(
-            formatCurrency(amount),
+          MaskedAmount(
+            amount,
             style: tt.labelSmall?.copyWith(fontWeight: FontWeight.bold),
           ),
         ],

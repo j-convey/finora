@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/notification_preferences_provider.dart';
+import '../../../../core/services/notification_service.dart';
 
 enum SimplefinConnectionStatus { disconnected, connected, syncing, error }
 
@@ -99,11 +101,26 @@ class SimplefinNotifier extends StateNotifier<SimplefinState> {
     state = state.copyWith(status: SimplefinConnectionStatus.syncing);
     try {
       final dio = _ref.read(apiClientProvider);
-      await dio.post<void>('/api/simplefin/fetch');
+      final res = await dio.post<Map<String, dynamic>>('/api/simplefin/fetch');
       state = state.copyWith(
         status: SimplefinConnectionStatus.connected,
         lastSyncedAt: DateTime.now(),
       );
+      // Fire local notifications for new charges that exceed the threshold.
+      final notifPrefs = _ref.read(notificationPreferencesProvider);
+      if (notifPrefs.notifyOn != NotifyOn.never && res.data != null) {
+        final newTxns = (res.data!['new_transactions'] as List? ?? []);
+        for (final tx in newTxns) {
+          final amount = (tx['amount'] as num?)?.toDouble() ?? 0.0;
+          if (notifPrefs.shouldNotify(amount)) {
+            await NotificationService.showChargeNotification(
+              title: tx['title'] as String? ?? 'New charge',
+              amount: amount,
+              accountName: tx['account_name'] as String?,
+            );
+          }
+        }
+      }
     } catch (e) {
       state = state.copyWith(
         status: SimplefinConnectionStatus.error,

@@ -2,11 +2,14 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/auth/presentation/providers/auth_provider.dart';
+import '../providers/demo_mode_provider.dart';
+import 'demo_interceptor.dart';
 
 final apiClientProvider = Provider<Dio>((ref) {
   final serverUrl = ref.watch(authProvider).serverUrl;
   final baseUrl =
       serverUrl.startsWith('http') ? serverUrl : 'http://$serverUrl';
+  final isDemoMode = ref.watch(demoModeProvider);
 
   final dio = Dio(
     BaseOptions(
@@ -18,6 +21,7 @@ final apiClientProvider = Provider<Dio>((ref) {
   );
 
   dio.interceptors.add(_AuthInterceptor(ref));
+  if (isDemoMode) dio.interceptors.add(DemoInterceptor());
   return dio;
 });
 

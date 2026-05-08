@@ -35,6 +35,8 @@ class BudgetsPage extends ConsumerWidget {
     final budgets = ref.watch(budgetsProvider);
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+    final isMobilePlatform = Theme.of(context).platform == TargetPlatform.android ||
+        Theme.of(context).platform == TargetPlatform.iOS;
 
     final totalAllocated = budgets.fold(0.0, (s, b) => s + b.allocated);
     final totalSpent = budgets.fold(0.0, (s, b) => s + b.spent);
@@ -44,12 +46,14 @@ class BudgetsPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Budget'),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
+        leading: isMobilePlatform
+            ? Builder(
+                builder: (context) => IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () => Scaffold.of(context).openDrawer(),
+                ),
+              )
+            : null,
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -57,7 +61,7 @@ class BudgetsPage extends ConsumerWidget {
           ),
         ],
       ),
-      drawer: const MainDrawer(),
+      drawer: isMobilePlatform ? const MainDrawer() : null,
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'fab_budgets',
         onPressed: () => _showBudgetSheet(context, ref, existing: null),

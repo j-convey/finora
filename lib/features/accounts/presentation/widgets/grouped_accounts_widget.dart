@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/providers/hide_amounts_provider.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../data/models/account_model.dart';
 
@@ -71,7 +73,7 @@ class _GroupedAccountsWidgetState extends State<GroupedAccountsWidget> {
   }
 }
 
-class _AccountGroup extends StatelessWidget {
+class _AccountGroup extends ConsumerWidget {
   const _AccountGroup({
     required this.type,
     required this.accounts,
@@ -89,9 +91,10 @@ class _AccountGroup extends StatelessWidget {
   final void Function(AccountModel account, AccountType newType)? onTypeChanged;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+    final hidden = ref.watch(hideAmountsProvider);
 
     return Column(
       children: [
@@ -126,7 +129,7 @@ class _AccountGroup extends StatelessWidget {
                 ),
                 Flexible(
                   child: Text(
-                    formatCurrency(total),
+                    hidden ? '••••••' : formatCurrency(total),
                     style: tt.bodyLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: total < 0 ? const Color(0xFFEF5350) : cs.onSurface,
@@ -151,7 +154,7 @@ class _AccountGroup extends StatelessWidget {
   }
 }
 
-class _AccountListItem extends StatelessWidget {
+class _AccountListItem extends ConsumerWidget {
   const _AccountListItem({
     required this.account,
     this.onTypeChanged,
@@ -171,9 +174,10 @@ class _AccountListItem extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+    final hidden = ref.watch(hideAmountsProvider);
     final isNegative = account.balance < 0;
     final color = account.color ?? cs.primary;
 
@@ -200,7 +204,8 @@ class _AccountListItem extends StatelessWidget {
                     style: tt.labelSmall
                         ?.copyWith(color: cs.onSurfaceVariant),
                   ),
-                if (account.availableBalance != null &&
+                if (!hidden &&
+                    account.availableBalance != null &&
                     (account.type == AccountType.checking ||
                         account.type == AccountType.savings))
                   Text(
@@ -215,7 +220,7 @@ class _AccountListItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                formatCurrency(account.balance),
+                hidden ? '••••••' : formatCurrency(account.balance),
                 style: tt.bodyMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: isNegative ? const Color(0xFFEF5350) : cs.onSurface,

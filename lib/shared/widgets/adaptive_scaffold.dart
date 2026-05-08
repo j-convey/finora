@@ -4,14 +4,12 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/providers/shell_index_provider.dart';
 import '../../app/providers/sidebar_provider.dart';
+import '../../core/providers/demo_mode_provider.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/transactions/presentation/pages/transactions_page.dart';
 import '../../features/accounts/presentation/pages/accounts_page.dart';
 import '../../features/budgets/presentation/pages/budgets_page.dart';
-import '../../features/subscriptions/presentation/pages/subscriptions_page.dart';
 import '../../features/reports/presentation/pages/reports_page.dart';
-import 'add_transaction_sheet.dart';
-import 'main_drawer.dart';
 
 class _Destination {
   const _Destination({
@@ -71,8 +69,49 @@ class MainShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final index = ref.watch(shellIndexProvider);
     void onTap(int i) => ref.read(shellIndexProvider.notifier).state = i;
+    final isDemoMode = ref.watch(demoModeProvider);
 
-    final body = IndexedStack(index: index, children: _pages);
+    Widget body = IndexedStack(index: index, children: _pages);
+
+    if (isDemoMode) {
+      body = Column(
+        children: [
+          Material(
+            color: const Color(0xFFE65100),
+            child: InkWell(
+              onTap: () {},
+              child: SafeArea(
+                bottom: false,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.science_outlined,
+                          size: 14, color: Colors.white),
+                      const SizedBox(width: 6),
+                      Text(
+                        'DEMO MODE — sample data only',
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelSmall
+                            ?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.5),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(child: IndexedStack(index: index, children: _pages)),
+        ],
+      );
+    }
+
     final width = MediaQuery.sizeOf(context).width;
 
     return width >= 600
@@ -97,70 +136,207 @@ class _WideLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final sidebarExpanded = ref.watch(sidebarExpandedProvider);
-    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: Row(
         children: [
-          NavigationRail(
+          _Sidebar(
             selectedIndex: selectedIndex,
-            onDestinationSelected: onTap,
-            extended: sidebarExpanded,
-            labelType: NavigationRailLabelType.none,
-            leading: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: sidebarExpanded
-                  ? Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.account_balance, color: cs.primary),
-                        const SizedBox(width: 8),
-                        Text(
+            onTap: onTap,
+            expanded: sidebarExpanded,
+            onToggle: () => ref
+                .read(sidebarExpandedProvider.notifier)
+                .state = !sidebarExpanded,
+          ),
+          const VerticalDivider(thickness: 1, width: 1),
+          Expanded(child: body),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Custom sidebar ───────────────────────────────────────────────────────────
+
+class _Sidebar extends StatelessWidget {
+  const _Sidebar({
+    required this.selectedIndex,
+    required this.onTap,
+    required this.expanded,
+    required this.onToggle,
+  });
+
+  final int selectedIndex;
+  final void Function(int) onTap;
+  final bool expanded;
+  final VoidCallback onToggle;
+
+  static const _collapsedWidth = 72.0;
+  static const _expandedWidth = 220.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeInOut,
+      width: expanded ? _expandedWidth : _collapsedWidth,
+      child: Material(
+        color: cs.surface,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Logo ──────────────────────────────────────────────────────
+            SizedBox(
+              height: 64,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  children: [
+                    Icon(Icons.account_balance, color: cs.primary, size: 24),
+                    if (expanded) ...[
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
                           'Finora',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             color: cs.primary,
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
                           ),
                         ),
-                      ],
-                    )
-                  : Icon(Icons.account_balance, color: cs.primary, size: 26),
-            ),
-            trailing: Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: Icon(sidebarExpanded ? Icons.chevron_left : Icons.chevron_right),
-                    tooltip: sidebarExpanded ? 'Collapse sidebar' : 'Expand sidebar',
-                    onPressed: () {
-                      ref.read(sidebarExpandedProvider.notifier).state = !sidebarExpanded;
-                    },
-                  ),
-                  const SizedBox(height: 8),
-                  IconButton(
-                    icon: const Icon(Icons.settings_outlined),
-                    tooltip: 'Settings',
-                    onPressed: () => context.push('/settings'),
-                  ),
-                ],
+                      ),
+                    ],
+                  ],
+                ),
               ),
             ),
-            destinations: _destinations
-                .map(
-                  (d) => NavigationRailDestination(
-                    icon: Icon(d.icon),
-                    selectedIcon: Icon(d.selectedIcon),
-                    label: Text(d.label),
-                  ),
-                )
-                .toList(),
+            const Divider(height: 1),
+            const SizedBox(height: 8),
+            // ── Nav items ─────────────────────────────────────────────────
+            for (var i = 0; i < _destinations.length; i++)
+              _SidebarItem(
+                icon: _destinations[i].icon,
+                selectedIcon: _destinations[i].selectedIcon,
+                label: _destinations[i].label,
+                selected: selectedIndex == i,
+                expanded: expanded,
+                onTap: () => onTap(i),
+              ),
+            const Spacer(),
+            const Divider(height: 1),
+            const SizedBox(height: 4),
+            // ── Settings ──────────────────────────────────────────────────
+            _SidebarItem(
+              icon: Icons.settings_outlined,
+              selectedIcon: Icons.settings,
+              label: 'Settings',
+              selected: false,
+              expanded: expanded,
+              onTap: () => GoRouter.of(context).push('/settings'),
+            ),
+            // ── Collapse toggle ───────────────────────────────────────────
+            _SidebarItem(
+              icon: Icons.keyboard_double_arrow_left_outlined,
+              selectedIcon: Icons.keyboard_double_arrow_right_outlined,
+              label: 'Collapse',
+              selected: false,
+              expanded: expanded,
+              flipIcon: !expanded,
+              onTap: onToggle,
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SidebarItem extends StatelessWidget {
+  const _SidebarItem({
+    required this.icon,
+    required this.selectedIcon,
+    required this.label,
+    required this.selected,
+    required this.expanded,
+    required this.onTap,
+    this.flipIcon = false,
+  });
+
+  final IconData icon;
+  final IconData selectedIcon;
+  final String label;
+  final bool selected;
+  final bool expanded;
+  final bool flipIcon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final iconColor =
+        selected ? cs.onSecondaryContainer : cs.onSurfaceVariant;
+    final iconWidget = Transform.scale(
+      scaleX: flipIcon ? -1 : 1,
+      child: Icon(
+        selected ? selectedIcon : icon,
+        color: iconColor,
+        size: 22,
+      ),
+    );
+
+    return Tooltip(
+      message: expanded ? '' : label,
+      preferBelow: false,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(10),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            height: 44,
+            decoration: BoxDecoration(
+              color:
+                  selected ? cs.secondaryContainer : Colors.transparent,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            padding: EdgeInsets.symmetric(
+              horizontal: expanded ? 12 : 0,
+            ),
+            child: expanded
+                ? Row(
+                    children: [
+                      SizedBox(
+                        width: 32,
+                        child: Center(child: iconWidget),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: selected
+                                ? cs.onSecondaryContainer
+                                : cs.onSurfaceVariant,
+                            fontWeight: selected
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : Center(child: iconWidget),
           ),
-          const VerticalDivider(thickness: 1, width: 1),
-          Expanded(child: body),
-        ],
+        ),
       ),
     );
   }

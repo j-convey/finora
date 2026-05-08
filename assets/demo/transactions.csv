@@ -1,0 +1,151 @@
+id,title,amount,type,category,date,account_id
+demo-txn-001,Paycheck Deposit,5200.00,income,Paychecks,2026-03-01,demo-acc-1
+demo-txn-002,Whole Foods Market,145.32,expense,Groceries,2026-03-02,demo-acc-3
+demo-txn-003,Starbucks,5.45,expense,Coffee Shops,2026-03-02,demo-acc-3
+demo-txn-004,Shell Gas Station,67.82,expense,Gas,2026-03-03,demo-acc-1
+demo-txn-005,Chipotle Mexican Grill,18.75,expense,Restaurants & Bars,2026-03-04,demo-acc-3
+demo-txn-006,Netflix Subscription,15.99,expense,Entertainment & Recreation,2026-03-05,demo-acc-3
+demo-txn-007,Spotify Premium,9.99,expense,Entertainment & Recreation,2026-03-05,demo-acc-3
+demo-txn-008,Car Payment,425.00,expense,Auto Payment,2026-03-05,demo-acc-1
+demo-txn-009,Target,92.18,expense,Shopping,2026-03-06,demo-acc-1
+demo-txn-010,Trader Joe's,78.64,expense,Groceries,2026-03-07,demo-acc-3
+demo-txn-011,Blue Bottle Coffee,7.25,expense,Coffee Shops,2026-03-08,demo-acc-3
+demo-txn-012,Olive Garden Italian,64.87,expense,Restaurants & Bars,2026-03-08,demo-acc-3
+demo-txn-013,Water Bill Payment,42.50,expense,Water,2026-03-10,demo-acc-1
+demo-txn-014,Southwest Airlines,287.00,expense,Travel & Vacation,2026-03-10,demo-acc-1
+demo-txn-015,Kroger Grocery,118.45,expense,Groceries,2026-03-11,demo-acc-3
+demo-txn-016,AMC Theaters,36.00,expense,Entertainment & Recreation,2026-03-12,demo-acc-3
+demo-txn-017,Starbucks,5.95,expense,Coffee Shops,2026-03-13,demo-acc-3
+demo-txn-018,Thai Palace Restaurant,52.40,expense,Restaurants & Bars,2026-03-13,demo-acc-3
+demo-txn-019,Chevron Gas,71.20,expense,Gas,2026-03-14,demo-acc-1
+demo-txn-020,Costco Wholesale,187.64,expense,Groceries,2026-03-15,demo-acc-1
+demo-txn-021,Amazon.com,34.99,expense,Electronics,2026-03-15,demo-acc-3
+demo-txn-022,Paycheck Deposit,5200.00,income,Paychecks,2026-03-15,demo-acc-1
+demo-txn-023,Planet Fitness,49.99,expense,Fitness,2026-03-16,demo-acc-3
+demo-txn-024,Panera Bread,15.87,expense,Restaurants & Bars,2026-03-17,demo-acc-3
+demo-txn-025,Sushi Express,68.90,expense,Restaurants & Bars,2026-03-17,demo-acc-3
+demo-txn-026,Electric Bill,98.32,expense,Gas & Electric,2026-03-18,demo-acc-1
+demo-txn-027,Local Coffee Shop,6.75,expense,Coffee Shops,2026-03-19,demo-acc-3
+demo-txn-028,Burger King,14.23,expense,Restaurants & Bars,2026-03-20,demo-acc-3
+demo-txn-029,Shell Gas,63.45,expense,Gas,2026-03-21,demo-acc-1
+demo-txn-030,CVS Pharmacy,42.18,expense,Medical,2026-03-21,demo-acc-3
+demo-txn-031,Whole Foods Market,129.87,expense,Groceries,2026-03-22,demo-acc-3
+demo-txn-032,Concert Tickets,145.00,expense,Entertainment & Recreation,2026-03-22,demo-acc-1
+demo-txn-033,Starbucks,5.45,expense,Coffee Shops,2026-03-23,demo-acc-3
+demo-txn-034,Date Night Dinner,87.50,expense,Restaurants & Bars,2026-03-23,demo-acc-3
+demo-txn-035,Internet & Cable Bill,79.99,expense,Internet & Cable,2026-03-24,demo-acc-1
+demo-txn-036,H&M Clothing,65.40,expense,Clothing,2026-03-25,demo-acc-3
+demo-txn-037,Gas Station,58.12,expense,Gas,2026-03-26,demo-acc-1
+demo-txn-038,Taco Bell,9.45,expense,Restaurants & Bars,2026-03-27,demo-acc-3
+demo-txn-039,Dentist Appointment,150.00,expense,Dentist,2026-03-27,demo-acc-1
+demo-txn-040,Trader Joe's,82.34,expense,Groceries,2026-03-28,demo-acc-3
+demo-txn-041,Interest Deposit,12.45,income,Interest,2026-03-28,demo-acc-1
+demo-txn-042,Movie Night Concessions,28.50,expense,Entertainment & Recreation,2026-03-29,demo-acc-3
+demo-txn-043,Kroger Grocery,105.78,expense,Groceries,2026-03-30,demo-acc-3
+demo-txn-044,Parking Meter,15.00,expense,Parking & Tolls,2026-03-30,demo-acc-1
+demo-txn-045,Local Pizza Place,32.65,expense,Restaurants & Bars,2026-03-31,demo-acc-3
+demo-txn-046,Starbucks,5.95,expense,Coffee Shops,2026-03-31,demo-acc-3
+demo-txn-047,Freelance Income Deposit,1200.00,income,Business Income,2026-03-31,demo-acc-1
+demo-txn-048,Savings Account Transfer,300.00,transfer,Transfer,2026-03-31,demo-acc-1
+demo-txn-049,Paycheck Deposit,5200.00,income,Paychecks,2026-04-01,demo-acc-1
+demo-txn-050,Whole Foods Market,132.45,expense,Groceries,2026-04-02,demo-acc-3
+demo-txn-051,Starbucks,5.45,expense,Coffee Shops,2026-04-02,demo-acc-3
+demo-txn-052,Exxon Gas Station,72.18,expense,Gas,2026-04-03,demo-acc-1
+demo-txn-053,Chipotle Mexican Grill,19.87,expense,Restaurants & Bars,2026-04-04,demo-acc-3
+demo-txn-054,Netflix Subscription,15.99,expense,Entertainment & Recreation,2026-04-05,demo-acc-3
+demo-txn-055,Spotify Premium,9.99,expense,Entertainment & Recreation,2026-04-05,demo-acc-3
+demo-txn-056,Car Payment,425.00,expense,Auto Payment,2026-04-05,demo-acc-1
+demo-txn-057,Target Retail,87.23,expense,Shopping,2026-04-06,demo-acc-1
+demo-txn-058,Trader Joe's,81.92,expense,Groceries,2026-04-07,demo-acc-3
+demo-txn-059,Blue Bottle Coffee,7.50,expense,Coffee Shops,2026-04-08,demo-acc-3
+demo-txn-060,Sushi Restaurant,71.45,expense,Restaurants & Bars,2026-04-08,demo-acc-3
+demo-txn-061,Gas & Electric Bill,95.18,expense,Gas & Electric,2026-04-09,demo-acc-1
+demo-txn-062,Costco Wholesale,165.34,expense,Groceries,2026-04-10,demo-acc-1
+demo-txn-063,Amazon Electronics,124.99,expense,Electronics,2026-04-10,demo-acc-3
+demo-txn-064,AMC Theaters,32.00,expense,Entertainment & Recreation,2026-04-11,demo-acc-3
+demo-txn-065,Starbucks,5.95,expense,Coffee Shops,2026-04-12,demo-acc-3
+demo-txn-066,Date Night Dinner,95.32,expense,Restaurants & Bars,2026-04-12,demo-acc-3
+demo-txn-067,Water Bill Payment,41.75,expense,Water,2026-04-13,demo-acc-1
+demo-txn-068,Kroger Grocery,114.56,expense,Groceries,2026-04-14,demo-acc-3
+demo-txn-069,Paycheck Deposit,5200.00,income,Paychecks,2026-04-15,demo-acc-1
+demo-txn-070,Shell Gas Station,69.87,expense,Gas,2026-04-15,demo-acc-1
+demo-txn-071,Planet Fitness,49.99,expense,Fitness,2026-04-16,demo-acc-3
+demo-txn-072,Panera Bread,16.45,expense,Restaurants & Bars,2026-04-17,demo-acc-3
+demo-txn-073,Local Coffee Roastery,6.50,expense,Coffee Shops,2026-04-18,demo-acc-3
+demo-txn-074,Thai Restaurant,58.72,expense,Restaurants & Bars,2026-04-18,demo-acc-3
+demo-txn-075,CVS Pharmacy,38.99,expense,Medical,2026-04-19,demo-acc-3
+demo-txn-076,Chevron Gas,65.23,expense,Gas,2026-04-20,demo-acc-1
+demo-txn-077,Whole Foods Market,148.67,expense,Groceries,2026-04-20,demo-acc-3
+demo-txn-078,Concert Tickets,165.00,expense,Entertainment & Recreation,2026-04-21,demo-acc-1
+demo-txn-079,Starbucks,5.45,expense,Coffee Shops,2026-04-22,demo-acc-3
+demo-txn-080,Burger Restaurant,47.89,expense,Restaurants & Bars,2026-04-22,demo-acc-3
+demo-txn-081,Internet & Cable Bill,79.99,expense,Internet & Cable,2026-04-23,demo-acc-1
+demo-txn-082,H&M Clothing,58.34,expense,Clothing,2026-04-24,demo-acc-3
+demo-txn-083,Gas Station,61.45,expense,Gas,2026-04-25,demo-acc-1
+demo-txn-084,Taco Restaurant,22.34,expense,Restaurants & Bars,2026-04-26,demo-acc-3
+demo-txn-085,Auto Maintenance Shop,89.99,expense,Auto Maintenance,2026-04-26,demo-acc-1
+demo-txn-086,Trader Joe's,79.45,expense,Groceries,2026-04-27,demo-acc-3
+demo-txn-087,Movie & Dinner,115.67,expense,Entertainment & Recreation,2026-04-27,demo-acc-3
+demo-txn-088,Dentist Cleaning,85.00,expense,Dentist,2026-04-28,demo-acc-1
+demo-txn-089,Kroger Grocery,108.23,expense,Groceries,2026-04-29,demo-acc-3
+demo-txn-090,Interest Deposit,12.78,income,Interest,2026-04-29,demo-acc-1
+demo-txn-091,Starbucks,5.95,expense,Coffee Shops,2026-04-30,demo-acc-3
+demo-txn-092,Paycheck Deposit,5200.00,income,Paychecks,2026-05-01,demo-acc-1
+demo-txn-093,Whole Foods Market,138.45,expense,Groceries,2026-05-02,demo-acc-3
+demo-txn-094,Starbucks,5.45,expense,Coffee Shops,2026-05-02,demo-acc-3
+demo-txn-095,Shell Gas Station,70.34,expense,Gas,2026-05-03,demo-acc-1
+demo-txn-096,Chipotle Mexican Grill,20.12,expense,Restaurants & Bars,2026-05-04,demo-acc-3
+demo-txn-097,Netflix Subscription,15.99,expense,Entertainment & Recreation,2026-05-05,demo-acc-3
+demo-txn-098,Spotify Premium,9.99,expense,Entertainment & Recreation,2026-05-05,demo-acc-3
+demo-txn-099,Car Payment,425.00,expense,Auto Payment,2026-05-05,demo-acc-1
+demo-txn-100,Target,94.67,expense,Shopping,2026-05-06,demo-acc-1
+demo-txn-101,Trader Joe's,83.21,expense,Groceries,2026-05-07,demo-acc-3
+demo-txn-102,Blue Bottle Coffee,7.75,expense,Coffee Shops,2026-05-08,demo-acc-3
+demo-txn-103,Olive Garden Restaurant,72.18,expense,Restaurants & Bars,2026-05-08,demo-acc-3
+demo-txn-104,Water Bill Payment,43.20,expense,Water,2026-05-09,demo-acc-1
+demo-txn-105,Costco Wholesale,178.92,expense,Groceries,2026-05-10,demo-acc-1
+demo-txn-106,Amazon Electronics,89.99,expense,Electronics,2026-05-10,demo-acc-3
+demo-txn-107,AMC Theaters,34.00,expense,Entertainment & Recreation,2026-05-11,demo-acc-3
+demo-txn-108,Starbucks,5.95,expense,Coffee Shops,2026-05-12,demo-acc-3
+demo-txn-109,Date Night Dinner,102.45,expense,Restaurants & Bars,2026-05-12,demo-acc-3
+demo-txn-110,Gas & Electric Bill,97.54,expense,Gas & Electric,2026-05-13,demo-acc-1
+demo-txn-111,Kroger Grocery,121.34,expense,Groceries,2026-05-14,demo-acc-3
+demo-txn-112,Paycheck Deposit,5200.00,income,Paychecks,2026-05-15,demo-acc-1
+demo-txn-113,Chevron Gas,68.56,expense,Gas,2026-05-15,demo-acc-1
+demo-txn-114,Planet Fitness,49.99,expense,Fitness,2026-05-16,demo-acc-3
+demo-txn-115,Panera Bread,17.23,expense,Restaurants & Bars,2026-05-17,demo-acc-3
+demo-txn-116,Local Coffee Cafe,6.25,expense,Coffee Shops,2026-05-18,demo-acc-3
+demo-txn-117,Sushi & Sake Bar,79.45,expense,Restaurants & Bars,2026-05-18,demo-acc-3
+demo-txn-118,CVS Pharmacy,35.67,expense,Medical,2026-05-19,demo-acc-3
+demo-txn-119,Shell Gas Station,66.78,expense,Gas,2026-05-20,demo-acc-1
+demo-txn-120,Whole Foods Market,155.23,expense,Groceries,2026-05-20,demo-acc-3
+demo-txn-121,Concert & Festival,185.00,expense,Entertainment & Recreation,2026-05-21,demo-acc-1
+demo-txn-122,Starbucks,5.45,expense,Coffee Shops,2026-05-22,demo-acc-3
+demo-txn-123,Weekend Brunch,68.90,expense,Restaurants & Bars,2026-05-22,demo-acc-3
+demo-txn-124,Internet & Cable Bill,79.99,expense,Internet & Cable,2026-05-23,demo-acc-1
+demo-txn-125,Nike Clothing & Shoes,127.34,expense,Clothing,2026-05-24,demo-acc-3
+demo-txn-126,Gas Station,72.11,expense,Gas,2026-05-25,demo-acc-1
+demo-txn-127,Thai Food Delivery,45.67,expense,Restaurants & Bars,2026-05-26,demo-acc-3
+demo-txn-128,Car Oil Change,62.50,expense,Auto Maintenance,2026-05-26,demo-acc-1
+demo-txn-129,Trader Joe's,85.78,expense,Groceries,2026-05-27,demo-acc-3
+demo-txn-130,Movie & Dinner Outing,128.34,expense,Entertainment & Recreation,2026-05-27,demo-acc-3
+demo-txn-131,Dentist Visit,95.00,expense,Dentist,2026-05-28,demo-acc-1
+demo-txn-132,Kroger Grocery,116.45,expense,Groceries,2026-05-29,demo-acc-3
+demo-txn-133,Interest Deposit,13.12,income,Interest,2026-05-29,demo-acc-1
+demo-txn-134,Starbucks,5.95,expense,Coffee Shops,2026-05-30,demo-acc-3
+demo-txn-135,Freelance Income Deposit,950.00,income,Business Income,2026-05-30,demo-acc-1
+demo-txn-136,Gym Class Pack,85.00,expense,Fitness,2026-05-31,demo-acc-3
+demo-txn-137,Parking Downtown,18.00,expense,Parking & Tolls,2026-05-31,demo-acc-1
+demo-txn-138,Furniture Store,245.67,expense,Furniture & Housewares,2026-04-01,demo-acc-1
+demo-txn-139,Pet Store,34.50,expense,Pets,2026-04-02,demo-acc-3
+demo-txn-140,Uber Ride,22.45,expense,Taxi & Ride Shares,2026-04-03,demo-acc-1
+demo-txn-141,Home Depot,178.92,expense,Home Improvement,2026-04-08,demo-acc-1
+demo-txn-142,Grocery Outlet,95.34,expense,Groceries,2026-04-12,demo-acc-3
+demo-txn-143,Movie Tickets,28.00,expense,Entertainment & Recreation,2026-04-19,demo-acc-3
+demo-txn-144,Phone Bill,65.99,expense,Phone,2026-04-25,demo-acc-1
+demo-txn-145,Pet Food & Supplies,56.78,expense,Pets,2026-05-03,demo-acc-3
+demo-txn-146,Gym Membership,49.99,expense,Fitness,2026-05-01,demo-acc-3
+demo-txn-147,Books & Reading,32.45,expense,Entertainment & Recreation,2026-05-10,demo-acc-3
+demo-txn-148,Lyft Ride,19.87,expense,Taxi & Ride Shares,2026-05-16,demo-acc-1
+demo-txn-149,Lowe's Home Supplies,134.56,expense,Home Improvement,2026-05-22,demo-acc-1
+demo-txn-150,Miscellaneous Purchase,41.23,expense,Miscellaneous,2026-05-28,demo-acc-3

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/providers/hide_amounts_provider.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../shared/widgets/masked_amount.dart';
 import '../../data/models/account_model.dart';
 import '../../data/models/net_worth_history_model.dart';
 
-class NetWorthSummaryWidget extends StatelessWidget {
+class NetWorthSummaryWidget extends ConsumerWidget {
   const NetWorthSummaryWidget({
     required this.history,
     required this.currentAccounts,
@@ -15,9 +18,10 @@ class NetWorthSummaryWidget extends StatelessWidget {
   final List<AccountModel> currentAccounts;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+    final hidden = ref.watch(hideAmountsProvider);
 
     // Current net worth = sum of all account balances
     final currentNetWorth = currentAccounts.fold(0.0, (s, a) => s + a.balance);
@@ -45,9 +49,10 @@ class NetWorthSummaryWidget extends StatelessWidget {
                 style: tt.labelSmall
                     ?.copyWith(color: cs.onPrimaryContainer.withAlpha(178))),
             const SizedBox(height: 8),
-            Text(formatCurrency(currentNetWorth),
-                style: tt.headlineMedium
-                    ?.copyWith(fontWeight: FontWeight.bold)),
+            MaskedAmount(
+              currentNetWorth,
+              style: tt.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 12),
             Row(
               children: [
@@ -59,7 +64,9 @@ class NetWorthSummaryWidget extends StatelessWidget {
                 const SizedBox(width: 4),
                 Flexible(
                   child: Text(
-                    '${isPositive ? '+' : ''}${formatCurrency(change)} (${isPositive ? '+' : ''}${changePercentage.toStringAsFixed(1)}%)',
+                    hidden
+                        ? '•••••• (••••%)'
+                        : '${isPositive ? '+' : ''}${formatCurrency(change)} (${isPositive ? '+' : ''}${changePercentage.toStringAsFixed(1)}%)',
                     style: tt.labelSmall?.copyWith(color: changeColor),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -81,3 +88,4 @@ class NetWorthSummaryWidget extends StatelessWidget {
     );
   }
 }
+

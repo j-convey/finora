@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/providers/hide_amounts_provider.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../data/models/report_summary.dart';
 
 /// Summary statistics card shown at the bottom of each report tab.
-class ReportSummaryCard extends StatelessWidget {
+class ReportSummaryCard extends ConsumerWidget {
   const ReportSummaryCard({
     super.key,
     required this.summary,
@@ -17,9 +19,12 @@ class ReportSummaryCard extends StatelessWidget {
   final int tab;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+    final hidden = ref.watch(hideAmountsProvider);
+
+    String mask(String value) => hidden ? '••••••' : value;
 
     return Card(
       color: cs.surfaceContainerLow,
@@ -37,18 +42,18 @@ class ReportSummaryCard extends StatelessWidget {
             if (tab == 0) ...[
               _Row(
                 label: 'Total income',
-                value: '+${formatCurrency(summary.totalIncome)}',
+                value: mask('+${formatCurrency(summary.totalIncome)}'),
                 valueColor: const Color(0xFF4CAF50),
               ),
               _Row(
                 label: 'Total expenses',
-                value: formatCurrency(summary.totalExpenses),
+                value: mask(formatCurrency(summary.totalExpenses)),
                 valueColor: const Color(0xFFEF5350),
               ),
               _Row(
                 label: 'Net cash flow',
-                value:
-                    '${summary.netCashFlow >= 0 ? '+' : ''}${formatCurrency(summary.netCashFlow)}',
+                value: mask(
+                    '${summary.netCashFlow >= 0 ? '+' : ''}${formatCurrency(summary.netCashFlow)}'),
                 valueColor: summary.netCashFlow >= 0
                     ? const Color(0xFF4CAF50)
                     : const Color(0xFFEF5350),
@@ -62,13 +67,13 @@ class ReportSummaryCard extends StatelessWidget {
             if (tab == 1 && summary.largestExpense != null)
               _Row(
                 label: 'Largest expense',
-                value: formatCurrency(summary.largestExpense!.amount),
+                value: mask(formatCurrency(summary.largestExpense!.amount)),
                 valueColor: const Color(0xFFEF5350),
               ),
             if (tab == 2 && summary.largestIncome != null)
               _Row(
                 label: 'Largest income',
-                value: '+${formatCurrency(summary.largestIncome!.amount)}',
+                value: mask('+${formatCurrency(summary.largestIncome!.amount)}'),
                 valueColor: const Color(0xFF4CAF50),
               ),
           ],

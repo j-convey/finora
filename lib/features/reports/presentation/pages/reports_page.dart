@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/providers/hide_amounts_provider.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/widgets/transaction_card.dart';
 import '../../../../shared/widgets/transaction_details_sheet.dart';
@@ -46,18 +47,32 @@ class _ReportsPageState extends ConsumerState<ReportsPage>
   Widget build(BuildContext context) {
     final period = ref.watch(reportPeriodProvider);
     final summary = ref.watch(reportSummaryProvider);
+    final isMobilePlatform = Theme.of(context).platform == TargetPlatform.android ||
+        Theme.of(context).platform == TargetPlatform.iOS;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Cash Flow'),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
+        leading: isMobilePlatform
+            ? Builder(
+                builder: (context) => IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () => Scaffold.of(context).openDrawer(),
+                ),
+              )
+            : null,
         actions: [
           _PeriodPickerButton(current: period),
+          Consumer(
+            builder: (context, ref, _) {
+              final hidden = ref.watch(hideAmountsProvider);
+              return IconButton(
+                icon: Icon(hidden ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                tooltip: hidden ? 'Show amounts' : 'Hide amounts',
+                onPressed: () => ref.read(hideAmountsProvider.notifier).state = !hidden,
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () => showAddTransactionSheet(context),
@@ -73,7 +88,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage>
           ],
         ),
       ),
-      drawer: const MainDrawer(),
+      drawer: isMobilePlatform ? const MainDrawer() : null,
       body: TabBarView(
         controller: _tabs,
         children: [
@@ -127,15 +142,16 @@ class _PeriodPickerButton extends ConsumerWidget {
 
 // ── Cash Flow tab ─────────────────────────────────────────────────────────────
 
-class _CashFlowTab extends StatelessWidget {
+class _CashFlowTab extends ConsumerWidget {
   const _CashFlowTab({required this.summary});
 
   final ReportSummary summary;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+    final hidden = ref.watch(hideAmountsProvider);
     final isPositive = summary.netCashFlow >= 0;
 
     return ListView(
@@ -161,7 +177,9 @@ class _CashFlowTab extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${isPositive ? '+' : ''}${formatCurrency(summary.netCashFlow)}',
+                        hidden
+                            ? '••••••'
+                            : '${isPositive ? '+' : ''}${formatCurrency(summary.netCashFlow)}',
                         style: tt.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: isPositive
@@ -177,13 +195,13 @@ class _CashFlowTab extends StatelessWidget {
                   children: [
                     _InlineStat(
                       label: 'Income',
-                      value: '+${formatCurrency(summary.totalIncome)}',
+                      value: hidden ? '••••••' : '+${formatCurrency(summary.totalIncome)}',
                       color: const Color(0xFF4CAF50),
                     ),
                     const SizedBox(height: 4),
                     _InlineStat(
                       label: 'Expenses',
-                      value: formatCurrency(summary.totalExpenses),
+                      value: hidden ? '••••••' : formatCurrency(summary.totalExpenses),
                       color: const Color(0xFFEF5350),
                     ),
                   ],

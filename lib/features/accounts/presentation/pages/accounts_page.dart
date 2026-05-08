@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/providers/hide_amounts_provider.dart';
 import '../../data/models/account_model.dart';
 import '../providers/accounts_provider.dart';
 import '../providers/net_worth_history_provider.dart';
@@ -34,24 +35,38 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
     final accountsList = ref.watch(accountsProvider);
     final netWorthHistory = ref.watch(netWorthHistoryProvider);
     final isMobile = MediaQuery.of(context).size.width < 600;
+    final isMobilePlatform = Theme.of(context).platform == TargetPlatform.android ||
+        Theme.of(context).platform == TargetPlatform.iOS;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Accounts'),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
+        leading: isMobilePlatform
+            ? Builder(
+                builder: (context) => IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () => Scaffold.of(context).openDrawer(),
+                ),
+              )
+            : null,
         actions: [
+          Consumer(
+            builder: (context, ref, _) {
+              final hidden = ref.watch(hideAmountsProvider);
+              return IconButton(
+                icon: Icon(hidden ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                tooltip: hidden ? 'Show amounts' : 'Hide amounts',
+                onPressed: () => ref.read(hideAmountsProvider.notifier).state = !hidden,
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () => showAddTransactionSheet(context),
           ),
         ],
       ),
-      drawer: const MainDrawer(),
+      drawer: isMobilePlatform ? const MainDrawer() : null,
       body: isMobile
           ? _buildMobileLayout(accountsList, netWorthHistory)
           : _buildDesktopLayout(accountsList, netWorthHistory),

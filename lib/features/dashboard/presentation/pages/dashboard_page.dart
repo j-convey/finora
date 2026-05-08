@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../app/providers/shell_index_provider.dart';
+import '../../../../core/providers/hide_amounts_provider.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../shared/widgets/masked_amount.dart';
 import '../../../accounts/data/models/account_model.dart';
 import '../../../accounts/presentation/providers/accounts_provider.dart';
 import '../../../budgets/presentation/providers/budgets_provider.dart';
@@ -41,6 +42,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     final transactions = ref.watch(transactionsProvider);
     final width = MediaQuery.sizeOf(context).width;
     final isWide = width >= 720;
+    final isMobile = Theme.of(context).platform == TargetPlatform.android ||
+        Theme.of(context).platform == TargetPlatform.iOS;
 
     final netWorth = accounts.fold(0.0, (s, a) => s + a.balance);
 
@@ -84,20 +87,32 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
+        leading: isMobile
+            ? Builder(
+                builder: (context) => IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () => Scaffold.of(context).openDrawer(),
+                ),
+              )
+            : null,
         actions: [
+          Consumer(
+            builder: (context, ref, _) {
+              final hidden = ref.watch(hideAmountsProvider);
+              return IconButton(
+                icon: Icon(hidden ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                tooltip: hidden ? 'Show amounts' : 'Hide amounts',
+                onPressed: () => ref.read(hideAmountsProvider.notifier).state = !hidden,
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () => showAddTransactionSheet(context),
           ),
         ],
       ),
-      drawer: const MainDrawer(),
+      drawer: isMobile ? const MainDrawer() : null,
       body: RefreshIndicator(
         onRefresh: () async {
           try {
@@ -276,7 +291,7 @@ class _BudgetCard extends StatelessWidget {
       ][month];
 }
 
-class _BudgetRow extends StatelessWidget {
+class _BudgetRow extends ConsumerWidget {
   const _BudgetRow({
     required this.label,
     required this.amount,
@@ -292,9 +307,10 @@ class _BudgetRow extends StatelessWidget {
   final bool positive;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+    final hidden = ref.watch(hideAmountsProvider);
     final remaining = budget - amount;
     final barColor = positive ? const Color(0xFF4CAF50) : cs.primary;
 
@@ -306,7 +322,7 @@ class _BudgetRow extends StatelessWidget {
           children: [
             Text(label, style: tt.bodyMedium),
             Text(
-              '${formatCurrency(budget)} budget',
+              hidden ? '•••••• budget' : '${formatCurrency(budget)} budget',
               style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
             ),
           ],
@@ -327,7 +343,9 @@ class _BudgetRow extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                '${formatCurrency(amount)} ${positive ? 'earned' : 'spent'}',
+                hidden
+                    ? '•••••• ${positive ? 'earned' : 'spent'}'
+                    : '${formatCurrency(amount)} ${positive ? 'earned' : 'spent'}',
                 style: tt.bodySmall?.copyWith(fontWeight: FontWeight.w600),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -335,7 +353,7 @@ class _BudgetRow extends StatelessWidget {
             const SizedBox(width: 4),
             Flexible(
               child: Text(
-                '${formatCurrency(remaining)} remaining',
+                hidden ? '•••••• remaining' : '${formatCurrency(remaining)} remaining',
                 style: tt.bodySmall?.copyWith(color: const Color(0xFF4CAF50)),
                 textAlign: TextAlign.end,
                 overflow: TextOverflow.ellipsis,
@@ -483,18 +501,25 @@ class _SpendingCardState extends ConsumerState<_SpendingCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Spending',
-                          style: tt.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.bold)),
-                      Text(
-                        '${formatCurrency(totalSpend)} $subtitleSuffix',
-                        style: tt.bodySmall
-                            ?.copyWith(color: cs.onSurfaceVariant),
-                      ),
-                    ],
+                  child: Consumer(
+                    builder: (context, ref, _) {
+                      final hidden = ref.watch(hideAmountsProvider);
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Spending',
+                              style: tt.titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold)),
+                          Text(
+                            hidden
+                                ? '•••••• $subtitleSuffix'
+                                : '${formatCurrency(totalSpend)} $subtitleSuffix',
+                            style: tt.bodySmall
+                                ?.copyWith(color: cs.onSurfaceVariant),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
                 PopupMenuButton<_SpendingPeriod>(
@@ -709,15 +734,16 @@ class _LineChartPainter extends CustomPainter {
 
 // ── Net Worth card ────────────────────────────────────────────────────────────
 
-class _NetWorthCard extends StatelessWidget {
+class _NetWorthCard extends ConsumerWidget {
   const _NetWorthCard({required this.netWorth});
 
   final double netWorth;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+    final hidden = ref.watch(hideAmountsProvider);
     const gain = 23331.71;
     const gainPct = 3.5;
 
@@ -733,8 +759,8 @@ class _NetWorthCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      formatCurrency(netWorth),
+                    MaskedAmount(
+                      netWorth,
                       style: tt.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 2),
@@ -744,7 +770,7 @@ class _NetWorthCard extends StatelessWidget {
                             size: 14, color: Color(0xFF4CAF50)),
                         const SizedBox(width: 2),
                         Text(
-                          '${formatCurrency(gain)} ($gainPct%)',
+                          hidden ? '•••••• (••••%)' : '${formatCurrency(gain)} ($gainPct%)',
                           style: tt.bodySmall?.copyWith(
                             color: const Color(0xFF4CAF50),
                             fontWeight: FontWeight.w600,

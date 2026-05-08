@@ -235,6 +235,33 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  /// Changes the current user's password.
+  /// Returns null on success, or an error message string on failure.
+  Future<String?> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final dio = _buildDio();
+      final accessToken = await _storage.getAccessToken();
+      if (accessToken != null) {
+        dio.options.headers['Authorization'] = 'Bearer $accessToken';
+      }
+      await dio.post<void>(
+        '/api/users/me/password',
+        data: {
+          'current_password': currentPassword,
+          'new_password': newPassword,
+        },
+      );
+      return null;
+    } on DioException catch (e) {
+      return _extractError(e);
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
   /// Probes a candidate server URL. Returns a [ServerProbeResult] describing
   /// whether the server is reachable and whether it already has users.
   /// Does NOT persist any state — purely informational.
