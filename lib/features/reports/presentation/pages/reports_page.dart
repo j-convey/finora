@@ -14,6 +14,8 @@ import '../widgets/category_legend_tile.dart';
 import '../widgets/category_transactions_sheet.dart';
 import '../widgets/donut_chart.dart';
 import '../widgets/report_summary_card.dart';
+import '../../../../shared/widgets/add_transaction_sheet.dart';
+import '../../../../shared/widgets/main_drawer.dart';
 
 class ReportsPage extends ConsumerStatefulWidget {
   const ReportsPage({super.key});
@@ -47,9 +49,19 @@ class _ReportsPageState extends ConsumerState<ReportsPage>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reports'),
+        title: const Text('Cash Flow'),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
         actions: [
           _PeriodPickerButton(current: period),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => showAddTransactionSheet(context),
+          ),
           const SizedBox(width: 8),
         ],
         bottom: TabBar(
@@ -61,6 +73,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage>
           ],
         ),
       ),
+      drawer: const MainDrawer(),
       body: TabBarView(
         controller: _tabs,
         children: [

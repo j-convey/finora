@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:file_picker/file_picker.dart';
 
 import '../../../../../app/providers/theme_provider.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../auth/data/models/user_model.dart';
 import '../../../transactions/presentation/providers/transactions_provider.dart';
 import '../../../transactions/presentation/providers/categories_provider.dart';
 import '../../../accounts/presentation/providers/accounts_provider.dart';
@@ -13,6 +15,7 @@ import '../../../subscriptions/presentation/providers/subscriptions_provider.dar
 import '../providers/database_backup_provider.dart';
 import '../providers/simplefin_provider.dart';
 import '../../../accounts/presentation/providers/net_worth_history_provider.dart';
+import '../../../../shared/widgets/add_transaction_sheet.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -35,12 +38,39 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
+    final user = auth.user;
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(
+        title: const Text('Settings'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => showAddTransactionSheet(context),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: ListView(
         children: [
+          // ── Profile ──────────────────────────────────────────
+          _SectionHeader(title: 'Profile'),
+          ListTile(
+            leading: CircleAvatar(
+              backgroundImage: user?.profilePictureUrl != null
+                  ? NetworkImage(user!.profilePictureUrl!)
+                  : null,
+              child: user?.profilePictureUrl == null
+                  ? const Icon(Icons.person_outline)
+                  : null,
+            ),
+            title: Text(user?.fullName ?? 'Set your name'),
+            subtitle: const Text('Tap to edit profile info'),
+            onTap: () => _showEditProfileSheet(context, ref, user),
+          ),
+          const Divider(),
+
           // ── Account ──────────────────────────────────────────
           _SectionHeader(title: 'Account'),
           ListTile(
@@ -367,6 +397,100 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     ref.read(subscriptionsProvider.notifier).clear();
     ref.read(categoriesProvider.notifier).clear();
     ref.read(netWorthHistoryProvider.notifier).clear();
+  }
+
+  void _showEditProfileSheet(BuildContext context, WidgetRef ref, UserModel? user) {
+    final nameController = TextEditingController(text: user?.fullName);
+    String? selectedFilePath;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setSheetState) => Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Edit Profile',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 20),
+              // Profile Picture Upload
+              Center(
+                child: Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundImage: selectedFilePath != null
+                          ? null // Will show file below
+                          : (user?.profilePictureUrl != null
+                              ? NetworkImage(user!.profilePictureUrl!)
+                              : null),
+                      child: selectedFilePath != null
+                          ? const Icon(Icons.check, color: Colors.green, size: 40)
+                          : (user?.profilePictureUrl == null
+                              ? const Icon(Icons.person, size: 40)
+                              : null),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: CircleAvatar(
+                        radius: 14,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          icon: const Icon(Icons.camera_alt, size: 16, color: Colors.white),
+                          onPressed: () async {
+                            final result = await FilePicker.platform.pickFiles(
+                              type: FileType.image,
+                            );
+                            if (result != null && result.files.single.path != null) {
+                              setSheetState(() {
+                                selectedFilePath = result.files.single.path;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Full Name',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 24),
+              FilledButton(
+                onPressed: () async {
+                  final success = await ref.read(authProvider.notifier).updateProfile(
+                        fullName: nameController.text.trim(),
+                        profilePicturePath: selectedFilePath,
+                      );
+                  if (success && context.mounted) {
+                    Navigator.pop(context);
+                  }
+                },
+                child: const Text('Save Changes'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 

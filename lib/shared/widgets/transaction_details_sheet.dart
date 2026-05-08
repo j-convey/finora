@@ -50,6 +50,7 @@ void showCategoryPicker(
 ) {
   showModalBottomSheet(
     context: context,
+    isScrollControlled: true,
     builder: (_) => CategoryPickerSheet(
       current: transaction.category,
       onSelected: (cat) {
@@ -403,62 +404,70 @@ class _CategoryPickerSheetState extends ConsumerState<CategoryPickerSheet> {
             .where((c) => c.toLowerCase().contains(_query.toLowerCase()))
             .toList();
 
-    return SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Text('Change Category', style: tt.titleMedium),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: SearchBar(
-              hintText: 'Search categories…',
-              leading: const Icon(Icons.search),
-              onChanged: (v) => setState(() => _query = v),
-              constraints: const BoxConstraints(minHeight: 44),
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Text('Change Category', style: tt.titleMedium),
             ),
-          ),
-          const Divider(height: 1),
-          Flexible(
-            child: filtered.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Center(
-                      child: Text(
-                        'No categories found',
-                        style: tt.bodySmall
-                            ?.copyWith(color: cs.onSurfaceVariant),
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: filtered.length,
-                    itemBuilder: (context, i) {
-                      final cat = filtered[i];
-                      final isSelected = cat == widget.current;
-                      return ListTile(
-                        leading: Icon(
-                          TransactionModel.iconForCategory(cat),
-                          color:
-                              isSelected ? cs.primary : cs.onSurfaceVariant,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: SearchBar(
+                hintText: 'Search categories…',
+                leading: const Icon(Icons.search),
+                onChanged: (v) => setState(() => _query = v),
+                constraints: const BoxConstraints(minHeight: 44),
+              ),
+            ),
+            const Divider(height: 1),
+            Flexible(
+              child: filtered.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Center(
+                        child: Text(
+                          'No categories found',
+                          style: tt.bodySmall
+                              ?.copyWith(color: cs.onSurfaceVariant),
                         ),
-                        title: Text(cat),
-                        trailing: isSelected
-                            ? Icon(Icons.check, color: cs.primary)
-                            : null,
-                        selected: isSelected,
-                        onTap: () {
-                          widget.onSelected(cat);
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                  ),
-          ),
-        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: filtered.length,
+                      itemBuilder: (context, i) {
+                        final cat = filtered[i];
+                        final isSelected = cat == widget.current;
+                        return ListTile(
+                          leading: Icon(
+                            TransactionModel.iconForCategory(cat),
+                            color:
+                                isSelected ? cs.primary : cs.onSurfaceVariant,
+                          ),
+                          title: Text(cat),
+                          trailing: isSelected
+                              ? Icon(Icons.check, color: cs.primary)
+                              : null,
+                          selected: isSelected,
+                          onTap: () {
+                            widget.onSelected(cat);
+                            Navigator.pop(context);
+                          },
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -4,9 +4,14 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../data/models/account_model.dart';
 
 class GroupedAccountsWidget extends StatefulWidget {
-  const GroupedAccountsWidget({required this.accounts, super.key});
+  const GroupedAccountsWidget({
+    required this.accounts,
+    this.onTypeChanged,
+    super.key,
+  });
 
   final List<AccountModel> accounts;
+  final void Function(AccountModel account, AccountType newType)? onTypeChanged;
 
   @override
   State<GroupedAccountsWidget> createState() => _GroupedAccountsWidgetState();
@@ -59,6 +64,7 @@ class _GroupedAccountsWidgetState extends State<GroupedAccountsWidget> {
               _expandedSections[type] = value;
             });
           },
+          onTypeChanged: widget.onTypeChanged,
         );
       }).toList(),
     );
@@ -72,6 +78,7 @@ class _AccountGroup extends StatelessWidget {
     required this.total,
     required this.isExpanded,
     required this.onExpandChanged,
+    this.onTypeChanged,
   });
 
   final AccountType type;
@@ -79,6 +86,7 @@ class _AccountGroup extends StatelessWidget {
   final double total;
   final bool isExpanded;
   final ValueChanged<bool> onExpandChanged;
+  final void Function(AccountModel account, AccountType newType)? onTypeChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +138,10 @@ class _AccountGroup extends StatelessWidget {
               ],
             ),
             children: accounts
-                .map((a) => _AccountListItem(account: a))
+                .map((a) => _AccountListItem(
+                      account: a,
+                      onTypeChanged: onTypeChanged,
+                    ))
                 .toList(),
           ),
         ),
@@ -141,9 +152,23 @@ class _AccountGroup extends StatelessWidget {
 }
 
 class _AccountListItem extends StatelessWidget {
-  const _AccountListItem({required this.account});
+  const _AccountListItem({
+    required this.account,
+    this.onTypeChanged,
+  });
 
   final AccountModel account;
+  final void Function(AccountModel account, AccountType newType)? onTypeChanged;
+
+  Future<void> _showTypePicker(BuildContext context) async {
+    final newType = await showDialog<AccountType>(
+      context: context,
+      builder: (ctx) => _AccountTypePickerDialog(current: account.type),
+    );
+    if (newType != null && newType != account.type) {
+      onTypeChanged?.call(account, newType);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -204,6 +229,16 @@ class _AccountListItem extends StatelessWidget {
                 ),
             ],
           ),
+          if (onTypeChanged != null) ...[
+            const SizedBox(width: 8),
+            IconButton(
+              icon: Icon(Icons.edit_outlined,
+                  size: 18, color: cs.onSurfaceVariant),
+              tooltip: 'Change account type',
+              onPressed: () => _showTypePicker(context),
+              visualDensity: VisualDensity.compact,
+            ),
+          ],
         ],
       ),
     );
@@ -215,5 +250,52 @@ class _AccountListItem extends StatelessWidget {
     if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
     if (diff.inHours < 24) return '${diff.inHours}h ago';
     return '${diff.inDays}d ago';
+  }
+}
+
+class _AccountTypePickerDialog extends StatelessWidget {
+  const _AccountTypePickerDialog({required this.current});
+
+  final AccountType current;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+    const types = AccountType.values;
+
+    return AlertDialog(
+      title: const Text('Account Type'),
+      contentPadding: const EdgeInsets.symmetric(vertical: 8),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: types.map((type) {
+          final selected = type == current;
+          return ListTile(
+            leading: Icon(
+              AccountModel.iconForType(type),
+              color: selected ? cs.primary : cs.onSurfaceVariant,
+            ),
+            title: Text(
+              AccountModel.labelForType(type),
+              style: tt.bodyMedium?.copyWith(
+                fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+                color: selected ? cs.primary : null,
+              ),
+            ),
+            trailing: selected
+                ? Icon(Icons.check, color: cs.primary)
+                : null,
+            onTap: () => Navigator.of(context).pop(type),
+          );
+        }).toList(),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+      ],
+    );
   }
 }

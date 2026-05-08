@@ -7,6 +7,7 @@ import '../../../transactions/data/models/transaction_model.dart';
 import '../../../transactions/presentation/providers/transactions_provider.dart';
 import '../../data/models/subscription_model.dart';
 import '../providers/subscriptions_provider.dart';
+import '../../../../shared/widgets/add_transaction_sheet.dart';
 
 class SubscriptionsPage extends ConsumerWidget {
   const SubscriptionsPage({super.key});
@@ -25,22 +26,10 @@ class SubscriptionsPage extends ConsumerWidget {
         title: const Text('Subscriptions'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add_to_photos_outlined),
-            tooltip: 'Add from transaction',
-            onPressed: () => _showTransactionPicker(context, ref),
+            icon: const Icon(Icons.add),
+            onPressed: () => showAddTransactionSheet(context),
           ),
-          IconButton(
-            icon: const Icon(Icons.refresh_outlined),
-            tooltip: 'Refresh',
-            onPressed: () {
-              ref.read(subscriptionsProvider.notifier).sync();
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: 'Settings',
-            onPressed: () => context.push('/settings'),
-          ),
+          const SizedBox(width: 8),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(

@@ -12,6 +12,8 @@ import '../../../transactions/data/models/transaction_model.dart';
 import '../../../transactions/presentation/providers/categories_provider.dart';
 import '../../../transactions/presentation/providers/transactions_provider.dart';
 import '../../../../shared/widgets/transaction_details_sheet.dart';
+import '../../../../shared/widgets/add_transaction_sheet.dart';
+import '../../../../shared/widgets/main_drawer.dart';
 
 class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
@@ -65,7 +67,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     final budgetCard = _BudgetCard(
       income: monthIncome,
       expenses: monthExpenses,
-      onSeeAll: () => ref.read(shellIndexProvider.notifier).state = 3,
+      onSeeAll: () => ref.read(shellIndexProvider.notifier).state = 4,
     );
 
     final spendingCard = const _SpendingCard();
@@ -76,25 +78,26 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     final transactionsCard = _RecentTransactionsCard(
       transactions: transactions.take(5).toList(),
       accountsById: accountsById,
-      onSeeAll: () => ref.read(shellIndexProvider.notifier).state = 1,
+      onSeeAll: () => ref.read(shellIndexProvider.notifier).state = 2,
     );
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Welcome back!'),
+        title: const Text('Dashboard'),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.bar_chart_outlined),
-            tooltip: 'Reports',
-            onPressed: () => context.push('/reports'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: 'Settings',
-            onPressed: () => context.push('/settings'),
+            icon: const Icon(Icons.add),
+            onPressed: () => showAddTransactionSheet(context),
           ),
         ],
       ),
+      drawer: const MainDrawer(),
       body: RefreshIndicator(
         onRefresh: () async {
           try {

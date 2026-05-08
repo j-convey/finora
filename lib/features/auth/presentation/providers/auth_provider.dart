@@ -192,6 +192,49 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   void clearError() => state = state.copyWith(clearError: true);
 
+  /// Updates the current user's profile info.
+  /// If [profilePicturePath] is provided, it is uploaded as a multipart file.
+  Future<bool> updateProfile({
+    String? fullName,
+    String? profilePicturePath,
+  }) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final dio = _buildDio();
+      final accessToken = await _storage.getAccessToken();
+      if (accessToken != null) {
+        dio.options.headers['Authorization'] = 'Bearer $accessToken';
+      }
+
+      dynamic data;
+      if (profilePicturePath != null) {
+        data = FormData.fromMap({
+          if (fullName != null) 'full_name': fullName,
+          'profile_picture': await MultipartFile.fromFile(
+            profilePicturePath,
+            filename: 'profile_picture.jpg',
+          ),
+        });
+      } else {
+        data = {
+          if (fullName != null) 'full_name': fullName,
+        };
+      }
+
+      final response = await dio.patch<Map<String, dynamic>>(
+        '/api/users/me',
+        data: data,
+      );
+
+      final updatedUser = UserModel.fromJson(response.data!);
+      state = state.copyWith(isLoading: false, user: updatedUser);
+      return true;
+    } on DioException catch (e) {
+      state = state.copyWith(isLoading: false, error: _extractError(e));
+      return false;
+    }
+  }
+
   /// Probes a candidate server URL. Returns a [ServerProbeResult] describing
   /// whether the server is reachable and whether it already has users.
   /// Does NOT persist any state — purely informational.

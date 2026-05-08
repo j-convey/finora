@@ -8,7 +8,7 @@ enum _ServerState { idle, checking, ok, error }
 /// Single-screen auth page.
 ///
 /// Layout:
-///   • Server URL field — on focus-lost, probes the server.
+///   • Server URL field — provides a button to probe the server.
 ///   • Once server is reachable: Email + Password fields appear.
 ///   • If server has no users yet: "First Time Setup" button appears
 ///     alongside the regular Sign In button.
@@ -32,23 +32,36 @@ class _SetupPageState extends ConsumerState<SetupPage> {
   @override
   void initState() {
     super.initState();
+    _urlController.addListener(_onUrlChange);
 
-    // If a server URL is already stored, pre-fill the field.
+    // If a server URL is already stored, probe it immediately.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final storedUrl = ref.read(authProvider).serverUrl;
       if (storedUrl.isNotEmpty) {
         _urlController.text = storedUrl;
+        _probeServer();
       }
     });
   }
 
   @override
   void dispose() {
+    _urlController.removeListener(_onUrlChange);
     _urlController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _urlFocus.dispose();
     super.dispose();
+  }
+
+  void _onUrlChange() {
+    // If the user starts typing, reset the server state so they can "Check Connection" again.
+    if (_serverState != _ServerState.idle) {
+      setState(() {
+        _serverState = _ServerState.idle;
+        _serverHasUsers = null;
+      });
+    }
   }
 
   Future<void> _probeServer() async {
@@ -164,6 +177,7 @@ class _SetupPageState extends ConsumerState<SetupPage> {
                     },
                   ),
                   keyboardType: TextInputType.url,
+                  onSubmitted: (_) => _probeServer(),
                 ),
                 if (_serverState == _ServerState.error) ...[
                   const SizedBox(height: 6),

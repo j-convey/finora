@@ -10,6 +10,8 @@ import '../../features/accounts/presentation/pages/accounts_page.dart';
 import '../../features/budgets/presentation/pages/budgets_page.dart';
 import '../../features/subscriptions/presentation/pages/subscriptions_page.dart';
 import '../../features/reports/presentation/pages/reports_page.dart';
+import 'add_transaction_sheet.dart';
+import 'main_drawer.dart';
 
 class _Destination {
   const _Destination({
@@ -23,12 +25,31 @@ class _Destination {
 }
 
 const _destinations = [
-  _Destination(label: 'Dashboard', icon: Icons.home_outlined, selectedIcon: Icons.home),
-  _Destination(label: 'Transactions', icon: Icons.receipt_long_outlined, selectedIcon: Icons.receipt_long),
-  _Destination(label: 'Accounts', icon: Icons.account_balance_wallet_outlined, selectedIcon: Icons.account_balance_wallet),
-  _Destination(label: 'Budgets', icon: Icons.donut_large_outlined, selectedIcon: Icons.donut_large),
-  _Destination(label: 'Subscriptions', icon: Icons.subscriptions_outlined, selectedIcon: Icons.subscriptions),
-  _Destination(label: 'Reports', icon: Icons.assessment_outlined, selectedIcon: Icons.assessment),
+  _Destination(
+    label: 'Dashboard',
+    icon: Icons.home_outlined,
+    selectedIcon: Icons.home,
+  ),
+  _Destination(
+    label: 'Accounts',
+    icon: Icons.layers_outlined,
+    selectedIcon: Icons.layers,
+  ),
+  _Destination(
+    label: 'Transactions',
+    icon: Icons.credit_card_outlined,
+    selectedIcon: Icons.credit_card,
+  ),
+  _Destination(
+    label: 'Cash Flow',
+    icon: Icons.bar_chart_outlined,
+    selectedIcon: Icons.bar_chart,
+  ),
+  _Destination(
+    label: 'Budget',
+    icon: Icons.account_balance_outlined,
+    selectedIcon: Icons.account_balance,
+  ),
 ];
 
 /// Main shell widget. Uses [IndexedStack] for tab state preservation.
@@ -40,11 +61,10 @@ class MainShell extends ConsumerWidget {
 
   static const _pages = [
     DashboardPage(),
-    TransactionsPage(),
     AccountsPage(),
-    BudgetsPage(),
-    SubscriptionsPage(),
+    TransactionsPage(),
     ReportsPage(),
+    BudgetsPage(),
   ];
 
   @override

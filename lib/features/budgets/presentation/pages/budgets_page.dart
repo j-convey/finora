@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../data/models/budget_model.dart';
 import '../providers/budgets_provider.dart';
+import '../../../../shared/widgets/add_transaction_sheet.dart';
+import '../../../../shared/widgets/main_drawer.dart';
 
 // ── Preset colours the user can pick from ───────────────────────────────────
 
@@ -41,15 +43,21 @@ class BudgetsPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Budgets'),
+        title: const Text('Budget'),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: 'Settings',
-            onPressed: () => context.push('/settings'),
+            icon: const Icon(Icons.add),
+            onPressed: () => showAddTransactionSheet(context),
           ),
         ],
       ),
+      drawer: const MainDrawer(),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'fab_budgets',
         onPressed: () => _showBudgetSheet(context, ref, existing: null),
@@ -121,8 +129,6 @@ class BudgetsPage extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                Text('Categories', style: tt.titleMedium),
-                const SizedBox(height: 8),
                 ...budgets.map(
                   (b) => _BudgetCard(
                     budget: b,
@@ -194,97 +200,112 @@ class _BudgetCard extends ConsumerWidget {
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
+  String _getImageForCategory(String category) {
+    return switch (category) {
+      'Groceries' => 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80',
+      'Dining' => 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
+      'Transport' => 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=800&q=80',
+      'Entertainment' => 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=800&q=80',
+      'Utilities' => 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=800&q=80',
+      'Health' => 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=800&q=80',
+      'Shopping' => 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80',
+      'Rent' => 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80',
+      'Travel' => 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800&q=80',
+      _ => 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&w=800&q=80',
+    };
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-    final barColor = budget.isOverBudget ? cs.error : budget.color;
-    final pct = (budget.progress * 100).toStringAsFixed(0);
+    final imageUrl = _getImageForCategory(budget.category);
 
-    return Dismissible(
-      key: Key(budget.id),
-      direction: DismissDirection.endToStart,
-      confirmDismiss: (_) async {
-        onDelete();
-        return false; // dialog handles the actual delete
-      },
-      background: Container(
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 20),
-        decoration: BoxDecoration(
-          color: cs.error,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(Icons.delete_outlined, color: cs.onError),
-      ),
-      child: Card(
-        margin: const EdgeInsets.only(bottom: 10),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
           onTap: onEdit,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
+          onLongPress: onDelete,
+          child: Container(
+            height: 200,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: cs.surfaceContainerHighest, // Base color if image fails
+              image: DecorationImage(
+                image: NetworkImage(imageUrl),
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                  Colors.black.withAlpha(100),
+                  BlendMode.darken,
+                ),
+              ),
+            ),
+            child: Stack(
               children: [
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 18,
-                      backgroundColor: barColor.withAlpha(30),
-                      child: Icon(budget.icon, size: 18, color: barColor),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        budget.category.toUpperCase(),
+                        style: tt.labelLarge?.copyWith(
+                          color: Colors.white.withAlpha(200),
+                          letterSpacing: 1.2,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        formatCurrency(budget.allocated),
+                        style: tt.headlineMedium?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Progress bar
+                      Stack(
                         children: [
-                          Text(
-                            budget.category,
-                            style: tt.bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.w500),
+                          Container(
+                            height: 8,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withAlpha(40),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
                           ),
-                          Text(
-                            budget.isOverBudget
-                                ? 'Over budget by \$${(budget.spent - budget.allocated).toStringAsFixed(2)}'
-                                : '${formatCurrency(budget.remaining)} remaining',
-                            style: tt.bodySmall?.copyWith(
-                              color: budget.isOverBudget
-                                  ? cs.error
-                                  : cs.onSurfaceVariant,
+                          FractionallySizedBox(
+                            widthFactor: budget.progress,
+                            child: Container(
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          '$pct%',
-                          style: tt.titleSmall?.copyWith(
-                            color: barColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          '${formatCurrency(budget.spent)} / ${formatCurrency(budget.allocated)}',
-                          style: tt.bodySmall
-                              ?.copyWith(color: cs.onSurfaceVariant),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(Icons.edit_outlined,
-                        size: 16, color: cs.onSurfaceVariant),
-                  ],
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 12),
-                LinearProgressIndicator(
-                  value: budget.progress,
-                  backgroundColor: cs.surfaceContainerHighest,
-                  valueColor: AlwaysStoppedAnimation(barColor),
-                  borderRadius: BorderRadius.circular(4),
-                  minHeight: 6,
+                // Icon in the corner
+                Positioned(
+                  bottom: 20,
+                  right: 20,
+                  child: CircleAvatar(
+                    radius: 14,
+                    backgroundColor: Colors.white.withAlpha(40),
+                    child: Icon(
+                      budget.icon,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ],
             ),

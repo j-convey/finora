@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../data/models/account_model.dart';
 import '../providers/accounts_provider.dart';
@@ -9,6 +8,8 @@ import '../widgets/asset_liability_summary_panel.dart';
 import '../widgets/grouped_accounts_widget.dart';
 import '../widgets/net_worth_chart_widget.dart';
 import '../widgets/net_worth_summary_widget.dart';
+import '../../../../shared/widgets/add_transaction_sheet.dart';
+import '../../../../shared/widgets/main_drawer.dart';
 
 class AccountsPage extends ConsumerStatefulWidget {
   const AccountsPage({super.key});
@@ -32,36 +33,25 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
   Widget build(BuildContext context) {
     final accountsList = ref.watch(accountsProvider);
     final netWorthHistory = ref.watch(netWorthHistoryProvider);
-    final isMobile = MediaQuery.of(context).size.width < 800;
+    final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Accounts'),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_outlined),
-            tooltip: 'Refresh all',
-            onPressed: () {
-              ref.read(accountsProvider.notifier).sync();
-              ref.read(netWorthHistoryProvider.notifier).fetch();
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.add_outlined),
-            tooltip: 'Add account',
-            onPressed: () {
-              // TODO: Navigate to add account page
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Add account feature coming soon')),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () => context.push('/settings'),
+            icon: const Icon(Icons.add),
+            onPressed: () => showAddTransactionSheet(context),
           ),
         ],
       ),
+      drawer: const MainDrawer(),
       body: isMobile
           ? _buildMobileLayout(accountsList, netWorthHistory)
           : _buildDesktopLayout(accountsList, netWorthHistory),
@@ -113,7 +103,21 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
           ),
           const SizedBox(height: 16),
           // Grouped accounts
-          GroupedAccountsWidget(accounts: accounts),
+          GroupedAccountsWidget(
+            accounts: accounts,
+            onTypeChanged: (account, newType) {
+              ref
+                  .read(accountsProvider.notifier)
+                  .updateAccountType(account.id, newType)
+                  .catchError((Object e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to update account type: $e')),
+                  );
+                }
+              });
+            },
+          ),
         ],
       ),
     );
@@ -172,8 +176,25 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
                   ),
                   const SizedBox(height: 16),
                   // Grouped accounts
-                  GroupedAccountsWidget(accounts: accounts),
+                  GroupedAccountsWidget(
+                    accounts: accounts,
+                    onTypeChanged: (account, newType) {
+                      ref
+                          .read(accountsProvider.notifier)
+                          .updateAccountType(account.id, newType)
+                          .catchError((Object e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content:
+                                    Text('Failed to update account type: $e')),
+                          );
+                        }
+                      });
+                    },
+                  ),
                 ],
+
               ),
             ),
           ),

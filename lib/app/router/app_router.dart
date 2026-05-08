@@ -6,6 +6,7 @@ import '../../features/auth/presentation/pages/setup_page.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/reports/presentation/pages/reports_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
+import '../../features/subscriptions/presentation/pages/subscriptions_page.dart';
 import '../../shared/widgets/adaptive_scaffold.dart';
 
 /// A [ChangeNotifier] that pings GoRouter whenever [AuthStatus] changes.
@@ -63,6 +64,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/reports',
         builder: (context, state) => const ReportsPage(),
+      ),
+      GoRoute(
+        path: '/subscriptions',
+        builder: (context, state) => const SubscriptionsPage(),
       ),
     ],
   );
