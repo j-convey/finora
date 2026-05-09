@@ -59,7 +59,7 @@ class _DataSettingsPageState extends ConsumerState<DataSettingsPage> {
                 : const Icon(Icons.upload_file_outlined),
             title: const Text('Export Backup'),
             subtitle: const Text('Save a full database snapshot as JSON'),
-            onTap: _isExporting ? null : () => _exportDatabase(context),
+            onTap: _isExporting ? null : _exportDatabase,
           ),
           ListTile(
             leading: _isImporting
@@ -71,7 +71,7 @@ class _DataSettingsPageState extends ConsumerState<DataSettingsPage> {
                 : const Icon(Icons.download_outlined),
             title: const Text('Import Backup'),
             subtitle: const Text('Restore a previously exported JSON backup'),
-            onTap: _isImporting ? null : () => _confirmImport(context),
+            onTap: _isImporting ? null : _confirmImport,
           ),
           const Divider(),
 
@@ -145,7 +145,7 @@ class _DataSettingsPageState extends ConsumerState<DataSettingsPage> {
     }
   }
 
-  Future<void> _exportDatabase(BuildContext context) async {
+  Future<void> _exportDatabase() async {
     setState(() => _isExporting = true);
     try {
       await ref.read(databaseBackupProvider.notifier).exportDatabase();
@@ -168,7 +168,7 @@ class _DataSettingsPageState extends ConsumerState<DataSettingsPage> {
     }
   }
 
-  void _confirmImport(BuildContext context) {
+  void _confirmImport() {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(

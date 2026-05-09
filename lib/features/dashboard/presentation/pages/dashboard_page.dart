@@ -892,7 +892,7 @@ class _TransactionRow extends ConsumerWidget {
 
   static String _accountLabel(AccountModel a) {
     final institution = a.institutionName?.isNotEmpty == true ? a.institutionName! : null;
-    final parts = [if (institution != null) institution, a.name];
+    final parts = [?institution, a.name];
     return parts.join(' · ');
   }
 

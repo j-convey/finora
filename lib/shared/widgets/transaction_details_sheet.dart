@@ -115,7 +115,7 @@ class _TransactionDetailsSheetState
     final institution = account.institutionName?.isNotEmpty == true
         ? account.institutionName!
         : null;
-    final parts = [if (institution != null) institution, account.name];
+    final parts = [?institution, account.name];
     return parts.join(' · ');
   }
 

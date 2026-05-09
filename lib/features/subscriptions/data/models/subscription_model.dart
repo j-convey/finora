@@ -44,7 +44,7 @@ class SubscriptionModel {
   final DateTime? updatedAt;
 
   String get recurrenceLabel {
-    final interval = recurrenceInterval > 1 ? '${recurrenceInterval} ' : '';
+    final interval = recurrenceInterval > 1 ? '$recurrenceInterval ' : '';
     return switch (recurrenceUnit) {
       RecurrenceUnit.day => '${interval}day${recurrenceInterval > 1 ? 's' : ''}',
       RecurrenceUnit.week => '${interval}week${recurrenceInterval > 1 ? 's' : ''}',

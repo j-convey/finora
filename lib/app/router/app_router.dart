@@ -17,7 +17,7 @@ class _AuthStatusNotifier extends ChangeNotifier {
   _AuthStatusNotifier(Ref ref) {
     ref.listen<AuthStatus>(
       authProvider.select((s) => s.status),
-      (_, __) => notifyListeners(),
+      (_, _) => notifyListeners(),
     );
   }
 }

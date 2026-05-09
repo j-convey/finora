@@ -312,10 +312,10 @@ class _SidebarItem extends StatelessWidget {
                 ? Row(
                     children: [
                       SizedBox(
-                        width: 32,
+                        width: 28,
                         child: Center(child: iconWidget),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           label,

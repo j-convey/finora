@@ -387,7 +387,7 @@ class _CategoryDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     final effective = categories.contains(selected) ? selected : categories.first;
     return DropdownButtonFormField<String>(
-      value: effective,
+      initialValue: effective,
       isExpanded: true,
       decoration: const InputDecoration(
         labelText: 'Category',
