@@ -49,11 +49,6 @@ const _destinations = [
     icon: Icons.account_balance_outlined,
     selectedIcon: Icons.account_balance,
   ),
-  _Destination(
-    label: 'Subscriptions',
-    icon: Icons.subscriptions_outlined,
-    selectedIcon: Icons.subscriptions,
-  ),
 ];
 
 /// Main shell widget. Uses [IndexedStack] for tab state preservation.
@@ -69,7 +64,6 @@ class MainShell extends ConsumerWidget {
     TransactionsPage(),
     ReportsPage(),
     BudgetsPage(),
-    SubscriptionsPage(),
   ];
 
   @override
@@ -369,6 +363,7 @@ class _NarrowLayout extends StatelessWidget {
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
         onDestinationSelected: onTap,
+        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
         destinations: _destinations
             .map(
               (d) => NavigationDestination(
