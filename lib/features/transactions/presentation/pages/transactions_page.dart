@@ -24,6 +24,8 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
   Widget build(BuildContext context) {
     final all = ref.watch(transactionsProvider);
     final accountsById = {for (final a in ref.watch(accountsProvider)) a.id: a};
+    final isMobile = Theme.of(context).platform == TargetPlatform.android ||
+        Theme.of(context).platform == TargetPlatform.iOS;
 
     // Split parents that need review are shown in the list; all other split
     // parents are hidden (their children appear as individual rows instead).
@@ -57,12 +59,14 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Transactions'),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
+        leading: isMobile
+            ? Builder(
+                builder: (context) => IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () => Scaffold.of(context).openDrawer(),
+                ),
+              )
+            : null,
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -81,7 +85,7 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
           ),
         ),
       ),
-      drawer: const MainDrawer(),
+      drawer: isMobile ? const MainDrawer() : null,
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'fab_transactions',
         onPressed: () => _showAddSheet(context),
