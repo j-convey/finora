@@ -206,7 +206,7 @@ class SubscriptionsPage extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<int>(
-                      value: selectedRecurrenceInterval,
+                      initialValue: selectedRecurrenceInterval,
                       decoration: const InputDecoration(
                         labelText: 'Every',
                       ),
@@ -229,7 +229,7 @@ class SubscriptionsPage extends ConsumerWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: DropdownButtonFormField<RecurrenceUnit>(
-                      value: selectedRecurrenceUnit,
+                      initialValue: selectedRecurrenceUnit,
                       decoration: const InputDecoration(
                         labelText: 'Unit',
                       ),
@@ -252,7 +252,7 @@ class SubscriptionsPage extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<SubscriptionStatus>(
-                value: selectedStatus,
+                initialValue: selectedStatus,
                 decoration: const InputDecoration(
                   labelText: 'Status',
                 ),
@@ -612,7 +612,7 @@ class SubscriptionsPage extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<int>(
-                      value: selectedRecurrenceInterval,
+                      initialValue: selectedRecurrenceInterval,
                       decoration: const InputDecoration(
                         labelText: 'Every',
                       ),
@@ -635,7 +635,7 @@ class SubscriptionsPage extends ConsumerWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: DropdownButtonFormField<RecurrenceUnit>(
-                      value: selectedRecurrenceUnit,
+                      initialValue: selectedRecurrenceUnit,
                       decoration: const InputDecoration(
                         labelText: 'Unit',
                       ),
@@ -658,7 +658,7 @@ class SubscriptionsPage extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<SubscriptionStatus>(
-                value: selectedStatus,
+                initialValue: selectedStatus,
                 decoration: const InputDecoration(
                   labelText: 'Status',
                 ),

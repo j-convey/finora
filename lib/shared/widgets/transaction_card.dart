@@ -32,9 +32,15 @@ class TransactionCard extends StatelessWidget {
     final tt = Theme.of(context).textTheme;
     final isIncome = transaction.isIncome;
     final isPending = transaction.pending;
+    final isSplitParent = transaction.isSplitParent;
+    final isSplitChild = transaction.isSplitChild;
+    final needsReview = transaction.requiresUserReview;
+
+    // Split parents are muted (ghost rows); pending transactions are muted too.
+    final isMuted = isPending || isSplitParent;
 
     // Pending transactions are muted — they haven't settled yet.
-    final amountColor = isPending
+    final amountColor = isMuted
         ? cs.onSurfaceVariant
         : isIncome
             ? const Color(0xFF4CAF50)
@@ -47,12 +53,12 @@ class TransactionCard extends StatelessWidget {
         onTap: onTap,
         leading: CircleAvatar(
           backgroundColor: isIncome
-              ? const Color(0xFF4CAF50).withAlpha(isPending ? 15 : 30)
+              ? const Color(0xFF4CAF50).withAlpha(isMuted ? 15 : 30)
               : cs.surfaceContainerHighest,
           child: Icon(
             TransactionModel.iconForCategory(transaction.category),
             size: 20,
-            color: isPending
+            color: isMuted
                 ? cs.onSurfaceVariant
                 : isIncome
                     ? const Color(0xFF4CAF50)
@@ -66,11 +72,55 @@ class TransactionCard extends StatelessWidget {
                 transaction.title,
                 style: tt.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w500,
-                  color: isPending ? cs.onSurfaceVariant : null,
+                  color: isMuted ? cs.onSurfaceVariant : null,
                 ),
               ),
             ),
-            if (isPending) ...[
+            if (needsReview) ...[
+              const SizedBox(width: 6),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.errorContainer,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.warning_amber_rounded,
+                        size: 12,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onErrorContainer),
+                    const SizedBox(width: 3),
+                    Text(
+                      'Review',
+                      style: tt.labelSmall?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onErrorContainer),
+                    ),
+                  ],
+                ),
+              ),
+            ] else if (isSplitParent) ...[
+              const SizedBox(width: 6),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: cs.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: cs.outlineVariant),
+                ),
+                child: Text(
+                  'Split',
+                  style: tt.labelSmall
+                      ?.copyWith(color: cs.onSurfaceVariant),
+                ),
+              ),
+            ] else if (isPending) ...[
               const SizedBox(width: 6),
               Container(
                 padding:
@@ -96,6 +146,7 @@ class TransactionCard extends StatelessWidget {
                 children: [
                   _CategoryLine(
                     transaction: transaction,
+                    isSplitChild: isSplitChild,
                     onCategoryTap: onCategoryTap,
                     style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                     primaryColor: cs.primary,
@@ -111,6 +162,7 @@ class TransactionCard extends StatelessWidget {
               )
             : _CategoryLine(
                 transaction: transaction,
+                isSplitChild: isSplitChild,
                 onCategoryTap: onCategoryTap,
                 style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                 primaryColor: cs.primary,
@@ -153,24 +205,26 @@ class TransactionCard extends StatelessWidget {
   }
 }
 
-/// Renders the "Category · Date" subtitle line, with the category portion
-/// optionally tappable for inline re-categorization.
 class _CategoryLine extends StatelessWidget {
   const _CategoryLine({
     required this.transaction,
+    required this.isSplitChild,
     required this.onCategoryTap,
     required this.style,
     required this.primaryColor,
   });
 
   final TransactionModel transaction;
+  final bool isSplitChild;
   final VoidCallback? onCategoryTap;
   final TextStyle? style;
   final Color primaryColor;
 
   @override
   Widget build(BuildContext context) {
-    final dateText = ' · ${TransactionCard.relativeDate(transaction.date)}';
+    final datePart = ' · ${TransactionCard.relativeDate(transaction.date)}';
+    final splitPart = isSplitChild ? ' · Split' : '';
+    final dateText = '$datePart$splitPart';
 
     if (onCategoryTap == null) {
       return Text('${transaction.category}$dateText', style: style);

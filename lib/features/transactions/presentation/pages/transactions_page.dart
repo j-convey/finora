@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/widgets/add_transaction_sheet.dart';
@@ -9,7 +8,6 @@ import '../../../../shared/widgets/transaction_card.dart';
 import '../../../../shared/widgets/transaction_details_sheet.dart';
 import '../../../accounts/presentation/providers/accounts_provider.dart';
 import '../../../transactions/data/models/transaction_model.dart';
-import '../providers/categories_provider.dart';
 import '../providers/transactions_provider.dart';
 
 class TransactionsPage extends ConsumerStatefulWidget {
@@ -26,9 +24,16 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
   Widget build(BuildContext context) {
     final all = ref.watch(transactionsProvider);
     final accountsById = {for (final a in ref.watch(accountsProvider)) a.id: a};
+
+    // Split parents that need review are shown in the list; all other split
+    // parents are hidden (their children appear as individual rows instead).
+    final visible = all
+        .where((t) => !t.isSplitParent || t.requiresUserReview)
+        .toList();
+
     final filtered = _query.isEmpty
-        ? all
-        : all
+        ? visible
+        : visible
             .where((t) =>
                 t.title.toLowerCase().contains(_query.toLowerCase()) ||
                 t.category.toLowerCase().contains(_query.toLowerCase()))
@@ -41,10 +46,13 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
       grouped.putIfAbsent(key, () => []).add(t);
     }
 
+    // Budget totals exclude split parents (ghost rows) — only real leaf
+    // transactions and unsplit transactions are counted.
+    final budgetable = all.where((t) => !t.isSplitParent);
     final totalIncome =
-        all.where((t) => t.isIncome && !t.pending).fold(0.0, (s, t) => s + t.amount);
+        budgetable.where((t) => t.isIncome && !t.pending).fold(0.0, (s, t) => s + t.amount);
     final totalExpenses =
-        all.where((t) => t.isExpense && !t.pending).fold(0.0, (s, t) => s + t.amount);
+        budgetable.where((t) => t.isExpense && !t.pending).fold(0.0, (s, t) => s + t.amount);
 
     return Scaffold(
       appBar: AppBar(

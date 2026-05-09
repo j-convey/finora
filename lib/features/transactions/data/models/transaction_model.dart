@@ -16,6 +16,9 @@ class TransactionModel {
     this.merchantName,
     this.providerTransactionId,
     this.pending = false,
+    this.isSplitParent = false,
+    this.parentTransactionId,
+    this.requiresUserReview = false,
     this.createdAt,
     this.updatedAt,
   });
@@ -33,11 +36,21 @@ class TransactionModel {
   final String? merchantName;
   final String? providerTransactionId;
   final bool pending;
+  // ── Split transaction fields ────────────────────────────────
+  /// True when this row is a "ghost" parent whose amount has been split
+  /// into child transactions. Should be hidden from budget calculations.
+  final bool isSplitParent;
+  /// Set on child splits; null for normal or parent rows.
+  final String? parentTransactionId;
+  /// True when SimpleFIN updated the parent amount after a split was created,
+  /// meaning the split math is now invalid and the user must re-reconcile.
+  final bool requiresUserReview;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
   bool get isIncome => type == TransactionType.income;
   bool get isExpense => type == TransactionType.expense;
+  bool get isSplitChild => parentTransactionId != null;
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) =>
       TransactionModel(
@@ -53,6 +66,9 @@ class TransactionModel {
         merchantName: json['merchant_name'] as String?,
         providerTransactionId: json['provider_transaction_id'] as String?,
         pending: json['pending'] as bool? ?? false,
+        isSplitParent: json['is_split_parent'] as bool? ?? false,
+        parentTransactionId: json['parent_transaction_id'] as String?,
+        requiresUserReview: json['requires_user_review'] as bool? ?? false,
         createdAt: json['created_at'] != null
             ? DateTime.tryParse(json['created_at'] as String)
             : null,
@@ -61,10 +77,16 @@ class TransactionModel {
             : null,
       );
 
-  TransactionModel copyWith({String? category, String? notes}) => TransactionModel(
+  TransactionModel copyWith({
+    String? category,
+    String? notes,
+    double? amount,
+    bool? isSplitParent,
+    bool? requiresUserReview,
+  }) => TransactionModel(
         id: id,
         title: title,
-        amount: amount,
+        amount: amount ?? this.amount,
         type: type,
         category: category ?? this.category,
         date: date,
@@ -74,6 +96,9 @@ class TransactionModel {
         merchantName: merchantName,
         providerTransactionId: providerTransactionId,
         pending: pending,
+        isSplitParent: isSplitParent ?? this.isSplitParent,
+        parentTransactionId: parentTransactionId,
+        requiresUserReview: requiresUserReview ?? this.requiresUserReview,
         createdAt: createdAt,
         updatedAt: updatedAt,
       );

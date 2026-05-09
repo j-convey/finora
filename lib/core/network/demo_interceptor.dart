@@ -79,6 +79,9 @@ class DemoInterceptor extends Interceptor {
         'merchant_name': null,
         'provider_transaction_id': null,
         'pending': false,
+        'is_split_parent': false,
+        'parent_transaction_id': null,
+        'requires_user_review': false,
         'created_at': '${r['date']}T00:00:00',
         'updated_at': '${r['date']}T00:00:00',
       };
@@ -152,6 +155,10 @@ class DemoInterceptor extends Interceptor {
   Object? _mockWriteResponse(
       String path, String method, Map<String, dynamic> body) {
     if (method == 'DELETE') return null;
+    // Split: POST /api/transactions/{id}/split → return two fake child rows
+    if (path.contains('/split') && method == 'POST') {
+      return _fakeSplitChildren(path, body);
+    }
     if (path.startsWith('/api/transactions')) return _fakeTransaction(body);
     if (path.startsWith('/api/budgets')) return _fakeBudget(body);
     if (path.startsWith('/api/subscriptions')) return _fakeSubscription(body);
@@ -197,9 +204,48 @@ class DemoInterceptor extends Interceptor {
         'merchant_name': null,
         'provider_transaction_id': null,
         'pending': false,
+        'is_split_parent': false,
+        'parent_transaction_id': null,
+        'requires_user_review': false,
         'created_at': DateTime.now().toIso8601String(),
         'updated_at': DateTime.now().toIso8601String(),
       };
+
+  /// Returns a list of fake child split transactions for demo mode.
+  static List<Map<String, dynamic>> _fakeSplitChildren(
+    String path,
+    Map<String, dynamic> body,
+  ) {
+    // Extract the parent ID from the path: /api/transactions/{id}/split
+    final segments = path.split('/');
+    final parentId =
+        segments.length >= 4 ? segments[3] : 'demo-parent';
+
+    final splits = body['splits'] as List<dynamic>? ?? [];
+    return splits.asMap().entries.map((entry) {
+      final i = entry.key;
+      final split = entry.value as Map<String, dynamic>;
+      return {
+        'id': 'demo-split-${DateTime.now().millisecondsSinceEpoch}-$i',
+        'title': split['title'] ?? 'Split ${i + 1}',
+        'amount': split['amount'] ?? 0.0,
+        'type': 'expense',
+        'category': split['category'] ?? 'Uncategorized',
+        'date': DateTime.now().toIso8601String(),
+        'account_id': null,
+        'notes': split['notes'],
+        'original_description': null,
+        'merchant_name': null,
+        'provider_transaction_id': null,
+        'pending': false,
+        'is_split_parent': false,
+        'parent_transaction_id': parentId,
+        'requires_user_review': false,
+        'created_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toIso8601String(),
+      };
+    }).toList();
+  }
 
   static Map<String, dynamic> _fakeBudget(Map<String, dynamic> body) => {
         'id': 'demo-budget-new',

@@ -5,16 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d00bc8b7-04db-49c1-bbc3-c813358af057" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/accounts/presentation/pages/accounts_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/accounts/presentation/pages/accounts_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/accounts/presentation/widgets/asset_liability_summary_panel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/accounts/presentation/widgets/asset_liability_summary_panel.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/accounts/presentation/widgets/grouped_accounts_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/accounts/presentation/widgets/grouped_accounts_widget.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/accounts/presentation/widgets/net_worth_summary_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/accounts/presentation/widgets/net_worth_summary_widget.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/dashboard/presentation/pages/dashboard_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/dashboard/presentation/pages/dashboard_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/reports/presentation/pages/reports_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/reports/presentation/pages/reports_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/reports/presentation/widgets/category_legend_tile.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/reports/presentation/widgets/category_legend_tile.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/reports/presentation/widgets/report_summary_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/reports/presentation/widgets/report_summary_card.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/build.gradle.kts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

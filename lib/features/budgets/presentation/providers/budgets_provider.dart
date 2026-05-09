@@ -44,8 +44,8 @@ class BudgetsNotifier extends StateNotifier<List<BudgetModel>> {
   }) async {
     final dio = _ref.read(apiClientProvider);
     final body = <String, dynamic>{
-      'allocated': ?allocated,
-      'color': ?colorHex,
+      if (allocated != null) 'allocated': allocated,
+      if (colorHex != null) 'color': colorHex,
     };
     final response = await dio.patch<Map<String, dynamic>>(
       '/api/budgets/$id',
@@ -70,4 +70,3 @@ final budgetsProvider =
     StateNotifierProvider<BudgetsNotifier, List<BudgetModel>>(
   (ref) => BudgetsNotifier(ref),
 );
-
