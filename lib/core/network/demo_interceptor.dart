@@ -142,6 +142,9 @@ class DemoInterceptor extends Interceptor {
 
   Object? _fixture(String path) {
     if (path == '/api/accounts') return _accounts;
+    // Must be checked before the general /api/transactions catch-all.
+    final reimburseMatch = _reimbursementsPathMatch(path);
+    if (reimburseMatch != null) return _fakeReimbursementsResponse(reimburseMatch);
     if (path.startsWith('/api/transactions')) return _transactions;
     if (path == '/api/budgets') return _budgets;
     if (path == '/api/categories') return _categories;
@@ -155,6 +158,14 @@ class DemoInterceptor extends Interceptor {
   Object? _mockWriteResponse(
       String path, String method, Map<String, dynamic> body) {
     if (method == 'DELETE') return null;
+    // Reimbursements: POST create or PUT update
+    if (path == '/api/transactions/reimbursements' && method == 'POST') {
+      return _fakeReimbursement(body);
+    }
+    if (path.startsWith('/api/transactions/reimbursements/') && method == 'PUT') {
+      final id = path.split('/').last;
+      return _fakeReimbursement(body, id: id);
+    }
     // Split: POST /api/transactions/{id}/split → return two fake child rows
     if (path.contains('/split') && method == 'POST') {
       return _fakeSplitChildren(path, body);
@@ -246,6 +257,57 @@ class DemoInterceptor extends Interceptor {
       };
     }).toList();
   }
+
+  // ── Reimbursement fixtures ─────────────────────────────────────────────────
+
+  /// Extracts the transaction ID from a `/api/transactions/{id}/reimbursements`
+  /// path. Returns null if the path does not match that pattern.
+  static String? _reimbursementsPathMatch(String path) {
+    final segments = path.split('/');
+    // e.g. ['', 'api', 'transactions', '{id}', 'reimbursements']
+    if (segments.length == 5 &&
+        segments[1] == 'api' &&
+        segments[2] == 'transactions' &&
+        segments[4] == 'reimbursements') {
+      return segments[3];
+    }
+    return null;
+  }
+
+  /// Returns an empty `ReimbursementListResponse`-shaped map using the
+  /// transaction's real amount so the UI shows the correct totals and the
+  /// "Link Reimbursement" button is visible.
+  Map<String, dynamic> _fakeReimbursementsResponse(String transactionId) {
+    final txn = _transactions?.firstWhere(
+      (t) => t['id'] == transactionId,
+      orElse: () => {},
+    );
+    final amount = (txn?['amount'] as num?)?.toDouble() ?? 0.0;
+    return {
+      'transaction_id': transactionId,
+      'transaction_amount': amount,
+      'allocated_amount': 0.0,
+      'remaining_amount': amount,
+      'reimbursements': <Map<String, dynamic>>[],
+    };
+  }
+
+  static Map<String, dynamic> _fakeReimbursement(
+    Map<String, dynamic> body, {
+    String? id,
+  }) =>
+      {
+        'id': id ?? 'demo-reimb-${DateTime.now().millisecondsSinceEpoch}',
+        'expense_transaction_id':
+            body['expense_transaction_id'] ?? 'demo-expense',
+        'income_transaction_id':
+            body['income_transaction_id'] ?? 'demo-income',
+        'amount': body['amount'] ?? 0.0,
+        'notes': body['notes'],
+        'created_by_user_id': 9999,
+        'created_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toIso8601String(),
+      };
 
   static Map<String, dynamic> _fakeBudget(Map<String, dynamic> body) => {
         'id': 'demo-budget-new',

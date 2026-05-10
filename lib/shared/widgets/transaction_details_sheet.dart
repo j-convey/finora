@@ -7,6 +7,7 @@ import '../../features/accounts/presentation/providers/accounts_provider.dart';
 import '../../features/transactions/data/models/transaction_model.dart';
 import '../../features/transactions/presentation/providers/categories_provider.dart';
 import '../../features/transactions/presentation/providers/transactions_provider.dart';
+import 'reimbursement_sheet.dart';
 import 'split_transaction_sheet.dart';
 
 /// Shows the transaction details bottom sheet. Looks up the account by id
@@ -513,6 +514,20 @@ class _TransactionDetailsSheetState
                   ],
                 ],
               ),
+            // ── Reimbursements ─────────────────────────────────────────────
+            // Available for any server-persisted income or expense that is not
+            // a split-parent ghost row (server rule: split_parent_not_allowed).
+            if (!transaction.isSplitParent &&
+                !transaction.id.startsWith('u') &&
+                transaction.type != TransactionType.transfer) ...[  
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: () =>
+                    showReimbursementSheet(context, ref, transaction),
+                icon: const Icon(Icons.swap_horiz_outlined),
+                label: const Text('Reimbursements'),
+              ),
+            ],
           ],
         ),
       ),
