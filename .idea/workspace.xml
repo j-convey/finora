@@ -4,18 +4,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d00bc8b7-04db-49c1-bbc3-c813358af057" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/lib/features/transactions/presentation/providers/transaction_filters_provider.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/auth/data/services/token_storage_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/auth/data/services/token_storage_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/reports/presentation/providers/reports_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/reports/presentation/providers/reports_provider.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/transactions/data/models/transaction_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/transactions/data/models/transaction_model.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/transactions/presentation/pages/transactions_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/transactions/presentation/pages/transactions_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/transactions/presentation/providers/transactions_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/transactions/presentation/providers/transactions_provider.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/shared/widgets/adaptive_scaffold.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/shared/widgets/adaptive_scaffold.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/shared/widgets/transaction_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/shared/widgets/transaction_card.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/shared/widgets/transaction_details_sheet.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/shared/widgets/transaction_details_sheet.dart" afterDir="false" />
-    </list>
+    <list default="true" id="d00bc8b7-04db-49c1-bbc3-c813358af057" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

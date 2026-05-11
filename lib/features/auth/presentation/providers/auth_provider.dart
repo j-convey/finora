@@ -119,7 +119,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final dio = _buildDio();
-      final response = await dio.post<Map<String, dynamic>>(
+      final response = await dio.post<dynamic>(
         '/api/auth/register',
         data: {
           'email': email,
@@ -127,7 +127,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
           if (fullName != null && fullName.isNotEmpty) 'full_name': fullName,
         },
       );
-      final tokens = AuthTokens.fromJson(response.data!);
+      
+      // Handle wrapped response (server might return {"data": {...}})
+      final tokenData = response.data is Map<String, dynamic>
+          ? (response.data as Map<String, dynamic>)['data'] ?? response.data
+          : response.data;
+      
+      final tokens = AuthTokens.fromJson(tokenData as Map<String, dynamic>);
       await _storage.saveTokens(
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
@@ -136,6 +142,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
       return true;
     } on DioException catch (e) {
       state = state.copyWith(isLoading: false, error: _extractError(e));
+      return false;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
       return false;
     }
   }
@@ -148,11 +157,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final dio = _buildDio();
-      final response = await dio.post<Map<String, dynamic>>(
+      final response = await dio.post<dynamic>(
         '/api/auth/login',
         data: {'email': email, 'password': password},
       );
-      final tokens = AuthTokens.fromJson(response.data!);
+      print('DEBUG: Login response: ${response.data}');
+      
+      // Handle wrapped response (server might return {"data": {...}})
+      final tokenData = response.data is Map<String, dynamic>
+          ? (response.data as Map<String, dynamic>)['data'] ?? response.data
+          : response.data;
+      
+      final tokens = AuthTokens.fromJson(tokenData as Map<String, dynamic>);
       await _storage.saveTokens(
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
@@ -160,9 +176,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await _fetchCurrentUser();
       return true;
     } on DioException catch (e) {
+      print('DEBUG: DioException in login: ${e.message}, status: ${e.response?.statusCode}');
       state = state.copyWith(isLoading: false, error: _extractError(e));
       return false;
     } catch (e) {
+      print('DEBUG: Unexpected error in login: $e');
       state = state.copyWith(isLoading: false, error: e.toString());
       return false;
     }
@@ -317,14 +335,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
       }
       final dio = _buildDio();
       dio.options.headers['Authorization'] = 'Bearer $accessToken';
-      final response = await dio.get<Map<String, dynamic>>('/api/users/me');
-      final user = UserModel.fromJson(response.data!);
+      final response = await dio.get<dynamic>('/api/users/me');
+      print('DEBUG: /api/users/me response: ${response.data}');
+      
+      // Handle wrapped response (server might return {"data": {...}})
+      final userData = response.data is Map<String, dynamic>
+          ? (response.data as Map<String, dynamic>)['data'] ?? response.data
+          : response.data;
+      
+      final user = UserModel.fromJson(userData as Map<String, dynamic>);
       state = state.copyWith(
         isLoading: false,
         status: AuthStatus.authenticated,
         user: user,
       );
     } on DioException catch (e) {
+      print('DEBUG: DioException in _fetchCurrentUser: ${e.message}, status: ${e.response?.statusCode}, data: ${e.response?.data}');
       if (e.response?.statusCode == 401) {
         final refreshed = await _tryRefreshTokens();
         if (refreshed) {
@@ -344,6 +370,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
           error: _extractError(e),
         );
       }
+    } catch (e) {
+      print('DEBUG: Unexpected error in _fetchCurrentUser: $e');
+      state = state.copyWith(
+        isLoading: false,
+        status: AuthStatus.unauthenticated,
+        error: 'Failed to fetch user: $e',
+      );
     }
   }
 
@@ -353,17 +386,24 @@ class AuthNotifier extends StateNotifier<AuthState> {
     if (refreshToken == null) return false;
     try {
       final dio = _buildDio();
-      final response = await dio.post<Map<String, dynamic>>(
+      final response = await dio.post<dynamic>(
         '/api/auth/refresh',
         data: {'refresh_token': refreshToken},
       );
-      final tokens = AuthTokens.fromJson(response.data!);
+      
+      // Handle wrapped response (server might return {"data": {...}})
+      final tokenData = response.data is Map<String, dynamic>
+          ? (response.data as Map<String, dynamic>)['data'] ?? response.data
+          : response.data;
+      
+      final tokens = AuthTokens.fromJson(tokenData as Map<String, dynamic>);
       await _storage.saveTokens(
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
       );
       return true;
-    } catch (_) {
+    } catch (e) {
+      print('DEBUG: Error refreshing tokens: $e');
       return false;
     }
   }

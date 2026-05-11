@@ -63,20 +63,32 @@ class TokenStorageService {
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 
+  /// SharedPreferences key prefix used as a fallback when the OS keychain /
+  /// secure enclave is unavailable (e.g. macOS dev builds without a paid
+  /// provisioning profile).
+  static const _spFallbackPrefix = 'finora_token_fb_';
+
   Future<String?> _secureRead(String key) async {
     try {
-      return await _storage.read(key: key);
+      final value = await _storage.read(key: key);
+      if (value != null) return value;
+      // Keychain returned null (either missing or unavailable without throwing) —
+      // fall through to the SharedPreferences fallback.
     } catch (_) {
-      return null;
+      // Keychain threw (e.g. macOS without provisioning profile).
     }
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_spFallbackPrefix + key);
   }
 
   Future<void> _secureWrite(String key, String value) async {
     try {
       await _storage.write(key: key, value: value);
     } catch (_) {
-      // If secure storage fails (e.g. keychain issues), we do NOT fall back 
-      // to unencrypted storage to prevent token leakage.
+      // Keychain unavailable (e.g. macOS without provisioning profile) —
+      // fall back to SharedPreferences so login actually works in dev builds.
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_spFallbackPrefix + key, value);
     }
   }
 
@@ -86,6 +98,9 @@ class TokenStorageService {
     } catch (_) {
       // Best effort delete.
     }
+    // Always clear the fallback entry too.
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_spFallbackPrefix + key);
   }
 }
 
