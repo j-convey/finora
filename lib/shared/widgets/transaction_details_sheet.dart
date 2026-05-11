@@ -64,6 +64,27 @@ void showCategoryPicker(
   );
 }
 
+/// Shows the type picker bottom sheet for the given transaction.
+/// Tapping a type fires a PATCH via [TransactionsNotifier.updateType].
+void showTypePicker(
+  BuildContext context,
+  WidgetRef ref,
+  TransactionModel transaction,
+) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    builder: (_) => TypePickerSheet(
+      current: transaction.type,
+      onSelected: (type) {
+        ref
+            .read(transactionsProvider.notifier)
+            .updateType(transaction.id, type);
+      },
+    ),
+  );
+}
+
 // ── Transaction Details Sheet ────────────────────────────────────────────────
 
 class TransactionDetailsSheet extends ConsumerStatefulWidget {
@@ -499,6 +520,14 @@ class _TransactionDetailsSheetState
                       label: const Text('Category'),
                     ),
                   ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => showTypePicker(context, ref, transaction),
+                      icon: const Icon(Icons.swap_horiz_outlined),
+                      label: const Text('Type'),
+                    ),
+                  ),
                   if (!transaction.id.startsWith('u')) ...[
                     const SizedBox(width: 8),
                     Expanded(
@@ -746,6 +775,88 @@ class _CategoryPickerSheetState extends ConsumerState<CategoryPickerSheet> {
                         );
                       },
                     ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Type Picker Sheet ────────────────────────────────────────────────────────
+
+class TypePickerSheet extends StatelessWidget {
+  const TypePickerSheet({
+    super.key,
+    required this.current,
+    required this.onSelected,
+  });
+
+  final TransactionType current;
+  final void Function(TransactionType) onSelected;
+
+  static const _typeLabels = <TransactionType, String>{
+    TransactionType.income: 'Income',
+    TransactionType.expense: 'Expense',
+    TransactionType.transfer: 'Transfer',
+  };
+
+  static const _typeIcons = <TransactionType, IconData>{
+    TransactionType.income: Icons.trending_up,
+    TransactionType.expense: Icons.trending_down,
+    TransactionType.transfer: Icons.swap_horiz_outlined,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final tt = Theme.of(context).textTheme;
+    final cs = Theme.of(context).colorScheme;
+    final types = [
+      TransactionType.income,
+      TransactionType.expense,
+      TransactionType.transfer,
+    ];
+
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Text('Change Type', style: tt.titleMedium),
+            ),
+            const Divider(height: 1),
+            Flexible(
+              child: ListView.builder(
+                itemCount: types.length,
+                itemBuilder: (context, i) {
+                  final type = types[i];
+                  final isSelected = type == current;
+                  return ListTile(
+                    leading: Icon(
+                      _typeIcons[type]!,
+                      color: isSelected ? cs.primary : cs.onSurfaceVariant,
+                    ),
+                    title: Text(_typeLabels[type]!),
+                    trailing: isSelected
+                        ? Icon(Icons.check, color: cs.primary)
+                        : null,
+                    selected: isSelected,
+                    onTap: () {
+                      onSelected(type);
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              ),
             ),
           ],
         ),

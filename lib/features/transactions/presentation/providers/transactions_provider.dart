@@ -64,6 +64,28 @@ class TransactionsNotifier extends StateNotifier<List<TransactionModel>> {
     }
   }
 
+  Future<void> updateType(String id, TransactionType type) async {
+    // Optimistic update
+    state = state
+        .map((t) => t.id == id ? t.copyWith(type: type) : t)
+        .toList();
+    try {
+      final dio = _ref.read(apiClientProvider);
+      final typeString = switch (type) {
+        TransactionType.income => 'income',
+        TransactionType.expense => 'expense',
+        TransactionType.transfer => 'transfer',
+      };
+      await dio.patch<void>(
+        '/api/transactions/$id',
+        data: {'type': typeString},
+      );
+    } catch (_) {
+      // Revert on failure by re-syncing
+      await sync();
+    }
+  }
+
   /// Splits [transactionId] into the given [splits] (≥ 2 items).
   /// On success the parent row is marked as split-parent in local state
   /// and all returned child rows are appended.

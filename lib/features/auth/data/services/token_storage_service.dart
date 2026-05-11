@@ -34,7 +34,7 @@ class TokenStorageService {
     await prefs.setString(_keyServerUrl, url);
   }
 
-  // ── Tokens (secure storage, fallback to SharedPreferences) ───────────────
+  // ── Tokens (secure storage only) ──────────────────────────────────────────
 
   Future<String?> getAccessToken() => _secureRead(_keyAccessToken);
   Future<String?> getRefreshToken() => _secureRead(_keyRefreshToken);
@@ -65,15 +65,9 @@ class TokenStorageService {
 
   Future<String?> _secureRead(String key) async {
     try {
-      final value = await _storage.read(key: key);
-      if (value != null) return value;
-      // Secure storage returned null — may have been written to SharedPreferences
-      // as a fallback (e.g. macOS dev build where the Keychain is unavailable).
-      final prefs = await SharedPreferences.getInstance();
-      return prefs.getString('_sec_$key');
+      return await _storage.read(key: key);
     } catch (_) {
-      final prefs = await SharedPreferences.getInstance();
-      return prefs.getString('_sec_$key');
+      return null;
     }
   }
 
@@ -81,8 +75,8 @@ class TokenStorageService {
     try {
       await _storage.write(key: key, value: value);
     } catch (_) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('_sec_$key', value);
+      // If secure storage fails (e.g. keychain issues), we do NOT fall back 
+      // to unencrypted storage to prevent token leakage.
     }
   }
 
@@ -90,8 +84,7 @@ class TokenStorageService {
     try {
       await _storage.delete(key: key);
     } catch (_) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('_sec_$key');
+      // Best effort delete.
     }
   }
 }

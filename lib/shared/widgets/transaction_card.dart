@@ -31,6 +31,7 @@ class TransactionCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
     final isIncome = transaction.isIncome;
+    final isTransfer = transaction.type == TransactionType.transfer;
     final isPending = transaction.pending;
     final isSplitParent = transaction.isSplitParent;
     final isSplitChild = transaction.isSplitChild;
@@ -42,27 +43,33 @@ class TransactionCard extends StatelessWidget {
     // Pending transactions are muted — they haven't settled yet.
     final amountColor = isMuted
         ? cs.onSurfaceVariant
-        : isIncome
-            ? const Color(0xFF4CAF50)
-            : cs.onSurface;
-    final amountPrefix = isIncome ? '+' : '-';
+        : isTransfer
+            ? cs.primary
+            : isIncome
+                ? const Color(0xFF4CAF50)
+                : cs.onSurface;
+    final amountPrefix = isTransfer ? '↔ ' : (isIncome ? '+' : '-');
 
     final tile = Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         onTap: onTap,
         leading: CircleAvatar(
-          backgroundColor: isIncome
-              ? const Color(0xFF4CAF50).withAlpha(isMuted ? 15 : 30)
-              : cs.surfaceContainerHighest,
+          backgroundColor: isTransfer
+              ? cs.primary.withAlpha(isMuted ? 15 : 30)
+              : isIncome
+                  ? const Color(0xFF4CAF50).withAlpha(isMuted ? 15 : 30)
+                  : cs.surfaceContainerHighest,
           child: Icon(
             TransactionModel.iconForCategory(transaction.category),
             size: 20,
             color: isMuted
                 ? cs.onSurfaceVariant
-                : isIncome
-                    ? const Color(0xFF4CAF50)
-                    : cs.onSurfaceVariant,
+                : isTransfer
+                    ? cs.primary
+                    : isIncome
+                        ? const Color(0xFF4CAF50)
+                        : cs.onSurfaceVariant,
           ),
         ),
         title: Row(
@@ -100,6 +107,31 @@ class TransactionCard extends StatelessWidget {
                           color: Theme.of(context)
                               .colorScheme
                               .onErrorContainer),
+                    ),
+                  ],
+                ),
+              ),
+            ] else if (isTransfer) ...[
+              const SizedBox(width: 6),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: cs.primary.withAlpha(20),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: cs.primary.withAlpha(100)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.swap_horiz_outlined,
+                        size: 12,
+                        color: cs.primary),
+                    const SizedBox(width: 3),
+                    Text(
+                      transaction.category,
+                      style: tt.labelSmall
+                          ?.copyWith(color: cs.primary),
                     ),
                   ],
                 ),

@@ -58,7 +58,7 @@ const _destinations = [
 class MainShell extends ConsumerWidget {
   const MainShell({super.key});
 
-  static const _pages = [
+  static const List<Widget> _pages = [
     DashboardPage(),
     AccountsPage(),
     TransactionsPage(),

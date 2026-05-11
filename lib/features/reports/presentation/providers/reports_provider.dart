@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../transactions/data/models/transaction_model.dart';
 import '../../../transactions/presentation/providers/transactions_provider.dart';
 import '../../data/models/report_period.dart';
 import '../../data/models/report_summary.dart';
@@ -60,8 +61,13 @@ final reportSummaryProvider = Provider<ReportSummary>((ref) {
   double income = 0;
   double expenses = 0;
 
-  final expenseList = txns.where((t) => t.isExpense).toList();
-  final incomeList = txns.where((t) => t.isIncome).toList();
+  // Exclude transfers (type=transfer) and Transfer category from budget totals
+  final budgetableTransactions = txns.where((t) => 
+    t.type != TransactionType.transfer && t.category != 'Transfer'
+  ).toList();
+  
+  final expenseList = budgetableTransactions.where((t) => t.isExpense).toList();
+  final incomeList = budgetableTransactions.where((t) => t.isIncome).toList();
 
   for (final t in expenseList) {
     expenses += t.amount;
@@ -117,7 +123,7 @@ final reportSummaryProvider = Provider<ReportSummary>((ref) {
 
   // ── Monthly cash flow (for bar chart) ────────────────────────────────────
   final flowMap = <String, (double, double)>{}; // key → (income, expenses)
-  for (final t in txns) {
+  for (final t in budgetableTransactions) {
     final key = '${t.date.year}-${t.date.month.toString().padLeft(2, '0')}';
     final prev = flowMap[key] ?? (0.0, 0.0);
     if (t.isIncome) {
@@ -143,7 +149,7 @@ final reportSummaryProvider = Provider<ReportSummary>((ref) {
   return ReportSummary(
     totalIncome: income,
     totalExpenses: expenses,
-    transactionCount: txns.length,
+    transactionCount: budgetableTransactions.length,
     largestExpense: largestExpense,
     largestIncome: largestIncome,
     spendingByCategory: spendingByCategory,
