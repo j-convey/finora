@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/utils/currency_formatter.dart';
-import '../../features/transactions/data/models/split_input_model.dart';
-import '../../features/transactions/data/models/transaction_model.dart';
-import '../../features/transactions/presentation/providers/categories_provider.dart';
-import '../../features/transactions/presentation/providers/transactions_provider.dart';
+import 'package:finora/core/utils/currency_formatter.dart';
+import 'package:finora/features/transactions/data/models/split_input_model.dart';
+import 'package:finora/features/transactions/domain/entities/transaction.dart';
+import 'package:finora/features/transactions/presentation/extensions/transaction_ui_extension.dart';
+import 'package:finora/features/transactions/presentation/providers/categories_provider.dart';
+import 'package:finora/features/transactions/presentation/providers/transactions_provider.dart';
 
 /// Opens the split-transaction bottom sheet. The caller passes the [parent]
 /// transaction whose amount will be split into ≥ 2 named line items.
 void showSplitTransactionSheet(
   BuildContext context,
   WidgetRef ref,
-  TransactionModel parent,
+  Transaction parent,
 ) {
   showModalBottomSheet(
     context: context,
@@ -27,7 +28,7 @@ void showSplitTransactionSheet(
 class SplitTransactionSheet extends ConsumerStatefulWidget {
   const SplitTransactionSheet({super.key, required this.parent});
 
-  final TransactionModel parent;
+  final Transaction parent;
 
   @override
   ConsumerState<SplitTransactionSheet> createState() =>
@@ -165,7 +166,7 @@ class _SplitTransactionSheetState extends ConsumerState<SplitTransactionSheet> {
                   radius: 18,
                   backgroundColor: cs.surfaceContainerHigh,
                   child: Icon(
-                    TransactionModel.iconForCategory(widget.parent.category),
+                    widget.parent.icon,
                     size: 18,
                     color: cs.onSurfaceVariant,
                   ),

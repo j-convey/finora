@@ -5,13 +5,15 @@ import '../../../../app/providers/shell_index_provider.dart';
 import '../../../../core/providers/hide_amounts_provider.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/widgets/masked_amount.dart';
-import '../../../accounts/data/models/account_model.dart';
+import '../../../accounts/domain/entities/account.dart';
 import '../../../accounts/presentation/providers/accounts_provider.dart';
 import '../../../budgets/presentation/providers/budgets_provider.dart';
 import '../../../subscriptions/presentation/providers/subscriptions_provider.dart';
-import '../../../transactions/data/models/transaction_model.dart';
+import '../../../transactions/domain/entities/transaction.dart';
+import '../../../transactions/presentation/extensions/transaction_ui_extension.dart';
 import '../../../transactions/presentation/providers/categories_provider.dart';
 import '../../../transactions/presentation/providers/transactions_provider.dart';
+import '../../../../shared/widgets/responsive_layout.dart';
 import '../../../../shared/widgets/transaction_details_sheet.dart';
 import '../../../../shared/widgets/add_transaction_sheet.dart';
 import '../../../../shared/widgets/main_drawer.dart';
@@ -40,8 +42,6 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
   Widget build(BuildContext context) {
     final accounts = ref.watch(accountsProvider);
     final transactions = ref.watch(transactionsProvider);
-    final width = MediaQuery.sizeOf(context).width;
-    final isWide = width >= 720;
     final isMobile = Theme.of(context).platform == TargetPlatform.android ||
         Theme.of(context).platform == TargetPlatform.iOS;
 
@@ -125,19 +125,21 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         },
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
-          child: isWide
-              ? _WideLayout(
-                  budgetCard: budgetCard,
-                  spendingCard: spendingCard,
-                  netWorthCard: netWorthCard,
-                  transactionsCard: transactionsCard,
-                )
-              : _NarrowLayout(
-                  budgetCard: budgetCard,
-                  spendingCard: spendingCard,
-                  netWorthCard: netWorthCard,
-                  transactionsCard: transactionsCard,
-                ),
+          child: ResponsiveLayout(
+            mobileBreakpoint: 720,
+            mobile: _NarrowLayout(
+              budgetCard: budgetCard,
+              spendingCard: spendingCard,
+              netWorthCard: netWorthCard,
+              transactionsCard: transactionsCard,
+            ),
+            desktop: _WideLayout(
+              budgetCard: budgetCard,
+              spendingCard: spendingCard,
+              netWorthCard: netWorthCard,
+              transactionsCard: transactionsCard,
+            ),
+          ),
         ),
       ),
     );
@@ -833,8 +835,8 @@ class _RecentTransactionsCard extends StatelessWidget {
     required this.onSeeAll,
   });
 
-  final List<TransactionModel> transactions;
-  final Map<String, AccountModel> accountsById;
+  final List<Transaction> transactions;
+  final Map<String, Account> accountsById;
   final VoidCallback onSeeAll;
 
   @override
@@ -887,12 +889,12 @@ class _RecentTransactionsCard extends StatelessWidget {
 class _TransactionRow extends ConsumerWidget {
   const _TransactionRow({required this.transaction, this.account});
 
-  final TransactionModel transaction;
-  final AccountModel? account;
+  final Transaction transaction;
+  final Account? account;
 
-  static String _accountLabel(AccountModel a) {
+  static String _accountLabel(Account a) {
     final institution = a.institutionName?.isNotEmpty == true ? a.institutionName! : null;
-    final parts = [?institution, a.name];
+    final parts = [if (institution != null) institution, a.name];
     return parts.join(' · ');
   }
 
@@ -916,7 +918,7 @@ class _TransactionRow extends ConsumerWidget {
               radius: 18,
               backgroundColor: cs.surfaceContainerHighest,
               child: Icon(
-                TransactionModel.iconForCategory(transaction.category),
+                transaction.icon,
                 size: 18,
                 color: cs.onSurfaceVariant,
               ),

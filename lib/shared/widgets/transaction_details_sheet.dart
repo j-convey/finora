@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/utils/currency_formatter.dart';
-import '../../features/accounts/data/models/account_model.dart';
-import '../../features/accounts/presentation/providers/accounts_provider.dart';
-import '../../features/transactions/data/models/transaction_model.dart';
-import '../../features/transactions/presentation/providers/categories_provider.dart';
-import '../../features/transactions/presentation/providers/transactions_provider.dart';
+import 'package:finora/core/utils/currency_formatter.dart';
+import 'package:finora/features/accounts/domain/entities/account.dart';
+import 'package:finora/features/accounts/presentation/providers/accounts_provider.dart';
+import 'package:finora/features/transactions/domain/entities/transaction.dart';
+import 'package:finora/features/transactions/presentation/extensions/transaction_ui_extension.dart';
+import 'package:finora/features/transactions/presentation/providers/categories_provider.dart';
+import 'package:finora/features/transactions/presentation/providers/transactions_provider.dart';
 import 'reimbursement_sheet.dart';
 import 'split_transaction_sheet.dart';
 
@@ -21,7 +22,7 @@ import 'split_transaction_sheet.dart';
 void showTransactionDetails(
   BuildContext context,
   WidgetRef ref,
-  TransactionModel transaction,
+  Transaction transaction,
 ) {
   final account = transaction.accountId != null
       ? ref
@@ -48,7 +49,7 @@ void showTransactionDetails(
 void showCategoryPicker(
   BuildContext context,
   WidgetRef ref,
-  TransactionModel transaction,
+  Transaction transaction,
 ) {
   showModalBottomSheet(
     context: context,
@@ -69,14 +70,14 @@ void showCategoryPicker(
 void showTypePicker(
   BuildContext context,
   WidgetRef ref,
-  TransactionModel transaction,
+  Transaction transaction,
 ) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     builder: (_) => TypePickerSheet(
       current: transaction.type,
-      onSelected: (type) {
+      onSelected: (TransactionType type) {
         ref
             .read(transactionsProvider.notifier)
             .updateType(transaction.id, type);
@@ -95,8 +96,8 @@ class TransactionDetailsSheet extends ConsumerStatefulWidget {
     required this.onChangeCategory,
   });
 
-  final TransactionModel transaction;
-  final AccountModel? account;
+  final Transaction transaction;
+  final Account? account;
   final VoidCallback onChangeCategory;
 
   @override
@@ -137,7 +138,7 @@ class _TransactionDetailsSheetState
     final institution = account.institutionName?.isNotEmpty == true
         ? account.institutionName!
         : null;
-    final parts = [?institution, account.name];
+    final parts = [if (institution != null) institution, account.name];
     return parts.join(' · ');
   }
 
@@ -302,7 +303,7 @@ class _TransactionDetailsSheetState
                   radius: 22,
                   backgroundColor: cs.surfaceContainerHighest,
                   child: Icon(
-                    TransactionModel.iconForCategory(transaction.category),
+                    transaction.icon,
                     color: cs.onSurfaceVariant,
                   ),
                 ),
@@ -358,7 +359,7 @@ class _TransactionDetailsSheetState
               label: 'Category',
               value: transaction.category,
               leading: Icon(
-                TransactionModel.iconForCategory(transaction.category),
+                transaction.icon,
                 size: 18,
                 color: cs.primary,
               ),
@@ -573,7 +574,7 @@ class _ReviewBanner extends StatelessWidget {
     required this.onDismiss,
   });
 
-  final TransactionModel parentTransaction;
+  final Transaction parentTransaction;
   final VoidCallback onFixNow;
   final VoidCallback onDismiss;
 
@@ -759,7 +760,7 @@ class _CategoryPickerSheetState extends ConsumerState<CategoryPickerSheet> {
                         final isSelected = cat == widget.current;
                         return ListTile(
                           leading: Icon(
-                            TransactionModel.iconForCategory(cat),
+                            TransactionUIHelper.iconForCategory(cat),
                             color:
                                 isSelected ? cs.primary : cs.onSurfaceVariant,
                           ),
@@ -795,18 +796,6 @@ class TypePickerSheet extends StatelessWidget {
   final TransactionType current;
   final void Function(TransactionType) onSelected;
 
-  static const _typeLabels = <TransactionType, String>{
-    TransactionType.income: 'Income',
-    TransactionType.expense: 'Expense',
-    TransactionType.transfer: 'Transfer',
-  };
-
-  static const _typeIcons = <TransactionType, IconData>{
-    TransactionType.income: Icons.trending_up,
-    TransactionType.expense: Icons.trending_down,
-    TransactionType.transfer: Icons.swap_horiz_outlined,
-  };
-
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
@@ -816,6 +805,18 @@ class TypePickerSheet extends StatelessWidget {
       TransactionType.expense,
       TransactionType.transfer,
     ];
+
+    final typeLabels = {
+      TransactionType.income: 'Income',
+      TransactionType.expense: 'Expense',
+      TransactionType.transfer: 'Transfer',
+    };
+
+    final typeIcons = {
+      TransactionType.income: Icons.trending_up,
+      TransactionType.expense: Icons.trending_down,
+      TransactionType.transfer: Icons.swap_horiz_outlined,
+    };
 
     return Padding(
       padding: EdgeInsets.only(
@@ -842,10 +843,10 @@ class TypePickerSheet extends StatelessWidget {
                   final isSelected = type == current;
                   return ListTile(
                     leading: Icon(
-                      _typeIcons[type]!,
+                      typeIcons[type]!,
                       color: isSelected ? cs.primary : cs.onSurfaceVariant,
                     ),
-                    title: Text(_typeLabels[type]!),
+                    title: Text(typeLabels[type]!),
                     trailing: isSelected
                         ? Icon(Icons.check, color: cs.primary)
                         : null,

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/utils/currency_formatter.dart';
-import '../../../../shared/widgets/transaction_card.dart';
-import '../../../../shared/widgets/transaction_details_sheet.dart';
-import '../../../accounts/presentation/providers/accounts_provider.dart';
-import '../../../transactions/presentation/providers/transactions_provider.dart';
-import '../../domain/entities/report_summary.dart';
-import '../providers/reports_provider.dart';
+import 'package:finora/core/utils/currency_formatter.dart';
+import 'package:finora/shared/widgets/transaction_card.dart';
+import 'package:finora/shared/widgets/transaction_details_sheet.dart';
+import 'package:finora/features/accounts/presentation/providers/accounts_provider.dart';
+import 'package:finora/features/transactions/presentation/providers/transactions_provider.dart';
+import 'package:finora/features/reports/domain/entities/report_summary.dart';
+import 'package:finora/features/reports/presentation/providers/reports_provider.dart';
 
 /// Draggable bottom sheet that lists every transaction belonging to
 /// [category] within the currently selected report period.

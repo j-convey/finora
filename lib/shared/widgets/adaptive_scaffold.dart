@@ -10,7 +10,6 @@ import '../../features/transactions/presentation/pages/transactions_page.dart';
 import '../../features/accounts/presentation/pages/accounts_page.dart';
 import '../../features/budgets/presentation/pages/budgets_page.dart';
 import '../../features/reports/presentation/pages/reports_page.dart';
-import '../../features/subscriptions/presentation/pages/subscriptions_page.dart';
 
 class _Destination {
   const _Destination({

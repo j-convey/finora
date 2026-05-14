@@ -1,8 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-import '../../features/accounts/data/models/account_model.dart';
-import '../../features/transactions/data/models/transaction_model.dart';
+import 'package:finora/features/accounts/domain/entities/account.dart';
+import 'package:finora/features/transactions/domain/entities/transaction.dart';
+import 'package:finora/features/transactions/presentation/extensions/transaction_ui_extension.dart';
 
 class TransactionCard extends StatelessWidget {
   const TransactionCard({
@@ -14,15 +15,15 @@ class TransactionCard extends StatelessWidget {
     this.onCategoryTap,
   });
 
-  final TransactionModel transaction;
+  final Transaction transaction;
   final VoidCallback? onDismissed;
-  final AccountModel? account;
+  final Account? account;
   final VoidCallback? onTap;
   final VoidCallback? onCategoryTap;
 
-  static String _accountLabel(AccountModel a) {
+  static String _accountLabel(Account a) {
     final institution = a.institutionName?.isNotEmpty == true ? a.institutionName! : null;
-    final parts = [?institution, a.name];
+    final parts = [if (institution != null) institution, a.name];
     return parts.join(' · ');
   }
 
@@ -61,7 +62,7 @@ class TransactionCard extends StatelessWidget {
                   ? const Color(0xFF4CAF50).withAlpha(isMuted ? 15 : 30)
                   : cs.surfaceContainerHighest,
           child: Icon(
-            TransactionModel.iconForCategory(transaction.category),
+            transaction.icon,
             size: 20,
             color: isMuted
                 ? cs.onSurfaceVariant
@@ -246,7 +247,7 @@ class _CategoryLine extends StatelessWidget {
     required this.primaryColor,
   });
 
-  final TransactionModel transaction;
+  final Transaction transaction;
   final bool isSplitChild;
   final VoidCallback? onCategoryTap;
   final TextStyle? style;

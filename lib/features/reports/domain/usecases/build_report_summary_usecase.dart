@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../transactions/data/models/transaction_model.dart';
-import '../entities/report_period.dart';
-import '../entities/report_summary.dart';
+import 'package:finora/features/transactions/domain/entities/transaction.dart';
+import 'package:finora/features/reports/domain/entities/report_period.dart';
+import 'package:finora/features/reports/domain/entities/report_summary.dart';
 
 // ── Colour palette ────────────────────────────────────────────────────────────
 
@@ -42,7 +42,7 @@ const _monthAbbr = [
 class BuildReportSummaryUseCase {
   const BuildReportSummaryUseCase();
 
-  ReportSummary call(List<TransactionModel> all, ReportPeriod period) {
+  ReportSummary call(List<Transaction> all, ReportPeriod period) {
     final start = period.start;
 
     // Only settled transactions within the selected period.

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/utils/currency_formatter.dart';
-import '../../../../shared/widgets/add_transaction_sheet.dart';
-import '../../../../shared/widgets/main_drawer.dart';
-import '../../../../shared/widgets/transaction_card.dart';
-import '../../../../shared/widgets/transaction_details_sheet.dart';
-import '../../../accounts/presentation/providers/accounts_provider.dart';
-import '../../../transactions/data/models/transaction_model.dart';
-import '../providers/categories_provider.dart';
-import '../providers/transaction_filters_provider.dart';
-import '../providers/transactions_provider.dart';
+import 'package:finora/core/utils/currency_formatter.dart';
+import 'package:finora/shared/widgets/add_transaction_sheet.dart';
+import 'package:finora/shared/widgets/main_drawer.dart';
+import 'package:finora/shared/widgets/transaction_card.dart';
+import 'package:finora/shared/widgets/transaction_details_sheet.dart';
+import 'package:finora/features/accounts/presentation/providers/accounts_provider.dart';
+import 'package:finora/features/transactions/domain/entities/transaction.dart';
+import 'package:finora/features/transactions/presentation/providers/categories_provider.dart';
+import 'package:finora/features/transactions/presentation/providers/transaction_filters_provider.dart';
+import 'package:finora/features/transactions/presentation/providers/transactions_provider.dart';
 
 class TransactionsPage extends ConsumerStatefulWidget {
   const TransactionsPage({super.key});
@@ -82,7 +82,7 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
     final isSortedByDate = filters.sortBy == TransactionSort.latest ||
         filters.sortBy == TransactionSort.oldest;
 
-    final grouped = <String, List<TransactionModel>>{};
+    final grouped = <String, List<Transaction>>{};
     if (isSortedByDate) {
       for (final t in filtered) {
         final key = TransactionCard.relativeDate(t.date);
@@ -242,7 +242,6 @@ class _FilterSheet extends ConsumerWidget {
     final filters = ref.watch(transactionFiltersProvider);
     final accounts = ref.watch(accountsProvider);
     final categories = ref.watch(categoriesProvider);
-    final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
 
     final currentYear = DateTime.now().year;

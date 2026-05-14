@@ -1,24 +1,27 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/network/api_client.dart';
-import '../../data/models/split_input_model.dart';
-import '../../data/models/transaction_model.dart';
-import '../../data/datasources/split_transaction_service.dart';
+import 'package:finora/core/network/api_client.dart';
+import 'package:finora/features/transactions/data/models/split_input_model.dart';
+import 'package:finora/features/transactions/domain/entities/transaction.dart';
+import 'package:finora/features/transactions/domain/repositories/i_transactions_repository.dart';
+import 'package:finora/features/transactions/data/repositories/transactions_repository_impl.dart';
 
-class TransactionsNotifier extends StateNotifier<List<TransactionModel>> {
+final transactionsRepositoryProvider = Provider<ITransactionsRepository>((ref) {
+  final dio = ref.watch(apiClientProvider);
+  return TransactionsRepositoryImpl(dio);
+});
+
+class TransactionsNotifier extends StateNotifier<List<Transaction>> {
   TransactionsNotifier(this._ref) : super([]);
 
   final Ref _ref;
 
   Future<void> sync() async {
-    final dio = _ref.read(apiClientProvider);
-    final response = await dio.get<List<dynamic>>('/api/transactions');
-    state = (response.data ?? [])
-        .map((j) => TransactionModel.fromJson(j as Map<String, dynamic>))
-        .toList();
+    final repository = _ref.read(transactionsRepositoryProvider);
+    state = await repository.getTransactions();
   }
 
-  void addTransaction(TransactionModel transaction) {
+  void addTransaction(Transaction transaction) {
     state = [transaction, ...state];
   }
 
@@ -31,71 +34,50 @@ class TransactionsNotifier extends StateNotifier<List<TransactionModel>> {
   }
 
   Future<void> updateCategory(String id, String category) async {
+    final repository = _ref.read(transactionsRepositoryProvider);
     // Optimistic update
     state = state
         .map((t) => t.id == id ? t.copyWith(category: category) : t)
         .toList();
     try {
-      final dio = _ref.read(apiClientProvider);
-      await dio.patch<void>(
-        '/api/transactions/$id',
-        data: {'category': category},
-      );
+      await repository.updateTransaction(id, {'category': category});
     } catch (_) {
-      // Revert on failure by re-syncing
       await sync();
     }
   }
 
   Future<void> updateNotes(String id, String notes) async {
+    final repository = _ref.read(transactionsRepositoryProvider);
     // Optimistic update
     state = state
         .map((t) => t.id == id ? t.copyWith(notes: notes) : t)
         .toList();
     try {
-      final dio = _ref.read(apiClientProvider);
-      await dio.patch<void>(
-        '/api/transactions/$id',
-        data: {'notes': notes},
-      );
+      await repository.updateTransaction(id, {'notes': notes});
     } catch (_) {
-      // Revert on failure by re-syncing
       await sync();
     }
   }
 
   Future<void> updateType(String id, TransactionType type) async {
+    final repository = _ref.read(transactionsRepositoryProvider);
     // Optimistic update
     state = state
         .map((t) => t.id == id ? t.copyWith(type: type) : t)
         .toList();
     try {
-      final dio = _ref.read(apiClientProvider);
-      final typeString = switch (type) {
-        TransactionType.income => 'income',
-        TransactionType.expense => 'expense',
-        TransactionType.transfer => 'transfer',
-      };
-      await dio.patch<void>(
-        '/api/transactions/$id',
-        data: {'type': typeString},
-      );
+      await repository.updateTransaction(id, {'type': type.toJson()});
     } catch (_) {
-      // Revert on failure by re-syncing
       await sync();
     }
   }
 
-  /// Splits [transactionId] into the given [splits] (≥ 2 items).
-  /// On success the parent row is marked as split-parent in local state
-  /// and all returned child rows are appended.
   Future<void> splitTransaction(
     String transactionId,
     List<SplitInputModel> splits,
   ) async {
-    final dio = _ref.read(apiClientProvider);
-    final service = SplitTransactionService(dio);
-    final children = await service.splitTransaction(transactionId, splits);
+    final repository = _ref.read(transactionsRepositoryProvider);
+    final children = await repository.splitTransaction(transactionId, splits);
     // Mark parent as split parent
     state = state
         .map((t) => t.id == transactionId ? t.copyWith(isSplitParent: true) : t)
@@ -106,12 +88,9 @@ class TransactionsNotifier extends StateNotifier<List<TransactionModel>> {
     state = [...state, ...newChildren];
   }
 
-  /// Removes all child splits from [transactionId], restoring the parent to a
-  /// normal unsplit transaction.
   Future<void> unsplitTransaction(String transactionId) async {
-    final dio = _ref.read(apiClientProvider);
-    final service = SplitTransactionService(dio);
-    await service.unsplitTransaction(transactionId);
+    final repository = _ref.read(transactionsRepositoryProvider);
+    await repository.unsplitTransaction(transactionId);
     // Remove all children belonging to this parent
     state = state.where((t) => t.parentTransactionId != transactionId).toList();
     // Restore parent to normal
@@ -120,8 +99,6 @@ class TransactionsNotifier extends StateNotifier<List<TransactionModel>> {
         .toList();
   }
 
-  /// Clears the [requiresUserReview] flag on [transactionId] after the user
-  /// has acknowledged or resolved the split re-reconciliation prompt.
   void clearReviewFlag(String transactionId) {
     state = state
         .map(
@@ -134,7 +111,6 @@ class TransactionsNotifier extends StateNotifier<List<TransactionModel>> {
 }
 
 final transactionsProvider =
-    StateNotifierProvider<TransactionsNotifier, List<TransactionModel>>(
+    StateNotifierProvider<TransactionsNotifier, List<Transaction>>(
   (ref) => TransactionsNotifier(ref),
 );
-

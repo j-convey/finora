@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../transactions/presentation/providers/transactions_provider.dart';
-import '../../domain/entities/report_period.dart';
-import '../../domain/entities/report_summary.dart';
-import '../../domain/usecases/build_report_summary_usecase.dart';
+import 'package:finora/features/transactions/presentation/providers/transactions_provider.dart';
+import 'package:finora/features/reports/domain/entities/report_period.dart';
+import 'package:finora/features/reports/domain/entities/report_summary.dart';
+import 'package:finora/features/reports/domain/usecases/build_report_summary_usecase.dart';
 
 // ── Providers ─────────────────────────────────────────────────────────────────
 

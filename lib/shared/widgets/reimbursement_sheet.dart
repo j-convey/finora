@@ -2,11 +2,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/utils/currency_formatter.dart';
-import '../../features/transactions/data/models/reimbursement_model.dart';
-import '../../features/transactions/data/models/transaction_model.dart';
-import '../../features/transactions/presentation/providers/reimbursement_provider.dart';
-import '../../features/transactions/presentation/providers/transactions_provider.dart';
+import 'package:finora/core/utils/currency_formatter.dart';
+import 'package:finora/features/transactions/data/models/reimbursement_model.dart';
+import 'package:finora/features/transactions/domain/entities/transaction.dart';
+import 'package:finora/features/transactions/presentation/extensions/transaction_ui_extension.dart';
+import 'package:finora/features/transactions/presentation/providers/reimbursement_provider.dart';
+import 'package:finora/features/transactions/presentation/providers/transactions_provider.dart';
 import 'transaction_card.dart';
 
 /// Opens the reimbursement management sheet for [transaction].
@@ -14,7 +15,7 @@ import 'transaction_card.dart';
 void showReimbursementSheet(
   BuildContext context,
   WidgetRef ref,
-  TransactionModel transaction,
+  Transaction transaction,
 ) {
   showModalBottomSheet(
     context: context,
@@ -33,7 +34,7 @@ enum _SheetView { list, pick, form }
 class ReimbursementSheet extends ConsumerStatefulWidget {
   const ReimbursementSheet({super.key, required this.transaction});
 
-  final TransactionModel transaction;
+  final Transaction transaction;
 
   @override
   ConsumerState<ReimbursementSheet> createState() =>
@@ -44,7 +45,7 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
   _SheetView _view = _SheetView.list;
 
   // Shared across pick → form flow
-  TransactionModel? _counterpart;
+  Transaction? _counterpart;
   String? _editingId;
   String _pickQuery = '';
 
@@ -81,7 +82,7 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
         _pickQuery = '';
       });
 
-  void _selectCounterpart(TransactionModel t, double myRemaining) {
+  void _selectCounterpart(Transaction t, double myRemaining) {
     // Pre-fill with the smaller of what I have left and the counterpart's total.
     // The server validates capacity precisely; the user can adjust before submit.
     final prefill = myRemaining.clamp(0.0, t.amount);
@@ -95,7 +96,7 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
     });
   }
 
-  void _goToEdit(ReimbursementModel r, List<TransactionModel> allTxns) {
+  void _goToEdit(ReimbursementModel r, List<Transaction> allTxns) {
     _amountCtrl.text = r.amount.toStringAsFixed(2);
     _notesCtrl.text = r.notes ?? '';
     final isExpense = widget.transaction.isExpense;
@@ -410,7 +411,7 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
                                 ? const Color(0xFF4CAF50).withAlpha(30)
                                 : cs.surfaceContainerHighest,
                             child: Icon(
-                              TransactionModel.iconForCategory(t.category),
+                              t.icon,
                               size: 18,
                               color: t.isIncome
                                   ? const Color(0xFF4CAF50)
@@ -545,7 +546,7 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
 class _TxnCard extends StatelessWidget {
   const _TxnCard({required this.transaction});
 
-  final TransactionModel transaction;
+  final Transaction transaction;
 
   @override
   Widget build(BuildContext context) {
@@ -569,7 +570,7 @@ class _TxnCard extends StatelessWidget {
                 ? const Color(0xFF4CAF50).withAlpha(30)
                 : cs.surfaceContainerHigh,
             child: Icon(
-              TransactionModel.iconForCategory(transaction.category),
+              transaction.icon,
               size: 18,
               color: isIncome ? const Color(0xFF4CAF50) : cs.onSurfaceVariant,
             ),
@@ -690,8 +691,8 @@ class _ReimbursementTile extends StatelessWidget {
   });
 
   final ReimbursementModel reimbursement;
-  final TransactionModel currentTransaction;
-  final List<TransactionModel> allTransactions;
+  final Transaction currentTransaction;
+  final List<Transaction> allTransactions;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 

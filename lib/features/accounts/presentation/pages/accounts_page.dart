@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/providers/hide_amounts_provider.dart';
-import '../../data/models/account_model.dart';
+import '../../domain/entities/account.dart';
 import '../providers/accounts_provider.dart';
 import '../providers/net_worth_history_provider.dart';
 import '../widgets/asset_liability_summary_panel.dart';
 import '../widgets/grouped_accounts_widget.dart';
 import '../widgets/net_worth_chart_widget.dart';
 import '../widgets/net_worth_summary_widget.dart';
+import '../../../../shared/widgets/responsive_layout.dart';
 import '../../../../shared/widgets/add_transaction_sheet.dart';
 import '../../../../shared/widgets/main_drawer.dart';
 
@@ -34,7 +35,6 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
   Widget build(BuildContext context) {
     final accountsList = ref.watch(accountsProvider);
     final netWorthHistory = ref.watch(netWorthHistoryProvider);
-    final isMobile = MediaQuery.of(context).size.width < 600;
     final isMobilePlatform = Theme.of(context).platform == TargetPlatform.android ||
         Theme.of(context).platform == TargetPlatform.iOS;
 
@@ -67,14 +67,15 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
         ],
       ),
       drawer: isMobilePlatform ? const MainDrawer() : null,
-      body: isMobile
-          ? _buildMobileLayout(accountsList, netWorthHistory)
-          : _buildDesktopLayout(accountsList, netWorthHistory),
+      body: ResponsiveLayout(
+        mobile: _buildMobileLayout(accountsList, netWorthHistory),
+        desktop: _buildDesktopLayout(accountsList, netWorthHistory),
+      ),
     );
   }
 
   Widget _buildMobileLayout(
-    List<AccountModel> accounts,
+    List<Account> accounts,
     AsyncValue<dynamic> netWorthHistory,
   ) {
     return SingleChildScrollView(
@@ -139,7 +140,7 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
   }
 
   Widget _buildDesktopLayout(
-    List<AccountModel> accounts,
+    List<Account> accounts,
     AsyncValue<dynamic> netWorthHistory,
   ) {
     return Padding(

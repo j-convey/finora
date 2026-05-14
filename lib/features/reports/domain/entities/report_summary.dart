@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../transactions/data/models/transaction_model.dart';
+import 'package:finora/features/transactions/domain/entities/transaction.dart';
 
 /// A single aggregated category bucket (spending or income).
 class ReportCategory {
@@ -57,8 +57,8 @@ class ReportSummary {
   final double totalIncome;
   final double totalExpenses;
   final int transactionCount;
-  final TransactionModel? largestExpense;
-  final TransactionModel? largestIncome;
+  final Transaction? largestExpense;
+  final Transaction? largestIncome;
   final List<ReportCategory> spendingByCategory;
   final List<ReportCategory> incomeByCategory;
 
@@ -66,10 +66,10 @@ class ReportSummary {
   final List<MonthlyFlow> monthlyFlow;
 
   /// Up to 5 most recent settled expense transactions.
-  final List<TransactionModel> recentExpenses;
+  final List<Transaction> recentExpenses;
 
   /// Up to 5 most recent settled income transactions.
-  final List<TransactionModel> recentIncome;
+  final List<Transaction> recentIncome;
 
   double get netCashFlow => totalIncome - totalExpenses;
   double get savingsRate => totalIncome > 0 ? netCashFlow / totalIncome : 0;

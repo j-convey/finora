@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers/hide_amounts_provider.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/widgets/masked_amount.dart';
-import '../../data/models/account_model.dart';
+import '../../domain/entities/account.dart';
 import '../../data/models/net_worth_history_model.dart';
 
 class NetWorthSummaryWidget extends ConsumerWidget {
@@ -15,7 +15,7 @@ class NetWorthSummaryWidget extends ConsumerWidget {
   });
 
   final NetWorthHistory history;
-  final List<AccountModel> currentAccounts;
+  final List<Account> currentAccounts;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

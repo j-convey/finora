@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../features/transactions/data/models/transaction_model.dart';
-import '../../features/transactions/presentation/providers/categories_provider.dart';
-import '../../features/transactions/presentation/providers/transactions_provider.dart';
+import 'package:finora/features/transactions/domain/entities/transaction.dart';
+import 'package:finora/features/transactions/presentation/providers/categories_provider.dart';
+import 'package:finora/features/transactions/presentation/providers/transactions_provider.dart';
 
 class AddTransactionSheet extends ConsumerStatefulWidget {
   const AddTransactionSheet({super.key});
@@ -32,7 +32,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     final categories = ref.read(categoriesProvider);
     final selectedCategory = _category ?? (categories.isNotEmpty ? categories.first : 'Uncategorized');
     ref.read(transactionsProvider.notifier).addTransaction(
-          TransactionModel(
+          Transaction(
             id: 'u${DateTime.now().millisecondsSinceEpoch}',
             title: _titleCtrl.text.trim(),
             amount: amount,
@@ -72,13 +72,13 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
           const SizedBox(height: 16),
           // Type toggle
           SegmentedButton<TransactionType>(
-            segments: const [
+            segments: [
               ButtonSegment(
-                  value: TransactionType.expense, label: Text('Expense')),
+                  value: TransactionType.expense, label: const Text('Expense')),
               ButtonSegment(
-                  value: TransactionType.income, label: Text('Income')),
+                  value: TransactionType.income, label: const Text('Income')),
               ButtonSegment(
-                  value: TransactionType.transfer, label: Text('Transfer')),
+                  value: TransactionType.transfer, label: const Text('Transfer')),
             ],
             selected: {_type},
             onSelectionChanged: (s) => setState(() => _type = s.first),

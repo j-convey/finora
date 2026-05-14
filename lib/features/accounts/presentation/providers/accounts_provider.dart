@@ -1,52 +1,38 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/network/api_client.dart';
-import '../../data/models/account_model.dart';
+import 'package:finora/core/network/api_client.dart';
+import 'package:finora/features/accounts/domain/entities/account.dart';
+import 'package:finora/features/accounts/domain/repositories/i_accounts_repository.dart';
+import 'package:finora/features/accounts/data/repositories/accounts_repository_impl.dart';
 
-class AccountsNotifier extends StateNotifier<List<AccountModel>> {
+final accountsRepositoryProvider = Provider<IAccountsRepository>((ref) {
+  final dio = ref.watch(apiClientProvider);
+  return AccountsRepositoryImpl(dio);
+});
+
+class AccountsNotifier extends StateNotifier<List<Account>> {
   AccountsNotifier(this._ref) : super([]);
 
   final Ref _ref;
 
   Future<void> sync() async {
-    final dio = _ref.read(apiClientProvider);
-    final response = await dio.get<List<dynamic>>('/api/accounts');
-    state = (response.data ?? [])
-        .map((j) => AccountModel.fromJson(j as Map<String, dynamic>))
-        .toList();
+    final repository = _ref.read(accountsRepositoryProvider);
+    state = await repository.getAccounts();
   }
 
   Future<void> updateAccountType(String accountId, AccountType type) async {
-    final typeStr = switch (type) {
-      AccountType.checking => 'checking',
-      AccountType.savings => 'savings',
-      AccountType.creditCard => 'credit_card',
-      AccountType.investment => 'investment',
-      AccountType.cash => 'cash',
-    };
+    final repository = _ref.read(accountsRepositoryProvider);
 
     // Snapshot previous state so we can revert on failure.
     final previous = state;
 
     // Update immediately so the UI regroups at once.
     state = state
-        .map((a) => a.id == accountId
-            ? AccountModel(
-                id: a.id,
-                name: a.name,
-                type: type,
-                balance: a.balance,
-                availableBalance: a.availableBalance,
-                institutionName: a.institutionName,
-                color: a.color,
-                updatedAt: a.updatedAt,
-              )
-            : a)
+        .map((a) => a.id == accountId ? a.copyWith(type: type) : a)
         .toList();
 
     try {
-      final dio = _ref.read(apiClientProvider);
-      await dio.patch<void>('/api/accounts/$accountId', data: {'type': typeStr});
+      await repository.updateAccountType(accountId, type);
     } catch (_) {
       // Revert to original state if the API call fails.
       state = previous;
@@ -60,7 +46,7 @@ class AccountsNotifier extends StateNotifier<List<AccountModel>> {
 }
 
 final accountsProvider =
-    StateNotifierProvider<AccountsNotifier, List<AccountModel>>(
+    StateNotifierProvider<AccountsNotifier, List<Account>>(
   (ref) => AccountsNotifier(ref),
 );
 

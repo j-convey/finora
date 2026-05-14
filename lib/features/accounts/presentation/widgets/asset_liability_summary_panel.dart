@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/providers/hide_amounts_provider.dart';
-import '../../../../core/utils/currency_formatter.dart';
-import '../../../../shared/widgets/masked_amount.dart';
-import '../../data/models/account_model.dart';
+import 'package:finora/core/providers/hide_amounts_provider.dart';
+import 'package:finora/core/utils/currency_formatter.dart';
+import 'package:finora/shared/widgets/masked_amount.dart';
+import 'package:finora/features/accounts/domain/entities/account.dart';
+import 'package:finora/features/accounts/presentation/extensions/account_ui_extension.dart';
 
 class AssetLiabilitySummaryPanel extends ConsumerWidget {
   const AssetLiabilitySummaryPanel({required this.accounts, super.key});
 
-  final List<AccountModel> accounts;
+  final List<Account> accounts;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -232,7 +233,7 @@ class _AssetTypeItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            '${AccountModel.labelForType(type)} ${percent.toStringAsFixed(0)}%',
+            '${type.label} ${percent.toStringAsFixed(0)}%',
             style: tt.labelSmall,
           ),
           MaskedAmount(
@@ -267,7 +268,7 @@ class _LiabilityTypeItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            '${AccountModel.labelForType(type)} ${percent.toStringAsFixed(0)}%',
+            '${type.label} ${percent.toStringAsFixed(0)}%',
             style: tt.labelSmall,
           ),
           MaskedAmount(

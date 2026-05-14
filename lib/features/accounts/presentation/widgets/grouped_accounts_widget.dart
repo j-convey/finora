@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/providers/hide_amounts_provider.dart';
-import '../../../../core/utils/currency_formatter.dart';
-import '../../data/models/account_model.dart';
+import 'package:finora/core/providers/hide_amounts_provider.dart';
+import 'package:finora/core/utils/currency_formatter.dart';
+import 'package:finora/features/accounts/domain/entities/account.dart';
+import 'package:finora/features/accounts/presentation/extensions/account_ui_extension.dart';
 
 class GroupedAccountsWidget extends StatefulWidget {
   const GroupedAccountsWidget({
@@ -12,8 +13,8 @@ class GroupedAccountsWidget extends StatefulWidget {
     super.key,
   });
 
-  final List<AccountModel> accounts;
-  final void Function(AccountModel account, AccountType newType)? onTypeChanged;
+  final List<Account> accounts;
+  final void Function(Account account, AccountType newType)? onTypeChanged;
 
   @override
   State<GroupedAccountsWidget> createState() => _GroupedAccountsWidgetState();
@@ -31,7 +32,7 @@ class _GroupedAccountsWidgetState extends State<GroupedAccountsWidget> {
   @override
   Widget build(BuildContext context) {
     // Group accounts by type
-    final groupedAccounts = <AccountType, List<AccountModel>>{};
+    final groupedAccounts = <AccountType, List<Account>>{};
     for (final account in widget.accounts) {
       groupedAccounts.putIfAbsent(account.type, () => []).add(account);
     }
@@ -84,11 +85,11 @@ class _AccountGroup extends ConsumerWidget {
   });
 
   final AccountType type;
-  final List<AccountModel> accounts;
+  final List<Account> accounts;
   final double total;
   final bool isExpanded;
   final ValueChanged<bool> onExpandChanged;
-  final void Function(AccountModel account, AccountType newType)? onTypeChanged;
+  final void Function(Account account, AccountType newType)? onTypeChanged;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -105,7 +106,7 @@ class _AccountGroup extends ConsumerWidget {
             title: Row(
               children: [
                 Icon(
-                  AccountModel.iconForType(type),
+                  type.icon,
                   size: 24,
                   color: cs.primary,
                 ),
@@ -115,7 +116,7 @@ class _AccountGroup extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        AccountModel.labelForType(type),
+                        type.label,
                         style: tt.bodyLarge
                             ?.copyWith(fontWeight: FontWeight.w500),
                       ),
@@ -160,8 +161,8 @@ class _AccountListItem extends ConsumerWidget {
     this.onTypeChanged,
   });
 
-  final AccountModel account;
-  final void Function(AccountModel account, AccountType newType)? onTypeChanged;
+  final Account account;
+  final void Function(Account account, AccountType newType)? onTypeChanged;
 
   Future<void> _showTypePicker(BuildContext context) async {
     final newType = await showDialog<AccountType>(
@@ -187,7 +188,7 @@ class _AccountListItem extends ConsumerWidget {
         children: [
           CircleAvatar(
             backgroundColor: color.withAlpha(30),
-            child: Icon(AccountModel.iconForType(account.type),
+            child: Icon(account.icon,
                 color: color, size: 20),
           ),
           const SizedBox(width: 12),
@@ -267,7 +268,7 @@ class _AccountTypePickerDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-    const types = AccountType.values;
+    final types = AccountType.values;
 
     return AlertDialog(
       title: const Text('Account Type'),
@@ -278,11 +279,11 @@ class _AccountTypePickerDialog extends StatelessWidget {
           final selected = type == current;
           return ListTile(
             leading: Icon(
-              AccountModel.iconForType(type),
+              type.icon,
               color: selected ? cs.primary : cs.onSurfaceVariant,
             ),
             title: Text(
-              AccountModel.labelForType(type),
+              type.label,
               style: tt.bodyMedium?.copyWith(
                 fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
                 color: selected ? cs.primary : null,

@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/providers/hide_amounts_provider.dart';
-import '../../../../core/utils/currency_formatter.dart';
-import '../../../../shared/widgets/transaction_card.dart';
-import '../../../../shared/widgets/transaction_details_sheet.dart';
-import '../../../accounts/presentation/providers/accounts_provider.dart';
-import '../../../transactions/data/models/transaction_model.dart';
-import '../../domain/entities/report_period.dart';
-import '../../domain/entities/report_summary.dart';
-import '../providers/reports_provider.dart';
-import '../widgets/cash_flow_chart.dart';
-import '../widgets/category_legend_tile.dart';
-import '../widgets/category_transactions_sheet.dart';
-import '../widgets/donut_chart.dart';
-import '../widgets/report_summary_card.dart';
-import '../../../../shared/widgets/add_transaction_sheet.dart';
-import '../../../../shared/widgets/main_drawer.dart';
+import 'package:finora/core/providers/hide_amounts_provider.dart';
+import 'package:finora/core/utils/currency_formatter.dart';
+import 'package:finora/shared/widgets/transaction_card.dart';
+import 'package:finora/shared/widgets/transaction_details_sheet.dart';
+import 'package:finora/features/accounts/presentation/providers/accounts_provider.dart';
+import 'package:finora/features/transactions/domain/entities/transaction.dart';
+import 'package:finora/features/reports/domain/entities/report_period.dart';
+import 'package:finora/features/reports/domain/entities/report_summary.dart';
+import 'package:finora/features/reports/presentation/providers/reports_provider.dart';
+import 'package:finora/features/reports/presentation/widgets/cash_flow_chart.dart';
+import 'package:finora/features/reports/presentation/widgets/category_legend_tile.dart';
+import 'package:finora/features/reports/presentation/widgets/category_transactions_sheet.dart';
+import 'package:finora/features/reports/presentation/widgets/donut_chart.dart';
+import 'package:finora/features/reports/presentation/widgets/report_summary_card.dart';
+import 'package:finora/shared/widgets/add_transaction_sheet.dart';
+import 'package:finora/shared/widgets/main_drawer.dart';
 
 class ReportsPage extends ConsumerStatefulWidget {
   const ReportsPage({super.key});
@@ -312,7 +312,7 @@ class _CategoryTab extends ConsumerStatefulWidget {
   final double total;
   final ReportSummary summary;
   final String centerLabel;
-  final List<TransactionModel> recentTransactions;
+  final List<Transaction> recentTransactions;
 
   /// 1 = Spending, 2 = Income.
   final int tab;
