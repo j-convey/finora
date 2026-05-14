@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/providers/hide_amounts_provider.dart';
 import '../../../../core/utils/currency_formatter.dart';
-import '../../data/models/report_summary.dart';
+import '../../domain/entities/report_summary.dart';
 
 /// A single row in the category breakdown list.
 ///

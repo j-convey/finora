@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/api_client.dart';
 import '../../data/models/reimbursement_model.dart';
-import '../../data/services/reimbursement_service.dart';
+import '../../data/datasources/reimbursement_service.dart';
 
 /// Provides and manages reimbursement data for a single transaction.
 ///

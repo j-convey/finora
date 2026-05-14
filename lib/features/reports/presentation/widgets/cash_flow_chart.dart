@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-import '../../data/models/report_summary.dart';
+import '../../domain/entities/report_summary.dart';
 
 /// Side-by-side monthly bar chart for the Cash Flow tab.
 ///

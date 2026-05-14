@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/api_client.dart';
@@ -87,9 +88,10 @@ class SimplefinNotifier extends StateNotifier<SimplefinState> {
         lastSyncedAt: DateTime.now(),
       );
     } catch (e) {
+      final message = e is DioException ? _extractError(e) : e.toString();
       state = state.copyWith(
         status: SimplefinConnectionStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: message,
       );
       rethrow;
     }
@@ -122,9 +124,10 @@ class SimplefinNotifier extends StateNotifier<SimplefinState> {
         }
       }
     } catch (e) {
+      final message = e is DioException ? _extractError(e) : e.toString();
       state = state.copyWith(
         status: SimplefinConnectionStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: message,
       );
       rethrow;
     }
@@ -139,6 +142,14 @@ class SimplefinNotifier extends StateNotifier<SimplefinState> {
       // Best-effort
     }
     state = const SimplefinState();
+  }
+
+  static String _extractError(DioException e) {
+    final data = e.response?.data;
+    if (data is Map) {
+      return (data['error'] ?? data['detail'] ?? e.message).toString();
+    }
+    return e.message ?? 'Unknown error';
   }
 }
 

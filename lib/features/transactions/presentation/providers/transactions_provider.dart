@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/network/api_client.dart';
 import '../../data/models/split_input_model.dart';
 import '../../data/models/transaction_model.dart';
-import '../../data/services/split_transaction_service.dart';
+import '../../data/datasources/split_transaction_service.dart';
 
 class TransactionsNotifier extends StateNotifier<List<TransactionModel>> {
   TransactionsNotifier(this._ref) : super([]);

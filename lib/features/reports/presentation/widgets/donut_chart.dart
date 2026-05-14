@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../data/models/report_summary.dart';
+import '../../domain/entities/report_summary.dart';
 
 /// Donut/pie chart rendered with [CustomPainter] — no package dependency.
 ///

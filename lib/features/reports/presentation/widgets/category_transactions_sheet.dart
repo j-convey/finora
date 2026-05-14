@@ -6,7 +6,7 @@ import '../../../../shared/widgets/transaction_card.dart';
 import '../../../../shared/widgets/transaction_details_sheet.dart';
 import '../../../accounts/presentation/providers/accounts_provider.dart';
 import '../../../transactions/presentation/providers/transactions_provider.dart';
-import '../../data/models/report_summary.dart';
+import '../../domain/entities/report_summary.dart';
 import '../providers/reports_provider.dart';
 
 /// Draggable bottom sheet that lists every transaction belonging to
