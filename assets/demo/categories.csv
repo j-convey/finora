@@ -1,53 +1,147 @@
-name
-Paychecks
-Interest
-Business Income
-Other Income
-Charity
-Gifts
-Auto Payment
-Public Transit
-Gas
-Auto Maintenance
-Parking & Tolls
-Taxi & Ride Shares
-Mortgage
-Rent
-Home Improvement
-Garbage
-Water
-Gas & Electric
-Internet & Cable
-Phone
-Groceries
-Restaurants & Bars
-Coffee Shops
-Travel & Vacation
-Entertainment & Recreation
-Personal
-Pets
-Fun Money
-Shopping
-Clothing
-Furniture & Housewares
-Electronics
-Child Care
-Child Activities
-Student Loans
-Education
-Medical
-Dentist
-Fitness
-Loan Repayment
-Financial & Legal Services
-Financial Fees
-Cash & ATM
-Insurance
-Taxes
-Uncategorized
-Check
-Miscellaneous
-Advertising & Promotion
+group,type,name
+Income,income,Paychecks
+Income,income,Bonuses & Commissions
+Income,income,Overtime
+Income,income,Business Income / Revenue
+Income,income,Freelance / Side Hustle Income
+Income,income,Self-Employment Income
+Income,income,Interest Income
+Income,income,Dividends & Investment Income
+Income,income,Rental Income
+Income,income,Pension / Retirement Income
+"Income","income","Government Benefits (Social Security, etc.)"
+Income,income,Tax Refunds & Credits
+Income,income,Reimbursements
+Income,income,Gifts Received
+Income,income,Alimony / Child Support Received
+Income,income,Other Income
+Housing,expense,Mortgage
+Housing,expense,Rent
+Housing,expense,Property Taxes
+Housing,expense,HOA / Condo Fees
+Housing,expense,Homeowners / Renters Insurance
+Housing,expense,Home Maintenance & Repairs
+Housing,expense,Home Improvement & Renovations
+Housing,expense,Lawn Care & Landscaping
+"Housing","expense","Home Services (cleaning, pest control, etc.)"
+Housing,expense,Furniture & Housewares
+Housing,expense,Appliances
+Transportation,expense,Auto Loan / Lease Payment
+Transportation,expense,Gas & Fuel
+Transportation,expense,Auto Insurance
+Transportation,expense,Auto Maintenance & Repairs
+Transportation,expense,Tires & Auto Parts
+Transportation,expense,Car Wash & Detailing
+Transportation,expense,Parking & Tolls
+Transportation,expense,Vehicle Registration & DMV Fees
+Transportation,expense,Public Transit
+Transportation,expense,Taxi & Ride Shares
+Transportation,expense,Bike / Scooter Share Programs
+Transportation,expense,Roadside Assistance & Warranty
+Utilities,expense,Electricity
+Utilities,expense,Natural Gas
+Utilities,expense,Water & Sewer
+Utilities,expense,Garbage & Recycling
+Utilities,expense,Internet
+Utilities,expense,Cable & Television
+Utilities,expense,Phone (Mobile & Landline)
+Utilities,expense,Streaming Subscriptions
+Utilities,expense,Subscriptions & Memberships
+Food & Dining,expense,Groceries
+Food & Dining,expense,Restaurants & Bars
+Food & Dining,expense,Fast Food
+Food & Dining,expense,Coffee Shops & Cafes
+Food & Dining,expense,Food Delivery & Takeout
+Food & Dining,expense,Alcohol & Tobacco
+Food & Dining,expense,Snacks & Convenience Stores
+Shopping,expense,Clothing & Apparel
+Shopping,expense,Shoes & Accessories
+Shopping,expense,Jewelry
+Shopping,expense,Electronics & Gadgets
+"Shopping","expense","Books, Music & Media"
+Shopping,expense,Household Supplies
+Shopping,expense,Tools & Hardware
+Personal Care,expense,Toiletries & Personal Hygiene
+Personal Care,expense,Beauty & Cosmetics
+Personal Care,expense,Haircuts & Salon Services
+"Personal Care","expense","Spa, Massage & Wellness Treatments"
+Personal Care,expense,Dry Cleaning & Laundry
+Personal Care,expense,Personal Care Services
+Health & Wellness,expense,Health Insurance
+Health & Wellness,expense,Medical & Doctor Visits
+Health & Wellness,expense,Prescriptions & Medications
+Health & Wellness,expense,Pharmacy / Over-the-Counter
+Health & Wellness,expense,Dentist & Dental Care
+Health & Wellness,expense,Vision Care / Eyeglasses / Contacts
+Health & Wellness,expense,Therapy & Mental Health
+Health & Wellness,expense,Hospital / Urgent Care / Emergency
+Health & Wellness,expense,Medical Devices & Supplies
+Health & Wellness,expense,Supplements & Vitamins
+Health & Wellness,expense,Alternative Medicine
+Fitness & Recreation,expense,Fitness / Gym Memberships
+Fitness & Recreation,expense,Fitness Classes & Equipment
+Fitness & Recreation,expense,Sports & Recreation
+Travel & Vacation,expense,Travel & Vacation
+Travel & Vacation,expense,Flights & Airfare
+Travel & Vacation,expense,Hotels & Lodging
+Travel & Vacation,expense,Rental Cars & Travel Transportation
+Travel & Vacation,expense,Travel Meals & Activities
+Travel & Vacation,expense,Souvenirs & Travel Gifts
+Entertainment & Lifestyle,expense,Entertainment & Recreation
+"Entertainment & Lifestyle","expense","Movies, Theater & Concerts"
+Entertainment & Lifestyle,expense,Video Games & Gaming
+Entertainment & Lifestyle,expense,Hobbies & Crafts
+Entertainment & Lifestyle,expense,Fun Money / Pocket Spending
+Entertainment & Lifestyle,expense,Sporting Events
+Children & Family,expense,Childcare / Daycare
+Children & Family,expense,Children's Clothing & Shoes
+Children & Family,expense,Child Activities / Sports / Lessons
+Children & Family,expense,School Fees & Supplies
+Children & Family,expense,Toys & Baby Supplies
+Children & Family,expense,Allowance / Kids' Spending
+Children & Family,expense,Child Support / Alimony Paid
+Education,expense,Student Loans
+Education,expense,Tuition & Education Fees
+Education,expense,Books & Educational Supplies
+Education,expense,Professional Development / Courses
+Pets,expense,Pet Food & Supplies
+Pets,expense,Veterinary Care & Pet Medical
+Pets,expense,Pet Grooming & Boarding
+Pets,expense,Pet Insurance
+Pets,expense,Pet Toys & Accessories
+Gifts & Donations,expense,Charity & Donations
+Gifts & Donations,expense,Religious Contributions
+Gifts & Donations,expense,Gifts Given
+Financial & Debt,expense,Loan Repayment (Non-Auto/Student)
+Financial & Debt,expense,Financial & Legal Services
+Financial & Debt,expense,Financial Fees
+Financial & Debt,expense,Bank & Credit Card Fees
+Financial & Debt,expense,Investment Fees
+Financial & Debt,expense,Cash & ATM Withdrawals
+"Financial & Debt","expense","Taxes (Income, Property, etc.)"
+Financial & Debt,expense,Accountant / Tax Preparation
+Business Expenses,expense,Advertising & Promotion
+Business Expenses,expense,Business Utilities & Communication
+Business Expenses,expense,Employee Wages & Contract Labor
+Business Expenses,expense,Business Travel & Meals
+Business Expenses,expense,Business Auto Expenses
+Business Expenses,expense,Business Insurance
+Business Expenses,expense,Office Supplies & Expenses
+Business Expenses,expense,Office Rent
+Business Expenses,expense,Postage & Shipping
+Business Expenses,expense,Business Software & Tools
+"Business Expenses","expense","Professional Services (legal, accounting)"
+Business Expenses,expense,Business Licenses & Permits
+Business Expenses,expense,Marketing & Client Entertainment
+Transfers & Adjustments,transfer,Internal Transfer
+Transfers & Adjustments,transfer,Savings Contributions
+Transfers & Adjustments,transfer,Investment Contributions
+Transfers & Adjustments,transfer,Retirement Contributions
+Transfers & Adjustments,transfer,Credit Card Payment
+Transfers & Adjustments,transfer,Balance Adjustments
+Other,expense,Uncategorized
+Other,expense,Check
+Other,expense,Miscellaneous
 Business Utilities & Communication
 Employee Wages & Contract Labor
 Business Travel & Meals

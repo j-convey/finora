@@ -115,7 +115,7 @@ class AccountSettingsPage extends ConsumerWidget {
     ref.read(accountsProvider.notifier).clear();
     ref.read(budgetsProvider.notifier).clear();
     ref.read(subscriptionsProvider.notifier).clear();
-    ref.read(categoriesProvider.notifier).clear();
+    ref.read(categoryGroupsProvider.notifier).clear();
     ref.read(netWorthHistoryProvider.notifier).clear();
   }
 }

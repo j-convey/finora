@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:finora/core/utils/currency_formatter.dart';
 import 'package:finora/features/transactions/data/models/split_input_model.dart';
+import 'package:finora/features/transactions/domain/entities/category_group.dart';
+import 'package:finora/features/transactions/domain/entities/category_item.dart';
 import 'package:finora/features/transactions/domain/entities/transaction.dart';
 import 'package:finora/features/transactions/presentation/extensions/transaction_ui_extension.dart';
 import 'package:finora/features/transactions/presentation/providers/categories_provider.dart';
@@ -92,7 +94,7 @@ class _SplitTransactionSheetState extends ConsumerState<SplitTransactionSheet> {
           (r) => SplitInputModel(
             title: r.titleCtrl.text.trim(),
             amount: double.parse(r.amountCtrl.text),
-            category: r.category?.isNotEmpty == true ? r.category : null,
+            categoryId: r.category?.id,
             notes: r.notesCtrl.text.trim().isEmpty ? null : r.notesCtrl.text.trim(),
           ),
         )
@@ -125,7 +127,7 @@ class _SplitTransactionSheetState extends ConsumerState<SplitTransactionSheet> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-    final categories = ref.watch(categoriesProvider);
+    final categories = ref.watch(categoryGroupsProvider);
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -262,7 +264,10 @@ class _SplitRowState {
   final titleCtrl = TextEditingController();
   final amountCtrl = TextEditingController();
   final notesCtrl = TextEditingController();
-  String? category;
+
+  /// The category selected by the user for this split row.
+  /// Null means the server will inherit the parent transaction's category.
+  CategoryItem? category;
 
   void dispose() {
     titleCtrl.dispose();
@@ -285,7 +290,7 @@ class _SplitRowWidget extends StatelessWidget {
 
   final _SplitRowState rowState;
   final int index;
-  final List<String> categories;
+  final List<CategoryGroup> categories;
   final String parentCategory;
   final bool canRemove;
   final VoidCallback onRemove;
@@ -358,7 +363,8 @@ class _SplitRowWidget extends StatelessWidget {
             const SizedBox(height: 8),
             _CategoryDropdown(
               categories: categories,
-              selected: rowState.category ?? parentCategory,
+              selected: rowState.category,
+              defaultName: parentCategory,
               onChanged: (cat) {
                 rowState.category = cat;
                 onChanged();
@@ -377,29 +383,69 @@ class _CategoryDropdown extends StatelessWidget {
   const _CategoryDropdown({
     required this.categories,
     required this.selected,
+    required this.defaultName,
     required this.onChanged,
   });
 
-  final List<String> categories;
-  final String selected;
-  final void Function(String) onChanged;
+  final List<CategoryGroup> categories;
+
+  /// The item explicitly selected by the user. Null = not yet chosen.
+  final CategoryItem? selected;
+
+  /// Category name to pre-select when [selected] is null (the parent's category).
+  final String defaultName;
+
+  final void Function(CategoryItem) onChanged;
 
   @override
   Widget build(BuildContext context) {
-    final effective = categories.contains(selected) ? selected : categories.first;
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
+    final allItems = categories.expand((g) => g.categories).toList();
+
+    // Effective display name: user selection → parent's name → first item.
+    final effectiveName = selected?.name ??
+        allItems.where((c) => c.name == defaultName).firstOrNull?.name ??
+        (allItems.isNotEmpty ? allItems.first.name : '');
+
+    final items = <DropdownMenuItem<String>>[];
+    for (final group in categories) {
+      items.add(DropdownMenuItem<String>(
+        enabled: false,
+        value: '__header__${group.group}',
+        child: Text(
+          group.group.toUpperCase(),
+          style: tt.labelSmall?.copyWith(
+            color: cs.onSurfaceVariant,
+            letterSpacing: 0.8,
+          ),
+        ),
+      ));
+      for (final cat in group.categories) {
+        items.add(DropdownMenuItem<String>(
+          value: cat.name,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: Text(cat.name),
+          ),
+        ));
+      }
+    }
+
     return DropdownButtonFormField<String>(
-      initialValue: effective,
+      value: effectiveName.isEmpty ? null : effectiveName,
       isExpanded: true,
       decoration: const InputDecoration(
         labelText: 'Category',
         border: OutlineInputBorder(),
         isDense: true,
       ),
-      items: categories
-          .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-          .toList(),
-      onChanged: (v) {
-        if (v != null) onChanged(v);
+      items: items,
+      onChanged: (name) {
+        if (name == null) return;
+        final item = allItems.where((c) => c.name == name).firstOrNull;
+        if (item != null) onChanged(item);
       },
     );
   }

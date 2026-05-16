@@ -129,7 +129,7 @@ class DatabaseBackupNotifier extends StateNotifier<DatabaseBackupState> {
         _ref.read(accountsProvider.notifier).sync(),
         _ref.read(budgetsProvider.notifier).sync(),
         _ref.read(subscriptionsProvider.notifier).sync(),
-        _ref.read(categoriesProvider.notifier).sync(),
+        _ref.read(categoryGroupsProvider.notifier).sync(),
         _ref.read(netWorthHistoryProvider.notifier).fetch(),
       ]);
     } catch (e) {

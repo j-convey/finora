@@ -14,7 +14,7 @@ class DemoInterceptor extends Interceptor {
   List<Map<String, dynamic>>? _budgets;
   List<Map<String, dynamic>>? _subscriptions;
   List<Map<String, dynamic>>? _netWorthHistory;
-  List<String>? _categories;
+  List<Map<String, dynamic>>? _categories;
 
   bool _loaded = false;
 
@@ -30,7 +30,26 @@ class DemoInterceptor extends Interceptor {
     _netWorthHistory = await _loadCsv('assets/demo/net_worth_history.csv');
 
     final catRows = await _loadCsv('assets/demo/categories.csv');
-    _categories = catRows.map((r) => r['name'] as String).toList();
+
+    // Build grouped structure matching the real API: [{ group, type, categories }]
+    // Each category is { id: int, name: string }. IDs start at 1 (sort_order + 1),
+    // matching the canonical IDs assigned by server migration 012.
+    final groupOrder = <String>[];
+    final groupMap = <String, Map<String, dynamic>>{};
+    int idCounter = 1;
+    for (final row in catRows) {
+      final group = row['group'] as String;
+      final type = row['type'] as String;
+      final name = row['name'] as String;
+      if (!groupMap.containsKey(group)) {
+        groupOrder.add(group);
+        groupMap[group] = {'group': group, 'type': type, 'categories': <Map<String, dynamic>>[]};
+      }
+      (groupMap[group]!['categories'] as List<Map<String, dynamic>>)
+          .add({'id': idCounter, 'name': name});
+      idCounter++;
+    }
+    _categories = groupOrder.map((g) => groupMap[g]!).toList();
 
     // Apply computed fields that the backend normally derives.
     _transactions = _transactions!.map(_enrichTransaction).toList();

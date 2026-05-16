@@ -1,9 +1,11 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:finora/core/utils/currency_formatter.dart';
 import 'package:finora/features/accounts/domain/entities/account.dart';
 import 'package:finora/features/accounts/presentation/providers/accounts_provider.dart';
+import 'package:finora/features/transactions/domain/entities/category_item.dart';
 import 'package:finora/features/transactions/domain/entities/transaction.dart';
 import 'package:finora/features/transactions/presentation/extensions/transaction_ui_extension.dart';
 import 'package:finora/features/transactions/presentation/providers/categories_provider.dart';
@@ -56,10 +58,33 @@ void showCategoryPicker(
     isScrollControlled: true,
     builder: (_) => CategoryPickerSheet(
       current: transaction.category,
-      onSelected: (cat) {
+      onSelected: (CategoryItem item) {
         ref
             .read(transactionsProvider.notifier)
-            .updateCategory(transaction.id, cat);
+            .updateCategory(transaction.id, item.id, item.name)
+            .catchError((Object e) {
+          if (context.mounted) {
+            String detail = e.toString();
+            if (e is DioException) {
+              final data = e.response?.data;
+              if (data is Map && data['detail'] != null) {
+                detail = data['detail'].toString();
+              } else if (data != null) {
+                detail = data.toString();
+              } else {
+                detail = '${e.response?.statusCode} ${e.response?.statusMessage}';
+              }
+            }
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Category update failed: $detail'),
+                backgroundColor:
+                    Theme.of(context).colorScheme.error,
+                duration: const Duration(seconds: 8),
+              ),
+            );
+          }
+        });
       },
     ),
   );
@@ -693,7 +718,7 @@ class CategoryPickerSheet extends ConsumerStatefulWidget {
   });
 
   final String current;
-  final void Function(String) onSelected;
+  final void Function(CategoryItem) onSelected;
 
   @override
   ConsumerState<CategoryPickerSheet> createState() =>
@@ -707,13 +732,33 @@ class _CategoryPickerSheetState extends ConsumerState<CategoryPickerSheet> {
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
     final cs = Theme.of(context).colorScheme;
-    final categories = ref.watch(categoriesProvider);
+    final groups = ref.watch(categoryGroupsProvider);
 
-    final filtered = _query.isEmpty
-        ? categories
-        : categories
-            .where((c) => c.toLowerCase().contains(_query.toLowerCase()))
-            .toList();
+    // When searching, show a flat filtered list across all groups.
+    // When idle, show a grouped list with section headers.
+    final isSearching = _query.isNotEmpty;
+    final flatFiltered = isSearching
+        ? groups
+            .expand((g) => g.categories)
+            .where(
+              (c) => c.name.toLowerCase().contains(_query.toLowerCase()),
+            )
+            .toList()
+        : const <CategoryItem>[];
+
+    // Build a flat list of items for the grouped view.
+    // Each entry is either a section header or a category item.
+    final groupedItems = <({bool isHeader, String text, CategoryItem? item})>[];
+    if (!isSearching) {
+      for (final group in groups) {
+        groupedItems.add((isHeader: true, text: group.group, item: null));
+        for (final cat in group.categories) {
+          groupedItems.add((isHeader: false, text: cat.name, item: cat));
+        }
+      }
+    }
+
+    final totalItems = isSearching ? flatFiltered.length : groupedItems.length;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -742,7 +787,7 @@ class _CategoryPickerSheetState extends ConsumerState<CategoryPickerSheet> {
             ),
             const Divider(height: 1),
             Flexible(
-              child: filtered.isEmpty
+              child: totalItems == 0
                   ? Padding(
                       padding: const EdgeInsets.all(24),
                       child: Center(
@@ -754,17 +799,50 @@ class _CategoryPickerSheetState extends ConsumerState<CategoryPickerSheet> {
                       ),
                     )
                   : ListView.builder(
-                      itemCount: filtered.length,
+                      itemCount: totalItems,
                       itemBuilder: (context, i) {
-                        final cat = filtered[i];
-                        final isSelected = cat == widget.current;
+                        if (isSearching) {
+                          final cat = flatFiltered[i]; // CategoryItem
+                          final isSelected = cat.name == widget.current;
+                          return ListTile(
+                            leading: Icon(
+                              TransactionUIHelper.iconForCategory(cat.name),
+                              color: isSelected ? cs.primary : cs.onSurfaceVariant,
+                            ),
+                            title: Text(cat.name),
+                            trailing: isSelected
+                                ? Icon(Icons.check, color: cs.primary)
+                                : null,
+                            selected: isSelected,
+                            onTap: () {
+                              widget.onSelected(cat);
+                              Navigator.pop(context);
+                            },
+                          );
+                        }
+
+                        final item = groupedItems[i];
+                        if (item.isHeader) {
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                            child: Text(
+                              item.text.toUpperCase(),
+                              style: tt.labelSmall?.copyWith(
+                                color: cs.onSurfaceVariant,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                          );
+                        }
+
+                        final cat = item.item!; // CategoryItem
+                        final isSelected = cat.name == widget.current;
                         return ListTile(
                           leading: Icon(
-                            TransactionUIHelper.iconForCategory(cat),
-                            color:
-                                isSelected ? cs.primary : cs.onSurfaceVariant,
+                            TransactionUIHelper.iconForCategory(cat.name),
+                            color: isSelected ? cs.primary : cs.onSurfaceVariant,
                           ),
-                          title: Text(cat),
+                          title: Text(cat.name),
                           trailing: isSelected
                               ? Icon(Icons.check, color: cs.primary)
                               : null,

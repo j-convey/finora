@@ -33,16 +33,17 @@ class TransactionsNotifier extends StateNotifier<List<Transaction>> {
     state = [];
   }
 
-  Future<void> updateCategory(String id, String category) async {
+  Future<void> updateCategory(String id, int categoryId, String categoryName) async {
     final repository = _ref.read(transactionsRepositoryProvider);
-    // Optimistic update
+    // Optimistic update — show the new name immediately.
     state = state
-        .map((t) => t.id == id ? t.copyWith(category: category) : t)
+        .map((t) => t.id == id ? t.copyWith(category: categoryName) : t)
         .toList();
     try {
-      await repository.updateTransaction(id, {'category': category});
-    } catch (_) {
+      await repository.updateTransaction(id, {'category_id': categoryId});
+    } catch (e) {
       await sync();
+      rethrow;
     }
   }
 
@@ -54,8 +55,9 @@ class TransactionsNotifier extends StateNotifier<List<Transaction>> {
         .toList();
     try {
       await repository.updateTransaction(id, {'notes': notes});
-    } catch (_) {
+    } catch (e) {
       await sync();
+      rethrow;
     }
   }
 

@@ -3,7 +3,7 @@ class SplitInputModel {
   const SplitInputModel({
     required this.title,
     required this.amount,
-    this.category,
+    this.categoryId,
     this.notes,
   });
 
@@ -11,13 +11,13 @@ class SplitInputModel {
   final double amount;
 
   /// When omitted the server inherits the parent's category.
-  final String? category;
+  final int? categoryId;
   final String? notes;
 
   Map<String, dynamic> toJson() => {
         'title': title,
         'amount': amount,
-        if (category != null) 'category': category,
+        if (categoryId != null) 'category_id': categoryId,
         if (notes != null && notes!.isNotEmpty) 'notes': notes,
       };
 }

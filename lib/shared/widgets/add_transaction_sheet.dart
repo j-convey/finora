@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:finora/features/transactions/domain/entities/category_item.dart';
 import 'package:finora/features/transactions/domain/entities/transaction.dart';
 import 'package:finora/features/transactions/presentation/providers/categories_provider.dart';
 import 'package:finora/features/transactions/presentation/providers/transactions_provider.dart';
@@ -17,7 +18,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   final _titleCtrl = TextEditingController();
   final _amountCtrl = TextEditingController();
   TransactionType _type = TransactionType.expense;
-  String? _category;
+  CategoryItem? _category;
 
   @override
   void dispose() {
@@ -29,15 +30,16 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   void _save() {
     final amount = double.tryParse(_amountCtrl.text);
     if (_titleCtrl.text.isEmpty || amount == null) return;
-    final categories = ref.read(categoriesProvider);
-    final selectedCategory = _category ?? (categories.isNotEmpty ? categories.first : 'Uncategorized');
+    final groups = ref.read(categoryGroupsProvider);
+    final allItems = groups.expand((g) => g.categories).toList();
+    final selectedItem = _category ?? (allItems.isNotEmpty ? allItems.first : null);
     ref.read(transactionsProvider.notifier).addTransaction(
           Transaction(
             id: 'u${DateTime.now().millisecondsSinceEpoch}',
             title: _titleCtrl.text.trim(),
             amount: amount,
             type: _type,
-            category: selectedCategory,
+            category: selectedItem?.name ?? 'Uncategorized',
             date: DateTime.now(),
           ),
         );
@@ -104,8 +106,34 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
           ),
           const SizedBox(height: 12),
           Consumer(builder: (context, ref, _) {
-            final categories = ref.watch(categoriesProvider);
-            final selected = _category ?? (categories.isNotEmpty ? categories.first : null);
+            final groups = ref.watch(categoryGroupsProvider);
+            final allItems = groups.expand((g) => g.categories).toList();
+            final selectedName = _category?.name ?? (allItems.isNotEmpty ? allItems.first.name : null);
+
+            final items = <DropdownMenuItem<String>>[];
+            for (final group in groups) {
+              items.add(DropdownMenuItem<String>(
+                enabled: false,
+                value: '__header__${group.group}',
+                child: Text(
+                  group.group.toUpperCase(),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+              ));
+              for (final cat in group.categories) {
+                items.add(DropdownMenuItem<String>(
+                  value: cat.name,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: Text(cat.name),
+                  ),
+                ));
+              }
+            }
+
             return InputDecorator(
               decoration: const InputDecoration(
                 labelText: 'Category',
@@ -113,12 +141,14 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
-                  value: selected,
+                  value: selectedName,
                   isDense: true,
-                  items: categories
-                      .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-                      .toList(),
-                  onChanged: (v) => setState(() => _category = v),
+                  items: items,
+                  onChanged: (name) {
+                    if (name == null) return;
+                    final item = allItems.where((c) => c.name == name).firstOrNull;
+                    if (item != null) setState(() => _category = item);
+                  },
                 ),
               ),
             );

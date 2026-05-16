@@ -124,7 +124,7 @@ class _DataSettingsPageState extends ConsumerState<DataSettingsPage> {
         ref.read(budgetsProvider.notifier).sync(),
         ref.read(subscriptionsProvider.notifier).sync(),
         ref.read(netWorthHistoryProvider.notifier).fetch(),
-        ref.read(categoriesProvider.notifier).sync(),
+        ref.read(categoryGroupsProvider.notifier).sync(),
       ]);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -310,7 +310,7 @@ class _DataSettingsPageState extends ConsumerState<DataSettingsPage> {
     ref.read(accountsProvider.notifier).clear();
     ref.read(budgetsProvider.notifier).clear();
     ref.read(subscriptionsProvider.notifier).clear();
-    ref.read(categoriesProvider.notifier).clear();
+    ref.read(categoryGroupsProvider.notifier).clear();
     ref.read(netWorthHistoryProvider.notifier).clear();
   }
 }

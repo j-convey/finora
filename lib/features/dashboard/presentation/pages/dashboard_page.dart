@@ -34,7 +34,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
       ref.read(accountsProvider.notifier).sync();
       ref.read(budgetsProvider.notifier).sync();
       ref.read(subscriptionsProvider.notifier).sync();
-      ref.read(categoriesProvider.notifier).sync();
+      ref.read(categoryGroupsProvider.notifier).sync();
     });
   }
 

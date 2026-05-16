@@ -32,7 +32,7 @@ class _DemoModeSettingsPageState extends ConsumerState<DemoModeSettingsPage> {
         ref.read(transactionsProvider.notifier).sync(),
         ref.read(budgetsProvider.notifier).sync(),
         ref.read(subscriptionsProvider.notifier).sync(),
-        ref.read(categoriesProvider.notifier).sync(),
+        ref.read(categoryGroupsProvider.notifier).sync(),
         ref.read(netWorthHistoryProvider.notifier).fetch(),
       ]);
     } catch (_) {
