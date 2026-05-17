@@ -136,12 +136,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           final demoService = ref.read(demoModeServiceProvider);
                           try {
                             await demoService.toggleDemoMode(true);
-                          } catch (_) {
+                          } catch (e, st) {
+                            debugPrint('ERROR: Failed to enter demo mode from login page.');
+                            debugPrint('Exception: $e');
+                            debugPrint('StackTrace: $st');
                             if (!context.mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
+                              SnackBar(
                                 content: Text(
-                                    'Failed to enter demo mode. Try again.'),
+                                    'Failed to enter demo mode. Try again. Error: $e'),
                               ),
                             );
                           }

@@ -29,6 +29,7 @@ class DemoModeService {
   bool isDemoModeActive() => _prefs.getBool(_kDemoModeKey) ?? false;
 
   Future<void> toggleDemoMode(bool enable) async {
+    print('DEBUG [DemoModeService]: toggleDemoMode(enable: $enable)');
     if (enable) {
       await _enableDemo();
     } else {
@@ -37,42 +38,65 @@ class DemoModeService {
   }
 
   Future<void> _enableDemo() async {
+    print('DEBUG [DemoModeService]: Entering _enableDemo()');
     final wasAuthenticated = _ref.read(authProvider).isAuthenticated;
+    print('DEBUG [DemoModeService]: _enableDemo() - pre-demo wasAuthenticated: $wasAuthenticated');
+
     await _prefs.setBool(_kPreDemoAuthKey, wasAuthenticated);
     await _prefs.setBool(_kDemoModeKey, true);
+    print('DEBUG [DemoModeService]: _enableDemo() - Saved preferences');
 
     _ref.read(demoModeProvider.notifier).updateState(true);
+    print('DEBUG [DemoModeService]: _enableDemo() - Updated Riverpod state to true');
 
     try {
       final dio = _ref.read(apiClientProvider);
-      await dio.post('/api/demo/enable');
-    } catch (_) {
+      print('DEBUG [DemoModeService]: _enableDemo() - Triggering POST /api/demo/enable');
+      final response = await dio.post('/api/demo/enable');
+      print('DEBUG [DemoModeService]: _enableDemo() - Server response: ${response.statusCode}');
+    } catch (e, st) {
+      print('DEBUG [DemoModeService]: _enableDemo() - Server error (ignored): $e');
+      print('DEBUG [DemoModeService]: _enableDemo() - Server error stack: $st');
       // Ignore errors, we still want to toggle locally.
     }
 
+    print('DEBUG [DemoModeService]: _enableDemo() - Clearing caches and refetching data');
     await clearCachesAndRefetch();
+    print('DEBUG [DemoModeService]: _enableDemo() - Finished');
   }
 
   Future<void> _disableDemo() async {
+    print('DEBUG [DemoModeService]: Entering _disableDemo()');
     final wasAuthBefore = _prefs.getBool(_kPreDemoAuthKey) ?? false;
+    print('DEBUG [DemoModeService]: _disableDemo() - pre-demo wasAuthBefore: $wasAuthBefore');
+
     await _prefs.setBool(_kDemoModeKey, false);
+    print('DEBUG [DemoModeService]: _disableDemo() - Saved preference demo_mode_active = false');
 
     _ref.read(demoModeProvider.notifier).updateState(false);
+    print('DEBUG [DemoModeService]: _disableDemo() - Updated Riverpod state to false');
 
     try {
       final dio = _ref.read(apiClientProvider);
-      await dio.post('/api/demo/disable');
-    } catch (_) {
+      print('DEBUG [DemoModeService]: _disableDemo() - Triggering POST /api/demo/disable');
+      final response = await dio.post('/api/demo/disable');
+      print('DEBUG [DemoModeService]: _disableDemo() - Server response: ${response.statusCode}');
+    } catch (e, st) {
+      print('DEBUG [DemoModeService]: _disableDemo() - Server error (ignored): $e');
+      print('DEBUG [DemoModeService]: _disableDemo() - Server error stack: $st');
       // Ignore errors.
     }
 
     await _clearAllCaches();
 
     if (wasAuthBefore) {
+      print('DEBUG [DemoModeService]: _disableDemo() - User was authenticated before demo, refetching caches');
       await clearCachesAndRefetch();
     } else {
+      print('DEBUG [DemoModeService]: _disableDemo() - User was NOT authenticated before demo, logging out');
       await _ref.read(authProvider.notifier).logout();
     }
+    print('DEBUG [DemoModeService]: _disableDemo() - Finished');
   }
 
   Future<void> _clearAllCaches() async {
@@ -80,9 +104,11 @@ class DemoModeService {
     // refreshing providers is usually how we reset/refetch data.
     // However, if we need to explicitly clear things, we can do it here.
     // Sync calls down below accomplish this implicitly.
+    print('DEBUG [DemoModeService]: _clearAllCaches() called');
   }
 
   Future<void> clearCachesAndRefetch() async {
+    print('DEBUG [DemoModeService]: clearCachesAndRefetch() called. Refreshing providers...');
     try {
       await Future.wait([
         _ref.read(accountsProvider.notifier).sync(),
@@ -92,8 +118,12 @@ class DemoModeService {
         _ref.read(categoryGroupsProvider.notifier).sync(),
         _ref.read(netWorthHistoryProvider.notifier).fetch(),
       ]);
-    } catch (_) {
+      print('DEBUG [DemoModeService]: clearCachesAndRefetch() finished successfully');
+    } catch (e, st) {
+      print('DEBUG [DemoModeService]: clearCachesAndRefetch() error: $e');
+      print('DEBUG [DemoModeService]: clearCachesAndRefetch() stack: $st');
       // Swallow errors (e.g. no connectivity).
+      throw e; // RETHROW SO THE UI CATCHES IT
     }
   }
 }
