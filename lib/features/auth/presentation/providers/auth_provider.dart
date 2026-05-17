@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/auth_tokens.dart';
 import '../../data/models/user_model.dart';
+import '../../../../core/providers/demo_mode_provider.dart';
 import '../../data/datasources/token_storage_service.dart';
 
 // ── Supporting types ──────────────────────────────────────────────────────────
@@ -45,6 +46,7 @@ class AuthState {
     this.user,
     this.isLoading = false,
     this.error,
+    this.isDemoModeActive = false,
   });
 
   final AuthStatus status;
@@ -56,8 +58,24 @@ class AuthState {
   final UserModel? user;
   final bool isLoading;
   final String? error;
+  final bool isDemoModeActive;
 
-  bool get isAuthenticated => status == AuthStatus.authenticated;
+  bool get isAuthenticated =>
+      status == AuthStatus.authenticated || isDemoModeActive;
+
+  UserModel? get activeUser {
+    if (isDemoModeActive) {
+      return UserModel(
+        id: 9999,
+        householdId: 1,
+        email: 'demo@finora.app',
+        fullName: 'Demo User',
+        isActive: true,
+        createdAt: DateTime.now(),
+      );
+    }
+    return user;
+  }
 
   AuthState copyWith({
     AuthStatus? status,
@@ -67,6 +85,7 @@ class AuthState {
     bool? isLoading,
     String? error,
     bool clearError = false,
+    bool? isDemoModeActive,
   }) =>
       AuthState(
         status: status ?? this.status,
@@ -74,13 +93,23 @@ class AuthState {
         user: clearUser ? null : user ?? this.user,
         isLoading: isLoading ?? this.isLoading,
         error: clearError ? null : error ?? this.error,
+        isDemoModeActive: isDemoModeActive ?? this.isDemoModeActive,
       );
 }
 
 // ── Notifier ──────────────────────────────────────────────────────────────────
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier(this._ref) : super(const AuthState());
+  AuthNotifier(this._ref)
+      : super(AuthState(isDemoModeActive: _ref.read(demoModeProvider))) {
+    _ref.listen<bool>(
+      demoModeProvider,
+      (previous, isDemoMode) {
+        state = state.copyWith(isDemoModeActive: isDemoMode);
+      },
+      fireImmediately: true,
+    );
+  }
 
   final Ref _ref;
   TokenStorageService get _storage => _ref.read(tokenStorageProvider);

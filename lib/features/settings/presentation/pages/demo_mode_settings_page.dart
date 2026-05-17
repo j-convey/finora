@@ -2,12 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/providers/demo_mode_provider.dart';
-import '../../../accounts/presentation/providers/accounts_provider.dart';
-import '../../../accounts/presentation/providers/net_worth_history_provider.dart';
-import '../../../budgets/presentation/providers/budgets_provider.dart';
-import '../../../subscriptions/presentation/providers/subscriptions_provider.dart';
-import '../../../transactions/presentation/providers/categories_provider.dart';
-import '../../../transactions/presentation/providers/transactions_provider.dart';
+import '../../../../core/services/demo_mode_service.dart';
 
 class DemoModeSettingsPage extends ConsumerStatefulWidget {
   const DemoModeSettingsPage({super.key});
@@ -22,23 +17,20 @@ class _DemoModeSettingsPageState extends ConsumerState<DemoModeSettingsPage> {
 
   Future<void> _toggle(bool enable) async {
     setState(() => _isLoading = true);
-    ref.read(demoModeProvider.notifier).state = enable;
-    // apiClientProvider rebuilds automatically because it watches demoModeProvider.
-    // Trigger a full data resync so every provider picks up either demo or
-    // real data immediately.
+    final demoModeService = ref.read(demoModeServiceProvider);
+
     try {
-      await Future.wait([
-        ref.read(accountsProvider.notifier).sync(),
-        ref.read(transactionsProvider.notifier).sync(),
-        ref.read(budgetsProvider.notifier).sync(),
-        ref.read(subscriptionsProvider.notifier).sync(),
-        ref.read(categoryGroupsProvider.notifier).sync(),
-        ref.read(netWorthHistoryProvider.notifier).fetch(),
-      ]);
+      await demoModeService.toggleDemoMode(enable);
     } catch (_) {
-      // Swallow errors from the real server when exiting demo mode with no
-      // connectivity — the user can manually sync later.
+      // Typically errors like 429 are swallowed by the service,
+      // but if any bubble up, we handle them.
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to toggle demo mode. Please try again.')),
+        );
+      }
     }
+
     if (mounted) setState(() => _isLoading = false);
   }
 

@@ -3,13 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../providers/demo_mode_provider.dart';
-import 'demo_interceptor.dart';
 
 final apiClientProvider = Provider<Dio>((ref) {
   final serverUrl = ref.watch(authProvider).serverUrl;
   final baseUrl =
       serverUrl.startsWith('http') ? serverUrl : 'http://$serverUrl';
-  final isDemoMode = ref.watch(demoModeProvider);
 
   final dio = Dio(
     BaseOptions(
@@ -21,9 +19,29 @@ final apiClientProvider = Provider<Dio>((ref) {
   );
 
   dio.interceptors.add(_AuthInterceptor(ref));
-  if (isDemoMode) dio.interceptors.add(DemoInterceptor());
+  dio.interceptors.add(_DemoHeaderInterceptor(ref));
   return dio;
 });
+
+class _DemoHeaderInterceptor extends Interceptor {
+  _DemoHeaderInterceptor(this._ref);
+
+  final Ref _ref;
+
+  @override
+  void onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) {
+    final isDemoMode = _ref.read(demoModeProvider);
+    if (isDemoMode) {
+      options.headers['X-Demo-Mode'] = 'true';
+    } else {
+      options.headers.remove('X-Demo-Mode');
+    }
+    handler.next(options);
+  }
+}
 
 /// Injects the Bearer token on every request, and auto-refreshes on 401.
 class _AuthInterceptor extends Interceptor {

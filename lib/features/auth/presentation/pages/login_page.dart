@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/services/demo_mode_service.dart';
 import '../providers/auth_provider.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -124,6 +125,34 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           context.go('/setup');
                         },
                   child: const Text('Change server'),
+                ),
+                const SizedBox(height: 24),
+                const Divider(),
+                const SizedBox(height: 24),
+                OutlinedButton.icon(
+                  onPressed: auth.isLoading
+                      ? null
+                      : () async {
+                          final demoService = ref.read(demoModeServiceProvider);
+                          try {
+                            await demoService.toggleDemoMode(true);
+                          } catch (_) {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      'Failed to enter demo mode. Try again.'),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                  icon: const Icon(Icons.science_outlined),
+                  label: const Text('Try Demo Mode'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFFE65100),
+                    side: const BorderSide(color: Color(0xFFE65100)),
+                  ),
                 ),
               ],
             ),
