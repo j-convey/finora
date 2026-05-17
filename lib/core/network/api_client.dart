@@ -39,6 +39,7 @@ class _DemoHeaderInterceptor extends Interceptor {
     } else {
       options.headers.remove('X-Demo-Mode');
     }
+    print('DEBUG [ApiClient]: Intercepting request to ${options.path}, X-Demo-Mode: ${options.headers['X-Demo-Mode']}');
     handler.next(options);
   }
 }

@@ -39,8 +39,8 @@ class DemoModeService {
 
   Future<void> _enableDemo() async {
     print('DEBUG [DemoModeService]: Entering _enableDemo()');
-    final wasAuthenticated = _ref.read(authProvider).isAuthenticated;
-    print('DEBUG [DemoModeService]: _enableDemo() - pre-demo wasAuthenticated: $wasAuthenticated');
+    final wasAuthenticated = _ref.read(authProvider).status == AuthStatus.authenticated;
+    print('DEBUG [DemoModeService]: _enableDemo() - pre-demo wasAuthenticated (real): $wasAuthenticated');
 
     await _prefs.setBool(_kPreDemoAuthKey, wasAuthenticated);
     await _prefs.setBool(_kDemoModeKey, true);
