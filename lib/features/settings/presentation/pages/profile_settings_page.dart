@@ -102,7 +102,8 @@ class ProfileSettingsPage extends ConsumerWidget {
                               ? NetworkImage(user!.profilePictureUrl!)
                               : null),
                       child: selectedFilePath != null
-                          ? const Icon(Icons.check, color: Colors.green, size: 40)
+                          ? const Icon(Icons.check,
+                              color: Colors.green, size: 40)
                           : (user?.profilePictureUrl == null
                               ? const Icon(Icons.person, size: 40)
                               : null),

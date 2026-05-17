@@ -25,15 +25,14 @@ class NetWorthSummaryWidget extends ConsumerWidget {
 
     // Current net worth = sum of all account balances
     final currentNetWorth = currentAccounts.fold(0.0, (s, a) => s + a.balance);
-    
+
     // Previous net worth = first entry from history (for 1-month change)
     final previousNetWorth = history.previousNetWorth;
-    
+
     // Calculate change and percentage
     final change = currentNetWorth - previousNetWorth;
-    final changePercentage = previousNetWorth != 0
-        ? (change / previousNetWorth.abs()) * 100
-        : 0.0;
+    final changePercentage =
+        previousNetWorth != 0 ? (change / previousNetWorth.abs()) * 100 : 0.0;
     final isPositive = change >= 0;
     final changeColor =
         isPositive ? const Color(0xFF4CAF50) : const Color(0xFFEF5350);
@@ -88,4 +87,3 @@ class NetWorthSummaryWidget extends ConsumerWidget {
     );
   }
 }
-

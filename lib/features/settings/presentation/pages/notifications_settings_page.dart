@@ -101,8 +101,8 @@ class _NotificationsSettingsPageState
                     onChanged: (val) {
                       final amount = double.tryParse(val);
                       if (amount != null && amount >= 0) {
-                        notifier.update(
-                            prefs.copyWith(thresholdAmount: amount));
+                        notifier
+                            .update(prefs.copyWith(thresholdAmount: amount));
                       }
                     },
                   ),

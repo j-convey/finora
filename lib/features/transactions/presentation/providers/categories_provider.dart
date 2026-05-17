@@ -115,14 +115,17 @@ const _fallbackGroups = <CategoryGroup>[
     CategoryItem(id: 87, name: 'Travel Meals & Activities'),
     CategoryItem(id: 88, name: 'Souvenirs & Travel Gifts'),
   ]),
-  CategoryGroup(group: 'Entertainment & Lifestyle', type: 'expense', categories: [
-    CategoryItem(id: 89, name: 'Entertainment & Recreation'),
-    CategoryItem(id: 90, name: 'Movies, Theater & Concerts'),
-    CategoryItem(id: 91, name: 'Video Games & Gaming'),
-    CategoryItem(id: 92, name: 'Hobbies & Crafts'),
-    CategoryItem(id: 93, name: 'Fun Money / Pocket Spending'),
-    CategoryItem(id: 94, name: 'Sporting Events'),
-  ]),
+  CategoryGroup(
+      group: 'Entertainment & Lifestyle',
+      type: 'expense',
+      categories: [
+        CategoryItem(id: 89, name: 'Entertainment & Recreation'),
+        CategoryItem(id: 90, name: 'Movies, Theater & Concerts'),
+        CategoryItem(id: 91, name: 'Video Games & Gaming'),
+        CategoryItem(id: 92, name: 'Hobbies & Crafts'),
+        CategoryItem(id: 93, name: 'Fun Money / Pocket Spending'),
+        CategoryItem(id: 94, name: 'Sporting Events'),
+      ]),
   CategoryGroup(group: 'Children & Family', type: 'expense', categories: [
     CategoryItem(id: 95, name: 'Childcare / Daycare'),
     CategoryItem(id: 96, name: "Children's Clothing & Shoes"),
@@ -175,14 +178,17 @@ const _fallbackGroups = <CategoryGroup>[
     CategoryItem(id: 133, name: 'Business Licenses & Permits'),
     CategoryItem(id: 134, name: 'Marketing & Client Entertainment'),
   ]),
-  CategoryGroup(group: 'Transfers & Adjustments', type: 'transfer', categories: [
-    CategoryItem(id: 135, name: 'Internal Transfer'),
-    CategoryItem(id: 136, name: 'Savings Contributions'),
-    CategoryItem(id: 137, name: 'Investment Contributions'),
-    CategoryItem(id: 138, name: 'Retirement Contributions'),
-    CategoryItem(id: 139, name: 'Credit Card Payment'),
-    CategoryItem(id: 140, name: 'Balance Adjustments'),
-  ]),
+  CategoryGroup(
+      group: 'Transfers & Adjustments',
+      type: 'transfer',
+      categories: [
+        CategoryItem(id: 135, name: 'Internal Transfer'),
+        CategoryItem(id: 136, name: 'Savings Contributions'),
+        CategoryItem(id: 137, name: 'Investment Contributions'),
+        CategoryItem(id: 138, name: 'Retirement Contributions'),
+        CategoryItem(id: 139, name: 'Credit Card Payment'),
+        CategoryItem(id: 140, name: 'Balance Adjustments'),
+      ]),
   CategoryGroup(group: 'Other', type: 'expense', categories: [
     CategoryItem(id: 141, name: 'Uncategorized'),
     CategoryItem(id: 142, name: 'Check'),

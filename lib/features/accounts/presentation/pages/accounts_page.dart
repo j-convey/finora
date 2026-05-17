@@ -35,8 +35,9 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
   Widget build(BuildContext context) {
     final accountsList = ref.watch(accountsProvider);
     final netWorthHistory = ref.watch(netWorthHistoryProvider);
-    final isMobilePlatform = Theme.of(context).platform == TargetPlatform.android ||
-        Theme.of(context).platform == TargetPlatform.iOS;
+    final isMobilePlatform =
+        Theme.of(context).platform == TargetPlatform.android ||
+            Theme.of(context).platform == TargetPlatform.iOS;
 
     return Scaffold(
       appBar: AppBar(
@@ -54,9 +55,12 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
             builder: (context, ref, _) {
               final hidden = ref.watch(hideAmountsProvider);
               return IconButton(
-                icon: Icon(hidden ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                icon: Icon(hidden
+                    ? Icons.visibility_off_outlined
+                    : Icons.visibility_outlined),
                 tooltip: hidden ? 'Show amounts' : 'Hide amounts',
-                onPressed: () => ref.read(hideAmountsProvider.notifier).state = !hidden,
+                onPressed: () =>
+                    ref.read(hideAmountsProvider.notifier).state = !hidden,
               );
             },
           ),
@@ -85,11 +89,10 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
         children: [
           // Net worth summary
           netWorthHistory.when(
-            data: (history) =>
-                NetWorthSummaryWidget(
-                  history: history,
-                  currentAccounts: accounts,
-                ),
+            data: (history) => NetWorthSummaryWidget(
+              history: history,
+              currentAccounts: accounts,
+            ),
             loading: () => const Card(
               child: Padding(
                 padding: EdgeInsets.all(20),
@@ -128,7 +131,8 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
                   .catchError((Object e) {
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Failed to update account type: $e')),
+                    SnackBar(
+                        content: Text('Failed to update account type: $e')),
                   );
                 }
               });
@@ -157,11 +161,10 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
                 children: [
                   // Net worth summary
                   netWorthHistory.when(
-                    data: (history) =>
-                        NetWorthSummaryWidget(
-                          history: history,
-                          currentAccounts: accounts,
-                        ),
+                    data: (history) => NetWorthSummaryWidget(
+                      history: history,
+                      currentAccounts: accounts,
+                    ),
                     loading: () => const Card(
                       child: Padding(
                         padding: EdgeInsets.all(20),
@@ -180,8 +183,7 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
                   const SizedBox(height: 16),
                   // Net worth chart
                   netWorthHistory.when(
-                    data: (history) =>
-                        NetWorthChartWidget(history: history),
+                    data: (history) => NetWorthChartWidget(history: history),
                     loading: () => const Card(
                       child: Padding(
                         padding: EdgeInsets.all(20),
@@ -210,7 +212,6 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
                     },
                   ),
                 ],
-
               ),
             ),
           ),
@@ -221,8 +222,7 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
             child: Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child:
-                    AssetLiabilitySummaryPanel(accounts: accounts),
+                child: AssetLiabilitySummaryPanel(accounts: accounts),
               ),
             ),
           ),

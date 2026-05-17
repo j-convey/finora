@@ -19,11 +19,9 @@ class NetWorthHistory {
 
   final List<NetWorthHistoryEntry> entries;
 
-  double get currentNetWorth =>
-      entries.isEmpty ? 0 : entries.last.netWorth;
+  double get currentNetWorth => entries.isEmpty ? 0 : entries.last.netWorth;
 
-  double get previousNetWorth =>
-      entries.isEmpty ? 0 : entries.first.netWorth;
+  double get previousNetWorth => entries.isEmpty ? 0 : entries.first.netWorth;
 
   double get netWorthChange => currentNetWorth - previousNetWorth;
 

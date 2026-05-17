@@ -9,9 +9,7 @@ final demoModeProvider = StateNotifierProvider<DemoModeNotifier, bool>((ref) {
 });
 
 class DemoModeNotifier extends StateNotifier<bool> {
-  DemoModeNotifier(this._service) : super(_service.isDemoModeActive());
-
-  final DemoModeService _service;
+  DemoModeNotifier(DemoModeService service) : super(service.isDemoModeActive());
 
   void updateState(bool isActive) {
     state = isActive;

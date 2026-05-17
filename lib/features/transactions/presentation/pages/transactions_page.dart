@@ -92,7 +92,8 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
 
     // Budget totals exclude split parents (ghost rows) and transfers.
     // Only real leaf transactions and unsplit transactions are counted.
-    final budgetable = all.where((t) => !t.isSplitParent && t.type != TransactionType.transfer);
+    final budgetable = all
+        .where((t) => !t.isSplitParent && t.type != TransactionType.transfer);
     final totalIncome = budgetable
         .where((t) => t.isIncome && !t.pending)
         .fold(0.0, (s, t) => s + t.amount);
@@ -115,7 +116,9 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
           IconButton(
             icon: Icon(
               filters.hasFilters ? Icons.filter_alt : Icons.filter_alt_outlined,
-              color: filters.hasFilters ? Theme.of(context).colorScheme.primary : null,
+              color: filters.hasFilters
+                  ? Theme.of(context).colorScheme.primary
+                  : null,
             ),
             tooltip: 'Filter & Sort',
             onPressed: () => _showFilterSheet(context),
@@ -180,11 +183,12 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
                       padding: const EdgeInsets.only(bottom: 4, top: 8),
                       child: Text(
                         entry.key,
-                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.labelMedium?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
                       ),
                     ),
                     ...entry.value.map(
@@ -207,8 +211,9 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
                   ...filtered.map(
                     (t) => TransactionCard(
                       transaction: t,
-                      account:
-                          t.accountId != null ? accountsById[t.accountId] : null,
+                      account: t.accountId != null
+                          ? accountsById[t.accountId]
+                          : null,
                       onTap: () => showTransactionDetails(context, ref, t),
                       onCategoryTap: () => showCategoryPicker(context, ref, t),
                       onDismissed: () => ref
@@ -247,8 +252,18 @@ class _FilterSheet extends ConsumerWidget {
     final currentYear = DateTime.now().year;
     final years = List.generate(5, (i) => currentYear - i);
     final months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
     ];
 
     return DraggableScrollableSheet(
@@ -315,7 +330,8 @@ class _FilterSheet extends ConsumerWidget {
             ],
             onChanged: (v) => ref
                 .read(transactionFiltersProvider.notifier)
-                .update((s) => s.copyWith(accountId: v, clearAccountId: v == null)),
+                .update(
+                    (s) => s.copyWith(accountId: v, clearAccountId: v == null)),
           ),
           const SizedBox(height: 24),
 
@@ -341,7 +357,8 @@ class _FilterSheet extends ConsumerWidget {
             ],
             onChanged: (v) => ref
                 .read(transactionFiltersProvider.notifier)
-                .update((s) => s.copyWith(category: v, clearCategory: v == null)),
+                .update(
+                    (s) => s.copyWith(category: v, clearCategory: v == null)),
           ),
           const SizedBox(height: 24),
 
@@ -406,8 +423,8 @@ class _FilterSheet extends ConsumerWidget {
                       ],
                       onChanged: (v) => ref
                           .read(transactionFiltersProvider.notifier)
-                          .update((s) =>
-                              s.copyWith(year: v, clearYear: v == null)),
+                          .update(
+                              (s) => s.copyWith(year: v, clearYear: v == null)),
                     ),
                   ],
                 ),
@@ -447,12 +464,11 @@ class _SummaryTile extends StatelessWidget {
                     color: Theme.of(context).colorScheme.onSurfaceVariant)),
             const SizedBox(height: 2),
             Text(value,
-                style:
-                    tt.titleSmall?.copyWith(color: color, fontWeight: FontWeight.bold)),
+                style: tt.titleSmall
+                    ?.copyWith(color: color, fontWeight: FontWeight.bold)),
           ],
         ),
       ),
     );
   }
 }
-

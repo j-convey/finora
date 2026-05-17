@@ -37,8 +37,7 @@ class ReimbursementSheet extends ConsumerStatefulWidget {
   final Transaction transaction;
 
   @override
-  ConsumerState<ReimbursementSheet> createState() =>
-      _ReimbursementSheetState();
+  ConsumerState<ReimbursementSheet> createState() => _ReimbursementSheetState();
 }
 
 class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
@@ -129,9 +128,7 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
         await notifier.updateReimbursement(
           _editingId!,
           amount: amount,
-          notes: _notesCtrl.text.trim().isEmpty
-              ? null
-              : _notesCtrl.text.trim(),
+          notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
         );
       } else {
         final cp = _counterpart!;
@@ -140,9 +137,7 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
           expenseTransactionId: isExpense ? widget.transaction.id : cp.id,
           incomeTransactionId: isExpense ? cp.id : widget.transaction.id,
           amount: amount,
-          notes: _notesCtrl.text.trim().isEmpty
-              ? null
-              : _notesCtrl.text.trim(),
+          notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
         );
       }
       _goToList();
@@ -197,7 +192,8 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
     if (code == 'over_reimbursement') {
       final max =
           data is Map ? (data['max_allowed'] as num?)?.toDouble() : null;
-      if (max != null) return 'Exceeds capacity. Maximum: ${formatCurrency(max)}';
+      if (max != null)
+        return 'Exceeds capacity. Maximum: ${formatCurrency(max)}';
       return msg ?? 'Amount exceeds available capacity.';
     }
     if (code == 'duplicate_link') {
@@ -247,7 +243,8 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
                 Expanded(
                   child: Text(
                     'Reimbursements',
-                    style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                    style:
+                        tt.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                   ),
                 ),
                 IconButton(
@@ -402,9 +399,8 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
                       itemCount: filtered.length,
                       itemBuilder: (_, i) {
                         final t = filtered[i];
-                        final color = t.isIncome
-                            ? const Color(0xFF4CAF50)
-                            : cs.onSurface;
+                        final color =
+                            t.isIncome ? const Color(0xFF4CAF50) : cs.onSurface;
                         return ListTile(
                           leading: CircleAvatar(
                             backgroundColor: t.isIncome
@@ -472,7 +468,8 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
                 Expanded(
                   child: Text(
                     isEditing ? 'Edit Reimbursement' : 'Link Reimbursement',
-                    style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                    style:
+                        tt.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                   ),
                 ),
                 IconButton(
@@ -728,8 +725,7 @@ class _ReimbursementTile extends StatelessWidget {
                   if (reimbursement.notes?.isNotEmpty == true)
                     Text(
                       reimbursement.notes!,
-                      style: tt.bodySmall
-                          ?.copyWith(color: cs.onSurfaceVariant),
+                      style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                     ),
                 ],
               ),

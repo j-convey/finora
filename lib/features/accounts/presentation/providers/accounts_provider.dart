@@ -45,8 +45,6 @@ class AccountsNotifier extends StateNotifier<List<Account>> {
   }
 }
 
-final accountsProvider =
-    StateNotifierProvider<AccountsNotifier, List<Account>>(
+final accountsProvider = StateNotifierProvider<AccountsNotifier, List<Account>>(
   (ref) => AccountsNotifier(ref),
 );
-

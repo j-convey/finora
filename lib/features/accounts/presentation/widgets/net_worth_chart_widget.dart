@@ -51,8 +51,7 @@ class NetWorthChartWidget extends StatelessWidget {
                   gridData: FlGridData(
                     show: true,
                     drawVerticalLine: false,
-                    horizontalInterval:
-                        (maxNetWorth - minNetWorth) / 4,
+                    horizontalInterval: (maxNetWorth - minNetWorth) / 4,
                     getDrawingHorizontalLine: (value) {
                       return FlLine(
                         color: cs.outlineVariant.withAlpha(76),

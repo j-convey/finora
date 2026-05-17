@@ -20,7 +20,8 @@ class SimplefinState {
   final DateTime? lastSyncedAt;
   final String? errorMessage;
 
-  bool get isConnected => status == SimplefinConnectionStatus.connected ||
+  bool get isConnected =>
+      status == SimplefinConnectionStatus.connected ||
       status == SimplefinConnectionStatus.syncing;
 
   SimplefinState copyWith({

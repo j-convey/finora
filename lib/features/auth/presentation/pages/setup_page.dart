@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/services/demo_mode_service.dart';
 import '../providers/auth_provider.dart';
 
 enum _ServerState { idle, checking, ok, error }
@@ -74,8 +73,7 @@ class _SetupPageState extends ConsumerState<SetupPage> {
       _serverHasUsers = null;
     });
 
-    final result =
-        await ref.read(authProvider.notifier).probeServer(url);
+    final result = await ref.read(authProvider.notifier).probeServer(url);
 
     if (!mounted) return;
 
@@ -172,8 +170,8 @@ class _SetupPageState extends ConsumerState<SetupPage> {
                         ),
                       _ServerState.ok => Icon(Icons.check_circle,
                           color: const Color(0xFF4CAF50)),
-                      _ServerState.error => Icon(Icons.error_outline,
-                          color: cs.error),
+                      _ServerState.error =>
+                        Icon(Icons.error_outline, color: cs.error),
                       _ServerState.idle => null,
                     },
                   ),
@@ -246,8 +244,7 @@ class _SetupPageState extends ConsumerState<SetupPage> {
                               const SizedBox(height: 8),
                               Text(
                                 auth.error!,
-                                style:
-                                    tt.bodySmall?.copyWith(color: cs.error),
+                                style: tt.bodySmall?.copyWith(color: cs.error),
                               ),
                             ],
                             const SizedBox(height: 20),

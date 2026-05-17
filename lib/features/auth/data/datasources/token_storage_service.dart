@@ -103,4 +103,3 @@ class TokenStorageService {
     await prefs.remove(_spFallbackPrefix + key);
   }
 }
-

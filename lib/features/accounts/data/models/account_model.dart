@@ -22,7 +22,8 @@ class AccountModel extends Account {
             ? (json['available_balance'] as num).toDouble()
             : null,
         institutionName: json['institution_name'] as String?,
-        color: json['color'] != null ? _hexToColor(json['color'] as String) : null,
+        color:
+            json['color'] != null ? _hexToColor(json['color'] as String) : null,
         updatedAt: json['updated_at'] != null
             ? DateTime.tryParse(json['updated_at'] as String)
             : null,

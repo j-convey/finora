@@ -90,9 +90,8 @@ class _SimplefinSection extends ConsumerWidget {
                   ],
                 )
               : TextButton(
-                  onPressed: isBusy
-                      ? null
-                      : () => _showConnectSheet(context, ref),
+                  onPressed:
+                      isBusy ? null : () => _showConnectSheet(context, ref),
                   child: const Text('Connect'),
                 ),
         ),
@@ -233,8 +232,8 @@ class _ConnectSimplefinSheetState extends State<_ConnectSimplefinSheet> {
               children: [
                 Text(
                   'How to get your Setup Token:',
-                  style: tt.labelMedium
-                      ?.copyWith(color: cs.onSecondaryContainer),
+                  style:
+                      tt.labelMedium?.copyWith(color: cs.onSecondaryContainer),
                 ),
                 const SizedBox(height: 6),
                 Text(

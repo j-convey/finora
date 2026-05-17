@@ -72,14 +72,14 @@ void showCategoryPicker(
               } else if (data != null) {
                 detail = data.toString();
               } else {
-                detail = '${e.response?.statusCode} ${e.response?.statusMessage}';
+                detail =
+                    '${e.response?.statusCode} ${e.response?.statusMessage}';
               }
             }
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Category update failed: $detail'),
-                backgroundColor:
-                    Theme.of(context).colorScheme.error,
+                backgroundColor: Theme.of(context).colorScheme.error,
                 duration: const Duration(seconds: 8),
               ),
             );
@@ -137,8 +137,19 @@ class _TransactionDetailsSheetState
   late final TextEditingController _notesController;
 
   static const _months = [
-    '', 'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December',
+    '',
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
 
   @override
@@ -240,9 +251,7 @@ class _TransactionDetailsSheetState
           20,
           16,
           20,
-          _editingNotes
-              ? MediaQuery.of(context).viewInsets.bottom + 24
-              : 24,
+          _editingNotes ? MediaQuery.of(context).viewInsets.bottom + 24 : 24,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -275,8 +284,8 @@ class _TransactionDetailsSheetState
             if (transaction.isSplitParent && !parentNeedsReview)
               Container(
                 margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: cs.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(8),
@@ -288,8 +297,7 @@ class _TransactionDetailsSheetState
                     const SizedBox(width: 8),
                     Text(
                       'This transaction has been split',
-                      style: tt.bodySmall
-                          ?.copyWith(color: cs.onSurfaceVariant),
+                      style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                     ),
                   ],
                 ),
@@ -298,8 +306,8 @@ class _TransactionDetailsSheetState
             if (transaction.isSplitChild && parentTransaction != null)
               Container(
                 margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: cs.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(8),
@@ -313,8 +321,8 @@ class _TransactionDetailsSheetState
                       child: Text(
                         'Part of: ${parentTransaction.merchantName ?? parentTransaction.title} '
                         '(${formatCurrency(parentTransaction.amount)})',
-                        style: tt.bodySmall
-                            ?.copyWith(color: cs.onSurfaceVariant),
+                        style:
+                            tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -344,8 +352,8 @@ class _TransactionDetailsSheetState
                       ),
                       Text(
                         _formatFullDate(transaction.date),
-                        style: tt.bodySmall
-                            ?.copyWith(color: cs.onSurfaceVariant),
+                        style:
+                            tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                       ),
                     ],
                   ),
@@ -367,8 +375,8 @@ class _TransactionDetailsSheetState
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('Amount',
-                      style: tt.labelMedium
-                          ?.copyWith(color: cs.onSurfaceVariant)),
+                      style:
+                          tt.labelMedium?.copyWith(color: cs.onSurfaceVariant)),
                   Text(
                     '$amountPrefix${formatCurrency(transaction.amount)}',
                     style: tt.titleLarge?.copyWith(
@@ -393,8 +401,7 @@ class _TransactionDetailsSheetState
               _DetailRow(label: 'Account', value: _accountLabel()!),
             if (transaction.merchantName != null &&
                 transaction.merchantName!.isNotEmpty)
-              _DetailRow(
-                  label: 'Merchant', value: transaction.merchantName!),
+              _DetailRow(label: 'Merchant', value: transaction.merchantName!),
             if (transaction.originalDescription != null &&
                 transaction.originalDescription!.isNotEmpty)
               _DetailRow(
@@ -476,10 +483,9 @@ class _TransactionDetailsSheetState
                                 color: transaction.notes?.isNotEmpty == true
                                     ? null
                                     : cs.onSurfaceVariant,
-                                fontStyle:
-                                    transaction.notes?.isNotEmpty == true
-                                        ? null
-                                        : FontStyle.italic,
+                                fontStyle: transaction.notes?.isNotEmpty == true
+                                    ? null
+                                    : FontStyle.italic,
                               ),
                             ),
                           ),
@@ -549,7 +555,8 @@ class _TransactionDetailsSheetState
                   const SizedBox(width: 8),
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: () => showTypePicker(context, ref, transaction),
+                      onPressed: () =>
+                          showTypePicker(context, ref, transaction),
                       icon: const Icon(Icons.swap_horiz_outlined),
                       label: const Text('Type'),
                     ),
@@ -574,7 +581,7 @@ class _TransactionDetailsSheetState
             // a split-parent ghost row (server rule: split_parent_not_allowed).
             if (!transaction.isSplitParent &&
                 !transaction.id.startsWith('u') &&
-                transaction.type != TransactionType.transfer) ...[  
+                transaction.type != TransactionType.transfer) ...[
               const SizedBox(height: 8),
               OutlinedButton.icon(
                 onPressed: () =>
@@ -625,8 +632,7 @@ class _ReviewBanner extends StatelessWidget {
               Expanded(
                 child: Text(
                   'Split Needs Re-reconciliation',
-                  style: tt.labelMedium
-                      ?.copyWith(color: cs.onErrorContainer),
+                  style: tt.labelMedium?.copyWith(color: cs.onErrorContainer),
                 ),
               ),
             ],
@@ -807,7 +813,8 @@ class _CategoryPickerSheetState extends ConsumerState<CategoryPickerSheet> {
                           return ListTile(
                             leading: Icon(
                               TransactionUIHelper.iconForCategory(cat.name),
-                              color: isSelected ? cs.primary : cs.onSurfaceVariant,
+                              color:
+                                  isSelected ? cs.primary : cs.onSurfaceVariant,
                             ),
                             title: Text(cat.name),
                             trailing: isSelected
@@ -840,7 +847,8 @@ class _CategoryPickerSheetState extends ConsumerState<CategoryPickerSheet> {
                         return ListTile(
                           leading: Icon(
                             TransactionUIHelper.iconForCategory(cat.name),
-                            color: isSelected ? cs.primary : cs.onSurfaceVariant,
+                            color:
+                                isSelected ? cs.primary : cs.onSurfaceVariant,
                           ),
                           title: Text(cat.name),
                           trailing: isSelected

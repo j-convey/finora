@@ -47,7 +47,9 @@ class AccountSettingsPage extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            auth.isAuthenticated ? 'Connected' : 'Not connected',
+                            auth.isAuthenticated
+                                ? 'Connected'
+                                : 'Not connected',
                             style: tt.titleMedium,
                           ),
                           if (auth.serverUrl.isNotEmpty) ...[

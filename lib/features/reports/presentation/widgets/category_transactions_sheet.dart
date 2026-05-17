@@ -78,8 +78,8 @@ class CategoryTransactionsSheet extends ConsumerWidget {
                 Expanded(
                   child: Text(
                     category.name,
-                    style: tt.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
+                    style:
+                        tt.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                   ),
                 ),
                 Column(
@@ -87,13 +87,13 @@ class CategoryTransactionsSheet extends ConsumerWidget {
                   children: [
                     Text(
                       formatCurrency(category.amount),
-                      style: tt.titleSmall
-                          ?.copyWith(fontWeight: FontWeight.bold),
+                      style:
+                          tt.titleSmall?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     Text(
                       '${txns.length} transaction${txns.length == 1 ? '' : 's'}',
-                      style: tt.labelSmall
-                          ?.copyWith(color: cs.onSurfaceVariant),
+                      style:
+                          tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
                     ),
                   ],
                 ),
@@ -109,8 +109,8 @@ class CategoryTransactionsSheet extends ConsumerWidget {
                 ? Center(
                     child: Text(
                       'No transactions found',
-                      style: tt.bodyMedium
-                          ?.copyWith(color: cs.onSurfaceVariant),
+                      style:
+                          tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
                     ),
                   )
                 : ListView.builder(
@@ -124,8 +124,7 @@ class CategoryTransactionsSheet extends ConsumerWidget {
                         account: t.accountId != null
                             ? accountsById[t.accountId]
                             : null,
-                        onTap: () =>
-                            showTransactionDetails(context, ref, t),
+                        onTap: () => showTransactionDetails(context, ref, t),
                         onCategoryTap: () =>
                             showCategoryPicker(context, ref, t),
                       );

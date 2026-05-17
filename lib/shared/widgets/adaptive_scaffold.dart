@@ -93,13 +93,10 @@ class MainShell extends ConsumerWidget {
                       const SizedBox(width: 6),
                       Text(
                         'DEMO MODE — sample data only',
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelSmall
-                            ?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.5),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5),
                       ),
                     ],
                   ),
@@ -144,9 +141,8 @@ class _WideLayout extends ConsumerWidget {
             selectedIndex: selectedIndex,
             onTap: onTap,
             expanded: sidebarExpanded,
-            onToggle: () => ref
-                .read(sidebarExpandedProvider.notifier)
-                .state = !sidebarExpanded,
+            onToggle: () => ref.read(sidebarExpandedProvider.notifier).state =
+                !sidebarExpanded,
           ),
           const VerticalDivider(thickness: 1, width: 1),
           Expanded(child: body),
@@ -278,8 +274,7 @@ class _SidebarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final iconColor =
-        selected ? cs.onSecondaryContainer : cs.onSurfaceVariant;
+    final iconColor = selected ? cs.onSecondaryContainer : cs.onSurfaceVariant;
     final iconWidget = Transform.scale(
       scaleX: flipIcon ? -1 : 1,
       child: Icon(
@@ -301,8 +296,7 @@ class _SidebarItem extends StatelessWidget {
             duration: const Duration(milliseconds: 180),
             height: 44,
             decoration: BoxDecoration(
-              color:
-                  selected ? cs.secondaryContainer : Colors.transparent,
+              color: selected ? cs.secondaryContainer : Colors.transparent,
               borderRadius: BorderRadius.circular(10),
             ),
             padding: EdgeInsets.symmetric(
@@ -325,9 +319,8 @@ class _SidebarItem extends StatelessWidget {
                             color: selected
                                 ? cs.onSecondaryContainer
                                 : cs.onSurfaceVariant,
-                            fontWeight: selected
-                                ? FontWeight.w600
-                                : FontWeight.normal,
+                            fontWeight:
+                                selected ? FontWeight.w600 : FontWeight.normal,
                             fontSize: 14,
                           ),
                         ),
@@ -376,4 +369,3 @@ class _NarrowLayout extends StatelessWidget {
     );
   }
 }
-

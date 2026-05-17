@@ -15,7 +15,9 @@ class SubscriptionsPage extends ConsumerWidget {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
 
-    final activeCount = subscriptions.where((s) => s.status == SubscriptionStatus.active).length;
+    final activeCount = subscriptions
+        .where((s) => s.status == SubscriptionStatus.active)
+        .length;
     final totalCount = subscriptions.length;
 
     return Scaffold(
@@ -36,7 +38,8 @@ class SubscriptionsPage extends ConsumerWidget {
         label: const Text('Add Subscription'),
       ),
       body: subscriptions.isEmpty
-          ? _EmptyState(onAdd: () => _showSubscriptionSheet(context, ref, existing: null))
+          ? _EmptyState(
+              onAdd: () => _showSubscriptionSheet(context, ref, existing: null))
           : ListView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 88),
               children: [
@@ -48,18 +51,22 @@ class SubscriptionsPage extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Subscriptions', style: tt.titleMedium?.copyWith(color: cs.onPrimaryContainer)),
+                        Text('Subscriptions',
+                            style: tt.titleMedium
+                                ?.copyWith(color: cs.onPrimaryContainer)),
                         const SizedBox(height: 8),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               '$activeCount active',
-                              style: tt.bodyMedium?.copyWith(color: cs.onPrimaryContainer.withAlpha(178)),
+                              style: tt.bodyMedium?.copyWith(
+                                  color: cs.onPrimaryContainer.withAlpha(178)),
                             ),
                             Text(
                               '$totalCount total',
-                              style: tt.bodyMedium?.copyWith(color: cs.onPrimaryContainer.withAlpha(178)),
+                              style: tt.bodyMedium?.copyWith(
+                                  color: cs.onPrimaryContainer.withAlpha(178)),
                             ),
                           ],
                         ),
@@ -86,7 +93,8 @@ class SubscriptionsPage extends ConsumerWidget {
           padding: const EdgeInsets.only(bottom: 12),
           child: _SubscriptionCard(
             subscription: subscription,
-            onEdit: () => _showSubscriptionSheet(context, ref, existing: subscription),
+            onEdit: () =>
+                _showSubscriptionSheet(context, ref, existing: subscription),
             onDelete: () => _showDeleteConfirmation(context, ref, subscription),
           ),
         ),
@@ -100,7 +108,8 @@ class SubscriptionsPage extends ConsumerWidget {
   }) {
     final isEditing = existing != null;
     final nameController = TextEditingController(text: existing?.name);
-    final merchantController = TextEditingController(text: existing?.merchantName);
+    final merchantController =
+        TextEditingController(text: existing?.merchantName);
     final categoryController = TextEditingController(text: existing?.category);
     final expectedAmountController = TextEditingController(
       text: existing?.expectedAmount?.toString() ?? '',
@@ -116,7 +125,8 @@ class SubscriptionsPage extends ConsumerWidget {
     );
 
     var selectedStatus = existing?.status ?? SubscriptionStatus.active;
-    var selectedRecurrenceUnit = existing?.recurrenceUnit ?? RecurrenceUnit.month;
+    var selectedRecurrenceUnit =
+        existing?.recurrenceUnit ?? RecurrenceUnit.month;
     var selectedRecurrenceInterval = existing?.recurrenceInterval ?? 1;
     var autoLinkEnabled = existing?.autoLinkEnabled ?? true;
 
@@ -170,7 +180,8 @@ class SubscriptionsPage extends ConsumerWidget {
                   labelText: 'Expected Amount',
                   prefixText: '\$ ',
                 ),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
               ),
               const SizedBox(height: 12),
               Row(
@@ -182,7 +193,8 @@ class SubscriptionsPage extends ConsumerWidget {
                         labelText: 'Min Amount',
                         prefixText: '\$ ',
                       ),
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -193,7 +205,8 @@ class SubscriptionsPage extends ConsumerWidget {
                         labelText: 'Max Amount',
                         prefixText: '\$ ',
                       ),
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
                     ),
                   ),
                 ],
@@ -233,7 +246,11 @@ class SubscriptionsPage extends ConsumerWidget {
                       items: RecurrenceUnit.values
                           .map((unit) => DropdownMenuItem(
                                 value: unit,
-                                child: Text(unit.toString().split('.').last.capitalize()),
+                                child: Text(unit
+                                    .toString()
+                                    .split('.')
+                                    .last
+                                    .capitalize()),
                               ))
                           .toList(),
                       onChanged: (value) {
@@ -256,7 +273,8 @@ class SubscriptionsPage extends ConsumerWidget {
                 items: SubscriptionStatus.values
                     .map((status) => DropdownMenuItem(
                           value: status,
-                          child: Text(status.toString().split('.').last.capitalize()),
+                          child: Text(
+                              status.toString().split('.').last.capitalize()),
                         ))
                     .toList(),
                 onChanged: (value) {
@@ -308,7 +326,8 @@ class SubscriptionsPage extends ConsumerWidget {
                               category: categoryController.text.isEmpty
                                   ? null
                                   : categoryController.text,
-                              expectedAmount: expectedAmountController.text.isEmpty
+                              expectedAmount: expectedAmountController
+                                      .text.isEmpty
                                   ? null
                                   : double.parse(expectedAmountController.text),
                               minAmount: minAmountController.text.isEmpty
@@ -318,12 +337,16 @@ class SubscriptionsPage extends ConsumerWidget {
                                   ? null
                                   : double.parse(maxAmountController.text),
                               recurrenceInterval: selectedRecurrenceInterval,
-                              recurrenceUnit: selectedRecurrenceUnit.toString().split('.').last,
+                              recurrenceUnit: selectedRecurrenceUnit
+                                  .toString()
+                                  .split('.')
+                                  .last,
                               status: selectedStatus.toString().split('.').last,
                               autoLinkEnabled: autoLinkEnabled,
-                              matchingNotes: matchingNotesController.text.isEmpty
-                                  ? null
-                                  : matchingNotesController.text,
+                              matchingNotes:
+                                  matchingNotesController.text.isEmpty
+                                      ? null
+                                      : matchingNotesController.text,
                             );
                       } else {
                         await ref.read(subscriptionsProvider.notifier).create(
@@ -334,7 +357,8 @@ class SubscriptionsPage extends ConsumerWidget {
                               category: categoryController.text.isEmpty
                                   ? null
                                   : categoryController.text,
-                              expectedAmount: expectedAmountController.text.isEmpty
+                              expectedAmount: expectedAmountController
+                                      .text.isEmpty
                                   ? null
                                   : double.parse(expectedAmountController.text),
                               minAmount: minAmountController.text.isEmpty
@@ -344,12 +368,16 @@ class SubscriptionsPage extends ConsumerWidget {
                                   ? null
                                   : double.parse(maxAmountController.text),
                               recurrenceInterval: selectedRecurrenceInterval,
-                              recurrenceUnit: selectedRecurrenceUnit.toString().split('.').last,
+                              recurrenceUnit: selectedRecurrenceUnit
+                                  .toString()
+                                  .split('.')
+                                  .last,
                               status: selectedStatus.toString().split('.').last,
                               autoLinkEnabled: autoLinkEnabled,
-                              matchingNotes: matchingNotesController.text.isEmpty
-                                  ? null
-                                  : matchingNotesController.text,
+                              matchingNotes:
+                                  matchingNotesController.text.isEmpty
+                                      ? null
+                                      : matchingNotesController.text,
                             );
                       }
                       if (context.mounted) Navigator.pop(context);
@@ -380,7 +408,8 @@ class SubscriptionsPage extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Subscription?'),
-        content: Text('Are you sure you want to delete "${subscription.name}"?'),
+        content:
+            Text('Are you sure you want to delete "${subscription.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -389,7 +418,9 @@ class SubscriptionsPage extends ConsumerWidget {
           FilledButton(
             onPressed: () async {
               try {
-                await ref.read(subscriptionsProvider.notifier).delete(subscription.id);
+                await ref
+                    .read(subscriptionsProvider.notifier)
+                    .delete(subscription.id);
                 if (context.mounted) Navigator.pop(context);
               } catch (e) {
                 if (context.mounted) {
@@ -469,7 +500,8 @@ class _SubscriptionCard extends StatelessWidget {
 
     return Card(
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         title: Text(subscription.name, style: tt.titleMedium),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

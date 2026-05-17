@@ -117,13 +117,13 @@ class _AccountGroup extends ConsumerWidget {
                     children: [
                       Text(
                         type.label,
-                        style: tt.bodyLarge
-                            ?.copyWith(fontWeight: FontWeight.w500),
+                        style:
+                            tt.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
                       ),
                       Text(
                         '${accounts.length} ${accounts.length == 1 ? 'account' : 'accounts'}',
-                        style: tt.labelSmall
-                            ?.copyWith(color: cs.onSurfaceVariant),
+                        style:
+                            tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
                       ),
                     ],
                   ),
@@ -188,8 +188,7 @@ class _AccountListItem extends ConsumerWidget {
         children: [
           CircleAvatar(
             backgroundColor: color.withAlpha(30),
-            child: Icon(account.icon,
-                color: color, size: 20),
+            child: Icon(account.icon, color: color, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -197,13 +196,12 @@ class _AccountListItem extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(account.name,
-                    style: tt.bodyMedium
-                        ?.copyWith(fontWeight: FontWeight.w500)),
+                    style:
+                        tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500)),
                 if (account.institutionName != null)
                   Text(
                     account.institutionName!,
-                    style: tt.labelSmall
-                        ?.copyWith(color: cs.onSurfaceVariant),
+                    style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
                   ),
                 if (!hidden &&
                     account.availableBalance != null &&
@@ -211,8 +209,7 @@ class _AccountListItem extends ConsumerWidget {
                         account.type == AccountType.savings))
                   Text(
                     'Available: ${formatCurrency(account.availableBalance!)}',
-                    style: tt.labelSmall
-                        ?.copyWith(color: cs.onSurfaceVariant),
+                    style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
                   ),
               ],
             ),
@@ -230,8 +227,7 @@ class _AccountListItem extends ConsumerWidget {
               if (account.updatedAt != null)
                 Text(
                   _relativeTime(account.updatedAt!),
-                  style: tt.labelSmall
-                      ?.copyWith(color: cs.onSurfaceVariant),
+                  style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
                 ),
             ],
           ),
@@ -289,9 +285,7 @@ class _AccountTypePickerDialog extends StatelessWidget {
                 color: selected ? cs.primary : null,
               ),
             ),
-            trailing: selected
-                ? Icon(Icons.check, color: cs.primary)
-                : null,
+            trailing: selected ? Icon(Icons.check, color: cs.primary) : null,
             onTap: () => Navigator.of(context).pop(type),
           );
         }).toList(),

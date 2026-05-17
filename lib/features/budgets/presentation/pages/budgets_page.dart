@@ -34,8 +34,9 @@ class BudgetsPage extends ConsumerWidget {
     final budgets = ref.watch(budgetsProvider);
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-    final isMobilePlatform = Theme.of(context).platform == TargetPlatform.android ||
-        Theme.of(context).platform == TargetPlatform.iOS;
+    final isMobilePlatform =
+        Theme.of(context).platform == TargetPlatform.android ||
+            Theme.of(context).platform == TargetPlatform.iOS;
 
     final totalAllocated = budgets.fold(0.0, (s, b) => s + b.allocated);
     final totalSpent = budgets.fold(0.0, (s, b) => s + b.spent);
@@ -68,7 +69,8 @@ class BudgetsPage extends ConsumerWidget {
         label: const Text('Add Budget'),
       ),
       body: budgets.isEmpty
-          ? _EmptyState(onAdd: () => _showBudgetSheet(context, ref, existing: null))
+          ? _EmptyState(
+              onAdd: () => _showBudgetSheet(context, ref, existing: null))
           : ListView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 88),
               children: [
@@ -99,8 +101,7 @@ class BudgetsPage extends ConsumerWidget {
                         const SizedBox(height: 8),
                         LinearProgressIndicator(
                           value: overallProgress.clamp(0.0, 1.0),
-                          backgroundColor:
-                              cs.onPrimaryContainer.withAlpha(40),
+                          backgroundColor: cs.onPrimaryContainer.withAlpha(40),
                           valueColor: AlwaysStoppedAnimation(
                             overallProgress > 1
                                 ? cs.error
@@ -121,8 +122,7 @@ class BudgetsPage extends ConsumerWidget {
                             Text(
                               '${formatCurrency(totalAllocated - totalSpent)} remaining',
                               style: tt.bodySmall?.copyWith(
-                                color:
-                                    cs.onPrimaryContainer.withAlpha(178),
+                                color: cs.onPrimaryContainer.withAlpha(178),
                               ),
                             ),
                           ],
@@ -205,16 +205,26 @@ class _BudgetCard extends ConsumerWidget {
 
   String _getImageForCategory(String category) {
     return switch (category) {
-      'Groceries' => 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80',
-      'Dining' => 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
-      'Transport' => 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=800&q=80',
-      'Entertainment' => 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=800&q=80',
-      'Utilities' => 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=800&q=80',
-      'Health' => 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=800&q=80',
-      'Shopping' => 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80',
-      'Rent' => 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80',
-      'Travel' => 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800&q=80',
-      _ => 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&w=800&q=80',
+      'Groceries' =>
+        'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80',
+      'Dining' =>
+        'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
+      'Transport' =>
+        'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=800&q=80',
+      'Entertainment' =>
+        'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=800&q=80',
+      'Utilities' =>
+        'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=800&q=80',
+      'Health' =>
+        'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=800&q=80',
+      'Shopping' =>
+        'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80',
+      'Rent' =>
+        'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80',
+      'Travel' =>
+        'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800&q=80',
+      _ =>
+        'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&w=800&q=80',
     };
   }
 
@@ -442,8 +452,7 @@ class _BudgetSheetState extends State<_BudgetSheet> {
               prefixText: '\$',
               border: OutlineInputBorder(),
             ),
-            keyboardType:
-                const TextInputType.numberWithOptions(decimal: true),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
           ),
           const SizedBox(height: 16),
           Text('Color', style: tt.labelMedium),
@@ -475,8 +484,7 @@ class _BudgetSheetState extends State<_BudgetSheet> {
                         : null,
                   ),
                   child: isSelected
-                      ? Icon(Icons.check,
-                          size: 18, color: cs.surface)
+                      ? Icon(Icons.check, size: 18, color: cs.surface)
                       : null,
                 ),
               );
@@ -540,4 +548,3 @@ class _EmptyState extends StatelessWidget {
     );
   }
 }
-

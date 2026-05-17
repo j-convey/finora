@@ -59,7 +59,8 @@ class NotificationPreferences {
           )
         : NotifyOn.never;
     final threshold = prefs.getDouble(_keyThreshold) ?? 50.0;
-    return NotificationPreferences(notifyOn: notifyOn, thresholdAmount: threshold);
+    return NotificationPreferences(
+        notifyOn: notifyOn, thresholdAmount: threshold);
   }
 }
 

@@ -26,7 +26,8 @@ class _DemoModeSettingsPageState extends ConsumerState<DemoModeSettingsPage> {
       // but if any bubble up, we handle them.
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to toggle demo mode. Please try again.')),
+          const SnackBar(
+              content: Text('Failed to toggle demo mode. Please try again.')),
         );
       }
     }
@@ -127,19 +128,18 @@ class _DemoModeSettingsPageState extends ConsumerState<DemoModeSettingsPage> {
             const SizedBox(height: 8),
             Text(
               'Demo data',
-              style: tt.labelMedium?.copyWith(
-                  color: cs.primary, fontWeight: FontWeight.w600),
+              style: tt.labelMedium
+                  ?.copyWith(color: cs.primary, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             _demoInfoRow(
                 context, Icons.account_balance_wallet_outlined, '3 accounts'),
             _demoInfoRow(
                 context, Icons.credit_card_outlined, '35 transactions'),
-            _demoInfoRow(
-                context, Icons.account_balance_outlined, '4 budgets'),
+            _demoInfoRow(context, Icons.account_balance_outlined, '4 budgets'),
             _demoInfoRow(context, Icons.repeat_outlined, '3 subscriptions'),
-            _demoInfoRow(context, Icons.timeline_outlined,
-                '6 months net worth history'),
+            _demoInfoRow(
+                context, Icons.timeline_outlined, '6 months net worth history'),
           ],
         ],
       ),

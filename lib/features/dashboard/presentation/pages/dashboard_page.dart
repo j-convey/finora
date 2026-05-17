@@ -100,9 +100,12 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             builder: (context, ref, _) {
               final hidden = ref.watch(hideAmountsProvider);
               return IconButton(
-                icon: Icon(hidden ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                icon: Icon(hidden
+                    ? Icons.visibility_off_outlined
+                    : Icons.visibility_outlined),
                 tooltip: hidden ? 'Show amounts' : 'Hide amounts',
-                onPressed: () => ref.read(hideAmountsProvider.notifier).state = !hidden,
+                onPressed: () =>
+                    ref.read(hideAmountsProvider.notifier).state = !hidden,
               );
             },
           ),
@@ -237,8 +240,7 @@ class _BudgetCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
     final now = DateTime.now();
-    final monthLabel =
-        '${_monthName(now.month)} ${now.year}';
+    final monthLabel = '${_monthName(now.month)} ${now.year}';
 
     // Use income as the budget ceiling for the progress bars
     final incomeBudget = income > 0 ? income : 1.0;
@@ -258,8 +260,12 @@ class _BudgetCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Budget', style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-                    Text(monthLabel, style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
+                    Text('Budget',
+                        style: tt.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold)),
+                    Text(monthLabel,
+                        style:
+                            tt.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
                   ],
                 ),
                 TextButton(onPressed: onSeeAll, child: const Text('See all')),
@@ -288,8 +294,19 @@ class _BudgetCard extends StatelessWidget {
   }
 
   static String _monthName(int month) => const [
-        '', 'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
+        '',
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December'
       ][month];
 }
 
@@ -355,7 +372,9 @@ class _BudgetRow extends ConsumerWidget {
             const SizedBox(width: 4),
             Flexible(
               child: Text(
-                hidden ? '•••••• remaining' : '${formatCurrency(remaining)} remaining',
+                hidden
+                    ? '•••••• remaining'
+                    : '${formatCurrency(remaining)} remaining',
                 style: tt.bodySmall?.copyWith(color: const Color(0xFF4CAF50)),
                 textAlign: TextAlign.end,
                 overflow: TextOverflow.ellipsis,
@@ -389,8 +408,19 @@ class _SpendingCardState extends ConsumerState<_SpendingCard> {
   };
 
   static const _monthAbbr = [
-    '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    '',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
 
   // ── Data builders ────────────────────────────────────────────────────────
@@ -422,7 +452,8 @@ class _SpendingCardState extends ConsumerState<_SpendingCard> {
         }
         // Trim trailing zeros past today
         final today = now.day;
-        final trimmed = cumulative.sublist(0, today.clamp(1, cumulative.length));
+        final trimmed =
+            cumulative.sublist(0, today.clamp(1, cumulative.length));
 
         String? labelBuilder(int i) {
           final day = i + 1;
@@ -452,7 +483,10 @@ class _SpendingCardState extends ConsumerState<_SpendingCard> {
         for (final (y, m) in months) {
           double sum = 0;
           for (final t in txns) {
-            if (t.isExpense && !t.pending && t.date.year == y && t.date.month == m) {
+            if (t.isExpense &&
+                !t.pending &&
+                t.date.year == y &&
+                t.date.month == m) {
               sum += t.amount;
             }
           }
@@ -470,7 +504,10 @@ class _SpendingCardState extends ConsumerState<_SpendingCard> {
         for (int m = 1; m <= now.month; m++) {
           double sum = 0;
           for (final t in txns) {
-            if (t.isExpense && !t.pending && t.date.year == now.year && t.date.month == m) {
+            if (t.isExpense &&
+                !t.pending &&
+                t.date.year == now.year &&
+                t.date.month == m) {
               sum += t.amount;
             }
           }
@@ -547,13 +584,12 @@ class _SpendingCardState extends ConsumerState<_SpendingCard> {
             const SizedBox(height: 20),
             SizedBox(
               height: 160,
-              child: chartData.isEmpty ||
-                      chartData.every((v) => v == 0)
+              child: chartData.isEmpty || chartData.every((v) => v == 0)
                   ? Center(
                       child: Text(
                         'No spending data',
-                        style: tt.bodySmall
-                            ?.copyWith(color: cs.onSurfaceVariant),
+                        style:
+                            tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                       ),
                     )
                   : _LineChart(
@@ -586,6 +622,7 @@ class _LineChart extends StatelessWidget {
   final Color lineColor;
   final Color fillColor;
   final Color labelColor;
+
   /// Return a string label for data index [i], or null to skip.
   final String? Function(int i)? xLabelBuilder;
 
@@ -619,7 +656,7 @@ class _LineChartPainter extends CustomPainter {
   final Color labelColor;
   final String? Function(int i)? xLabelBuilder;
 
-  static const _yPadLeft = 56.0;  // room for Y-axis labels
+  static const _yPadLeft = 56.0; // room for Y-axis labels
   static const _xPadBottom = 20.0; // room for X-axis labels
   static const _yGridLines = 4;
 
@@ -763,7 +800,8 @@ class _NetWorthCard extends ConsumerWidget {
                   children: [
                     MaskedAmount(
                       netWorth,
-                      style: tt.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      style:
+                          tt.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 2),
                     Row(
@@ -772,7 +810,9 @@ class _NetWorthCard extends ConsumerWidget {
                             size: 14, color: Color(0xFF4CAF50)),
                         const SizedBox(width: 2),
                         Text(
-                          hidden ? '•••••• (••••%)' : '${formatCurrency(gain)} ($gainPct%)',
+                          hidden
+                              ? '•••••• (••••%)'
+                              : '${formatCurrency(gain)} ($gainPct%)',
                           style: tt.bodySmall?.copyWith(
                             color: const Color(0xFF4CAF50),
                             fontWeight: FontWeight.w600,
@@ -817,9 +857,7 @@ class _NetWorthCard extends ConsumerWidget {
       (i) {
         final t = i / (points - 1);
         // slight S-curve
-        final eased = t < 0.5
-            ? 2 * t * t
-            : 1 - (-2 * t + 2) * (-2 * t + 2) / 2;
+        final eased = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) * (-2 * t + 2) / 2;
         return start + (netWorth - start) * eased;
       },
     );
@@ -857,9 +895,11 @@ class _RecentTransactionsCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Transactions',
-                        style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                        style: tt.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold)),
                     Text('Most recent',
-                        style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
+                        style:
+                            tt.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
                   ],
                 ),
                 TextButton(onPressed: onSeeAll, child: const Text('See all')),
@@ -871,14 +911,16 @@ class _RecentTransactionsCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: Center(
                   child: Text('No transactions',
-                      style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
+                      style:
+                          tt.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
                 ),
               )
             else
               ...transactions.map((t) => _TransactionRow(
-                transaction: t,
-                account: t.accountId != null ? accountsById[t.accountId] : null,
-              )),
+                    transaction: t,
+                    account:
+                        t.accountId != null ? accountsById[t.accountId] : null,
+                  )),
           ],
         ),
       ),
@@ -893,7 +935,8 @@ class _TransactionRow extends ConsumerWidget {
   final Account? account;
 
   static String _accountLabel(Account a) {
-    final institution = a.institutionName?.isNotEmpty == true ? a.institutionName! : null;
+    final institution =
+        a.institutionName?.isNotEmpty == true ? a.institutionName! : null;
     final parts = [if (institution != null) institution, a.name];
     return parts.join(' · ');
   }
@@ -903,8 +946,11 @@ class _TransactionRow extends ConsumerWidget {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
     final isIncome = transaction.isIncome;
-    final amountColor =
-        transaction.pending ? cs.onSurfaceVariant : isIncome ? const Color(0xFF4CAF50) : cs.onSurface;
+    final amountColor = transaction.pending
+        ? cs.onSurfaceVariant
+        : isIncome
+            ? const Color(0xFF4CAF50)
+            : cs.onSurface;
     final prefix = isIncome ? '+' : '-';
 
     return InkWell(
@@ -963,4 +1009,3 @@ class _TransactionRow extends ConsumerWidget {
     );
   }
 }
-

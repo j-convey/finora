@@ -32,7 +32,8 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     if (_titleCtrl.text.isEmpty || amount == null) return;
     final groups = ref.read(categoryGroupsProvider);
     final allItems = groups.expand((g) => g.categories).toList();
-    final selectedItem = _category ?? (allItems.isNotEmpty ? allItems.first : null);
+    final selectedItem =
+        _category ?? (allItems.isNotEmpty ? allItems.first : null);
     ref.read(transactionsProvider.notifier).addTransaction(
           Transaction(
             id: 'u${DateTime.now().millisecondsSinceEpoch}',
@@ -71,94 +72,99 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                 ),
               ],
             ),
-          const SizedBox(height: 16),
-          // Type toggle
-          SegmentedButton<TransactionType>(
-            segments: [
-              ButtonSegment(
-                  value: TransactionType.expense, label: const Text('Expense')),
-              ButtonSegment(
-                  value: TransactionType.income, label: const Text('Income')),
-              ButtonSegment(
-                  value: TransactionType.transfer, label: const Text('Transfer')),
-            ],
-            selected: {_type},
-            onSelectionChanged: (s) => setState(() => _type = s.first),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _titleCtrl,
-            decoration: const InputDecoration(
-              labelText: 'Title',
-              border: OutlineInputBorder(),
+            const SizedBox(height: 16),
+            // Type toggle
+            SegmentedButton<TransactionType>(
+              segments: [
+                ButtonSegment(
+                    value: TransactionType.expense,
+                    label: const Text('Expense')),
+                ButtonSegment(
+                    value: TransactionType.income, label: const Text('Income')),
+                ButtonSegment(
+                    value: TransactionType.transfer,
+                    label: const Text('Transfer')),
+              ],
+              selected: {_type},
+              onSelectionChanged: (s) => setState(() => _type = s.first),
             ),
-            textCapitalization: TextCapitalization.sentences,
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _amountCtrl,
-            decoration: const InputDecoration(
-              labelText: 'Amount',
-              prefixText: '\$',
-              border: OutlineInputBorder(),
-            ),
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          ),
-          const SizedBox(height: 12),
-          Consumer(builder: (context, ref, _) {
-            final groups = ref.watch(categoryGroupsProvider);
-            final allItems = groups.expand((g) => g.categories).toList();
-            final selectedName = _category?.name ?? (allItems.isNotEmpty ? allItems.first.name : null);
-
-            final items = <DropdownMenuItem<String>>[];
-            for (final group in groups) {
-              items.add(DropdownMenuItem<String>(
-                enabled: false,
-                value: '__header__${group.group}',
-                child: Text(
-                  group.group.toUpperCase(),
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    letterSpacing: 0.8,
-                  ),
-                ),
-              ));
-              for (final cat in group.categories) {
-                items.add(DropdownMenuItem<String>(
-                  value: cat.name,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 8),
-                    child: Text(cat.name),
-                  ),
-                ));
-              }
-            }
-
-            return InputDecorator(
+            const SizedBox(height: 12),
+            TextField(
+              controller: _titleCtrl,
               decoration: const InputDecoration(
-                labelText: 'Category',
+                labelText: 'Title',
                 border: OutlineInputBorder(),
               ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: selectedName,
-                  isDense: true,
-                  items: items,
-                  onChanged: (name) {
-                    if (name == null) return;
-                    final item = allItems.where((c) => c.name == name).firstOrNull;
-                    if (item != null) setState(() => _category = item);
-                  },
-                ),
+              textCapitalization: TextCapitalization.sentences,
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _amountCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Amount',
+                prefixText: '\$',
+                border: OutlineInputBorder(),
               ),
-            );
-          }),
-          const SizedBox(height: 20),
-          FilledButton(
-            onPressed: _save,
-            child: const Text('Save Transaction'),
-          ),
-        ],
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+            ),
+            const SizedBox(height: 12),
+            Consumer(builder: (context, ref, _) {
+              final groups = ref.watch(categoryGroupsProvider);
+              final allItems = groups.expand((g) => g.categories).toList();
+              final selectedName = _category?.name ??
+                  (allItems.isNotEmpty ? allItems.first.name : null);
+
+              final items = <DropdownMenuItem<String>>[];
+              for (final group in groups) {
+                items.add(DropdownMenuItem<String>(
+                  enabled: false,
+                  value: '__header__${group.group}',
+                  child: Text(
+                    group.group.toUpperCase(),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          letterSpacing: 0.8,
+                        ),
+                  ),
+                ));
+                for (final cat in group.categories) {
+                  items.add(DropdownMenuItem<String>(
+                    value: cat.name,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: Text(cat.name),
+                    ),
+                  ));
+                }
+              }
+
+              return InputDecorator(
+                decoration: const InputDecoration(
+                  labelText: 'Category',
+                  border: OutlineInputBorder(),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: selectedName,
+                    isDense: true,
+                    items: items,
+                    onChanged: (name) {
+                      if (name == null) return;
+                      final item =
+                          allItems.where((c) => c.name == name).firstOrNull;
+                      if (item != null) setState(() => _category = item);
+                    },
+                  ),
+                ),
+              );
+            }),
+            const SizedBox(height: 20),
+            FilledButton(
+              onPressed: _save,
+              child: const Text('Save Transaction'),
+            ),
+          ],
         ),
       ),
     );

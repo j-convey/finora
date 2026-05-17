@@ -137,14 +137,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           try {
                             await demoService.toggleDemoMode(true);
                           } catch (_) {
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                      'Failed to enter demo mode. Try again.'),
-                                ),
-                              );
-                            }
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                    'Failed to enter demo mode. Try again.'),
+                              ),
+                            );
                           }
                         },
                   icon: const Icon(Icons.science_outlined),

@@ -58,8 +58,7 @@ class DatabaseBackupNotifier extends StateNotifier<DatabaseBackupState> {
       final res =
           await dio.get<Map<String, dynamic>>('/api/admin/export-database');
 
-      final jsonString =
-          const JsonEncoder.withIndent('  ').convert(res.data);
+      final jsonString = const JsonEncoder.withIndent('  ').convert(res.data);
 
       final timestamp = DateTime.now()
           .toIso8601String()

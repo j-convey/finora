@@ -100,8 +100,8 @@ class _CashFlowPainter extends CustomPainter {
       canvas.drawLine(Offset(_leftPad, y), Offset(size.width, y), gridPaint);
 
       final label = _compactY(maxValue * frac);
-      _text(canvas, label, labelStyle,
-          Offset(0, y - labelFontSize / 2), _leftPad - 4, TextAlign.right);
+      _text(canvas, label, labelStyle, Offset(0, y - labelFontSize / 2),
+          _leftPad - 4, TextAlign.right);
     }
 
     // ── Bars ───────────────────────────────────────────────────────────────
@@ -129,8 +129,8 @@ class _CashFlowPainter extends CustomPainter {
 
       // Expense bar
       final eh = (m.expenses / maxValue) * chartH;
-      final eRect = Rect.fromLTWH(
-          gx + barW + barGap, _topPad + chartH - eh, barW, eh);
+      final eRect =
+          Rect.fromLTWH(gx + barW + barGap, _topPad + chartH - eh, barW, eh);
       canvas.drawRRect(
         RRect.fromRectAndCorners(eRect,
             topLeft: topRadius, topRight: topRadius),

@@ -31,8 +31,18 @@ Color categoryColor(String name) =>
 // ── Month abbreviations ───────────────────────────────────────────────────────
 
 const _monthAbbr = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
 ];
 
 /// Derives a [ReportSummary] from a list of transactions and a [ReportPeriod].
@@ -61,8 +71,7 @@ class BuildReportSummaryUseCase {
 
     final expenseList =
         budgetableTransactions.where((t) => t.isExpense).toList();
-    final incomeList =
-        budgetableTransactions.where((t) => t.isIncome).toList();
+    final incomeList = budgetableTransactions.where((t) => t.isIncome).toList();
 
     // ── Totals ──────────────────────────────────────────────────────────────
     double income = 0;
@@ -131,19 +140,17 @@ class BuildReportSummaryUseCase {
         flowMap[key] = (prev.$1, prev.$2 + t.amount);
       }
     }
-    final monthlyFlow = (flowMap.keys.toList()..sort())
-        .map((k) {
-          final parts = k.split('-');
-          final month = int.parse(parts[1]);
-          final year = parts[0];
-          final data = flowMap[k]!;
-          return MonthlyFlow(
-            label: '${_monthAbbr[month - 1]} ${year.substring(2)}',
-            income: data.$1,
-            expenses: data.$2,
-          );
-        })
-        .toList();
+    final monthlyFlow = (flowMap.keys.toList()..sort()).map((k) {
+      final parts = k.split('-');
+      final month = int.parse(parts[1]);
+      final year = parts[0];
+      final data = flowMap[k]!;
+      return MonthlyFlow(
+        label: '${_monthAbbr[month - 1]} ${year.substring(2)}',
+        income: data.$1,
+        expenses: data.$2,
+      );
+    }).toList();
 
     return ReportSummary(
       totalIncome: income,

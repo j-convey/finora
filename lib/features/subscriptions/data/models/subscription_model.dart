@@ -46,24 +46,28 @@ class SubscriptionModel {
   String get recurrenceLabel {
     final interval = recurrenceInterval > 1 ? '$recurrenceInterval ' : '';
     return switch (recurrenceUnit) {
-      RecurrenceUnit.day => '${interval}day${recurrenceInterval > 1 ? 's' : ''}',
-      RecurrenceUnit.week => '${interval}week${recurrenceInterval > 1 ? 's' : ''}',
-      RecurrenceUnit.month => '${interval}month${recurrenceInterval > 1 ? 's' : ''}',
-      RecurrenceUnit.year => '${interval}year${recurrenceInterval > 1 ? 's' : ''}',
+      RecurrenceUnit.day =>
+        '${interval}day${recurrenceInterval > 1 ? 's' : ''}',
+      RecurrenceUnit.week =>
+        '${interval}week${recurrenceInterval > 1 ? 's' : ''}',
+      RecurrenceUnit.month =>
+        '${interval}month${recurrenceInterval > 1 ? 's' : ''}',
+      RecurrenceUnit.year =>
+        '${interval}year${recurrenceInterval > 1 ? 's' : ''}',
     };
   }
 
   String get statusLabel => switch (status) {
-    SubscriptionStatus.active => 'Active',
-    SubscriptionStatus.paused => 'Paused',
-    SubscriptionStatus.canceled => 'Canceled',
-  };
+        SubscriptionStatus.active => 'Active',
+        SubscriptionStatus.paused => 'Paused',
+        SubscriptionStatus.canceled => 'Canceled',
+      };
 
   Color get statusColor => switch (status) {
-    SubscriptionStatus.active => const Color(0xFF4CAF50),
-    SubscriptionStatus.paused => const Color(0xFFFFA726),
-    SubscriptionStatus.canceled => const Color(0xFFEF5350),
-  };
+        SubscriptionStatus.active => const Color(0xFF4CAF50),
+        SubscriptionStatus.paused => const Color(0xFFFFA726),
+        SubscriptionStatus.canceled => const Color(0xFFEF5350),
+      };
 
   static SubscriptionStatus _parseStatus(String value) {
     return SubscriptionStatus.values
@@ -152,22 +156,22 @@ class SubscriptionModel {
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'merchant_name': merchantName,
-    'category': category,
-    'expected_amount': expectedAmount,
-    'min_amount': minAmount,
-    'max_amount': maxAmount,
-    'recurrence_interval': recurrenceInterval,
-    'recurrence_unit': recurrenceUnit.toString().split('.').last,
-    'start_date': startDate?.toIso8601String(),
-    'end_date': endDate?.toIso8601String(),
-    'next_due_date': nextDueDate?.toIso8601String(),
-    'status': status.toString().split('.').last,
-    'auto_link_enabled': autoLinkEnabled,
-    'matching_notes': matchingNotes,
-    'created_at': createdAt.toIso8601String(),
-    'updated_at': updatedAt?.toIso8601String(),
-  };
+        'id': id,
+        'name': name,
+        'merchant_name': merchantName,
+        'category': category,
+        'expected_amount': expectedAmount,
+        'min_amount': minAmount,
+        'max_amount': maxAmount,
+        'recurrence_interval': recurrenceInterval,
+        'recurrence_unit': recurrenceUnit.toString().split('.').last,
+        'start_date': startDate?.toIso8601String(),
+        'end_date': endDate?.toIso8601String(),
+        'next_due_date': nextDueDate?.toIso8601String(),
+        'status': status.toString().split('.').last,
+        'auto_link_enabled': autoLinkEnabled,
+        'matching_notes': matchingNotes,
+        'created_at': createdAt.toIso8601String(),
+        'updated_at': updatedAt?.toIso8601String(),
+      };
 }

@@ -57,8 +57,8 @@ class _SplitTransactionSheetState extends ConsumerState<SplitTransactionSheet> {
     super.dispose();
   }
 
-  double get _splitTotal =>
-      _rows.fold(0.0, (sum, r) => sum + (double.tryParse(r.amountCtrl.text) ?? 0.0));
+  double get _splitTotal => _rows.fold(
+      0.0, (sum, r) => sum + (double.tryParse(r.amountCtrl.text) ?? 0.0));
 
   double get _remaining => widget.parent.amount - _splitTotal;
 
@@ -68,7 +68,8 @@ class _SplitTransactionSheetState extends ConsumerState<SplitTransactionSheet> {
   bool get _isValid {
     if (_rows.length < 2) return false;
     if (!_isBalanced) return false;
-    return _rows.every((r) => r.titleCtrl.text.trim().isNotEmpty &&
+    return _rows.every((r) =>
+        r.titleCtrl.text.trim().isNotEmpty &&
         (double.tryParse(r.amountCtrl.text) ?? -1) > 0);
   }
 
@@ -95,7 +96,9 @@ class _SplitTransactionSheetState extends ConsumerState<SplitTransactionSheet> {
             title: r.titleCtrl.text.trim(),
             amount: double.parse(r.amountCtrl.text),
             categoryId: r.category?.id,
-            notes: r.notesCtrl.text.trim().isEmpty ? null : r.notesCtrl.text.trim(),
+            notes: r.notesCtrl.text.trim().isEmpty
+                ? null
+                : r.notesCtrl.text.trim(),
           ),
         )
         .toList();
@@ -145,8 +148,8 @@ class _SplitTransactionSheetState extends ConsumerState<SplitTransactionSheet> {
             children: [
               Expanded(
                 child: Text('Split Transaction',
-                    style: tt.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold)),
+                    style:
+                        tt.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
               ),
               IconButton(
                 icon: const Icon(Icons.close),
@@ -185,16 +188,15 @@ class _SplitTransactionSheetState extends ConsumerState<SplitTransactionSheet> {
                       ),
                       Text(
                         widget.parent.category,
-                        style: tt.bodySmall
-                            ?.copyWith(color: cs.onSurfaceVariant),
+                        style:
+                            tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                       ),
                     ],
                   ),
                 ),
                 Text(
                   formatCurrency(widget.parent.amount),
-                  style: tt.titleSmall
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  style: tt.titleSmall?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -312,8 +314,7 @@ class _SplitRowWidget extends StatelessWidget {
               children: [
                 Text(
                   'Split ${index + 1}',
-                  style: tt.labelMedium
-                      ?.copyWith(color: cs.onSurfaceVariant),
+                  style: tt.labelMedium?.copyWith(color: cs.onSurfaceVariant),
                 ),
                 const Spacer(),
                 if (canRemove)
@@ -348,8 +349,8 @@ class _SplitRowWidget extends StatelessWidget {
                   child: TextField(
                     controller: rowState.amountCtrl,
                     onChanged: (_) => onChanged(),
-                    keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
                     decoration: const InputDecoration(
                       labelText: 'Amount',
                       prefixText: '\$',

@@ -61,9 +61,8 @@ class NotificationService {
   }) async {
     if (!_initialized) await init();
 
-    final body = accountName != null
-        ? '\$$amount on $accountName'
-        : '\$$amount';
+    final body =
+        accountName != null ? '\$$amount on $accountName' : '\$$amount';
 
     const androidDetails = AndroidNotificationDetails(
       'charges',

@@ -21,7 +21,8 @@ class TransactionModel extends Transaction {
     super.updatedAt,
   });
 
-  factory TransactionModel.fromJson(Map<String, dynamic> json) => TransactionModel(
+  factory TransactionModel.fromJson(Map<String, dynamic> json) =>
+      TransactionModel(
         id: json['id'] as String,
         title: json['title'] as String,
         amount: (json['amount'] as num).toDouble(),

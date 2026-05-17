@@ -47,7 +47,10 @@ class MainDrawer extends ConsumerWidget {
                     user.email,
                     style: TextStyle(
                       fontSize: 12,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer.withAlpha(180),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onPrimaryContainer
+                          .withAlpha(180),
                     ),
                   ),
               ],

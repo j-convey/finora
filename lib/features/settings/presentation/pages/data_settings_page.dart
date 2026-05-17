@@ -79,9 +79,9 @@ class _DataSettingsPageState extends ConsumerState<DataSettingsPage> {
           _header(context, 'Danger Zone'),
           ListTile(
             leading: Icon(Icons.delete_forever_outlined, color: cs.error),
-            title: Text('Clear Local Data',
-                style: TextStyle(color: cs.error)),
-            subtitle: const Text('Removes cached data — server data unaffected'),
+            title: Text('Clear Local Data', style: TextStyle(color: cs.error)),
+            subtitle:
+                const Text('Removes cached data — server data unaffected'),
             onTap: () => _confirmClear(context),
           ),
           ListTile(
@@ -95,8 +95,9 @@ class _DataSettingsPageState extends ConsumerState<DataSettingsPage> {
             title: Text('Reset Server Database',
                 style: TextStyle(color: cs.error)),
             subtitle: const Text('Permanently deletes all server data'),
-            onTap:
-                _isResettingDatabase ? null : () => _confirmServerReset(context),
+            onTap: _isResettingDatabase
+                ? null
+                : () => _confirmServerReset(context),
           ),
           const SizedBox(height: 32),
         ],
