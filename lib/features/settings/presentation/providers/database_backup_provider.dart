@@ -13,6 +13,7 @@ import '../../../budgets/presentation/providers/budgets_provider.dart';
 import '../../../transactions/presentation/providers/categories_provider.dart';
 import '../../../transactions/presentation/providers/transactions_provider.dart';
 import '../../../subscriptions/presentation/providers/subscriptions_provider.dart';
+import '../providers/simplefin_provider.dart';
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
@@ -131,6 +132,7 @@ class DatabaseBackupNotifier extends StateNotifier<DatabaseBackupState> {
         _ref.read(subscriptionsProvider.notifier).sync(),
         _ref.read(categoryGroupsProvider.notifier).sync(),
         _ref.read(netWorthHistoryProvider.notifier).fetch(),
+        _ref.read(simplefinProvider.notifier).refreshStatus(),
       ]);
     } catch (e) {
       state = state.copyWith(

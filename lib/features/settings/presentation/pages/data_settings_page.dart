@@ -9,6 +9,7 @@ import '../../../subscriptions/presentation/providers/subscriptions_provider.dar
 import '../../../transactions/presentation/providers/categories_provider.dart';
 import '../../../transactions/presentation/providers/transactions_provider.dart';
 import '../providers/database_backup_provider.dart';
+import '../providers/simplefin_provider.dart';
 
 class DataSettingsPage extends ConsumerStatefulWidget {
   const DataSettingsPage({super.key});
@@ -129,6 +130,7 @@ class _DataSettingsPageState extends ConsumerState<DataSettingsPage> {
         ref.read(subscriptionsProvider.notifier).sync(),
         ref.read(netWorthHistoryProvider.notifier).fetch(),
         ref.read(categoryGroupsProvider.notifier).sync(),
+        ref.read(simplefinProvider.notifier).refreshStatus(),
       ]);
       if (mounted) {
         ScaffoldMessenger.of(
@@ -317,5 +319,6 @@ class _DataSettingsPageState extends ConsumerState<DataSettingsPage> {
     ref.read(subscriptionsProvider.notifier).clear();
     ref.read(categoryGroupsProvider.notifier).clear();
     ref.read(netWorthHistoryProvider.notifier).clear();
+    ref.read(simplefinProvider.notifier).clear();
   }
 }

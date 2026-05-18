@@ -4,6 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/providers/notification_preferences_provider.dart';
 import '../../../../core/services/notification_service.dart';
+import '../../../accounts/presentation/providers/accounts_provider.dart';
+import '../../../budgets/presentation/providers/budgets_provider.dart';
+import '../../../subscriptions/presentation/providers/subscriptions_provider.dart';
+import '../../../transactions/presentation/providers/categories_provider.dart';
+import '../../../transactions/presentation/providers/transactions_provider.dart';
 
 enum SimplefinConnectionStatus { disconnected, connected, syncing, error }
 
@@ -39,14 +44,14 @@ class SimplefinState {
 
 class SimplefinNotifier extends StateNotifier<SimplefinState> {
   SimplefinNotifier(this._ref) : super(const SimplefinState()) {
-    _loadStatus();
+    refreshStatus();
   }
 
   final Ref _ref;
 
   /// Called on startup — asks the server if a SimpleFIN access URL is already
   /// stored, so the UI can show the correct connected/disconnected state.
-  Future<void> _loadStatus() async {
+  Future<void> refreshStatus() async {
     try {
       final dio = _ref.read(apiClientProvider);
       final res = await dio.get<Map<String, dynamic>>('/api/simplefin/status');
@@ -61,6 +66,8 @@ class SimplefinNotifier extends StateNotifier<SimplefinState> {
               ? DateTime.tryParse(data['last_synced_at'] as String)
               : null,
         );
+      } else {
+        state = const SimplefinState();
       }
     } catch (_) {
       // Server unreachable or not yet set up — stay disconnected, silently.
@@ -88,6 +95,7 @@ class SimplefinNotifier extends StateNotifier<SimplefinState> {
         ),
         lastSyncedAt: DateTime.now(),
       );
+      _syncAll();
     } catch (e) {
       final message = e is DioException ? _extractError(e) : e.toString();
       state = state.copyWith(
@@ -109,6 +117,10 @@ class SimplefinNotifier extends StateNotifier<SimplefinState> {
         status: SimplefinConnectionStatus.connected,
         lastSyncedAt: DateTime.now(),
       );
+
+      // Refresh all local data so new transactions/balances appear immediately.
+      _syncAll();
+
       // Fire local notifications for new charges that exceed the threshold.
       final notifPrefs = _ref.read(notificationPreferencesProvider);
       if (notifPrefs.notifyOn != NotifyOn.never && res.data != null) {
@@ -143,6 +155,22 @@ class SimplefinNotifier extends StateNotifier<SimplefinState> {
       // Best-effort
     }
     state = const SimplefinState();
+  }
+
+  /// Resets the local state without calling the server.
+  void clear() {
+    state = const SimplefinState();
+  }
+
+  /// Refreshes all cached application data from the server.
+  void _syncAll() {
+    Future.wait([
+      _ref.read(accountsProvider.notifier).sync(),
+      _ref.read(transactionsProvider.notifier).sync(),
+      _ref.read(budgetsProvider.notifier).sync(),
+      _ref.read(subscriptionsProvider.notifier).sync(),
+      _ref.read(categoryGroupsProvider.notifier).sync(),
+    ]).catchError((_) => []);
   }
 
   static String _extractError(DioException e) {
