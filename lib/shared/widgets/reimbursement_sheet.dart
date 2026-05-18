@@ -37,8 +37,7 @@ class ReimbursementSheet extends ConsumerStatefulWidget {
   final Transaction transaction;
 
   @override
-  ConsumerState<ReimbursementSheet> createState() =>
-      _ReimbursementSheetState();
+  ConsumerState<ReimbursementSheet> createState() => _ReimbursementSheetState();
 }
 
 class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
@@ -72,15 +71,15 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
   // ── Navigation helpers ───────────────────────────────────────────────────
 
   void _goToList() => setState(() {
-        _view = _SheetView.list;
-        _errorMessage = null;
-        _submitting = false;
-      });
+    _view = _SheetView.list;
+    _errorMessage = null;
+    _submitting = false;
+  });
 
   void _goToPick() => setState(() {
-        _view = _SheetView.pick;
-        _pickQuery = '';
-      });
+    _view = _SheetView.pick;
+    _pickQuery = '';
+  });
 
   void _selectCounterpart(Transaction t, double myRemaining) {
     // Pre-fill with the smaller of what I have left and the counterpart's total.
@@ -100,8 +99,9 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
     _amountCtrl.text = r.amount.toStringAsFixed(2);
     _notesCtrl.text = r.notes ?? '';
     final isExpense = widget.transaction.isExpense;
-    final counterpartId =
-        isExpense ? r.incomeTransactionId : r.expenseTransactionId;
+    final counterpartId = isExpense
+        ? r.incomeTransactionId
+        : r.expenseTransactionId;
     setState(() {
       _editingId = r.id;
       _counterpart = allTxns.where((t) => t.id == counterpartId).firstOrNull;
@@ -122,16 +122,15 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
     });
 
     try {
-      final notifier =
-          ref.read(reimbursementProvider(widget.transaction.id).notifier);
+      final notifier = ref.read(
+        reimbursementProvider(widget.transaction.id).notifier,
+      );
 
       if (_editingId != null) {
         await notifier.updateReimbursement(
           _editingId!,
           amount: amount,
-          notes: _notesCtrl.text.trim().isEmpty
-              ? null
-              : _notesCtrl.text.trim(),
+          notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
         );
       } else {
         final cp = _counterpart!;
@@ -140,9 +139,7 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
           expenseTransactionId: isExpense ? widget.transaction.id : cp.id,
           incomeTransactionId: isExpense ? cp.id : widget.transaction.id,
           amount: amount,
-          notes: _notesCtrl.text.trim().isEmpty
-              ? null
-              : _notesCtrl.text.trim(),
+          notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
         );
       }
       _goToList();
@@ -195,9 +192,11 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
     final msg = data is Map ? data['message'] as String? : null;
 
     if (code == 'over_reimbursement') {
-      final max =
-          data is Map ? (data['max_allowed'] as num?)?.toDouble() : null;
-      if (max != null) return 'Exceeds capacity. Maximum: ${formatCurrency(max)}';
+      final max = data is Map
+          ? (data['max_allowed'] as num?)?.toDouble()
+          : null;
+      if (max != null)
+        return 'Exceeds capacity. Maximum: ${formatCurrency(max)}';
       return msg ?? 'Amount exceeds available capacity.';
     }
     if (code == 'duplicate_link') {
@@ -220,10 +219,10 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
 
   @override
   Widget build(BuildContext context) => switch (_view) {
-        _SheetView.list => _buildList(context),
-        _SheetView.pick => _buildPick(context),
-        _SheetView.form => _buildForm(context),
-      };
+    _SheetView.list => _buildList(context),
+    _SheetView.pick => _buildPick(context),
+    _SheetView.form => _buildForm(context),
+  };
 
   // ── List view ────────────────────────────────────────────────────────────
 
@@ -247,7 +246,9 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
                 Expanded(
                   child: Text(
                     'Reimbursements',
-                    style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                    style: tt.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 IconButton(
@@ -318,7 +319,7 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
 
     final myRemaining =
         ref.watch(reimbursementProvider(txn.id)).valueOrNull?.remainingAmount ??
-            txn.amount;
+        txn.amount;
 
     final all = ref.watch(transactionsProvider);
     final eligible = all.where((t) {
@@ -331,13 +332,15 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
     final filtered = _pickQuery.isEmpty
         ? eligible
         : eligible
-            .where((t) =>
-                t.title.toLowerCase().contains(_pickQuery.toLowerCase()) ||
-                (t.merchantName
-                        ?.toLowerCase()
-                        .contains(_pickQuery.toLowerCase()) ??
-                    false))
-            .toList();
+              .where(
+                (t) =>
+                    t.title.toLowerCase().contains(_pickQuery.toLowerCase()) ||
+                    (t.merchantName?.toLowerCase().contains(
+                          _pickQuery.toLowerCase(),
+                        ) ??
+                        false),
+              )
+              .toList();
 
     return SafeArea(
       child: Container(
@@ -363,8 +366,9 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
                       isExpense
                           ? 'Select Income Transaction'
                           : 'Select Expense Transaction',
-                      style:
-                          tt.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                      style: tt.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
@@ -392,8 +396,9 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
                           isExpense
                               ? 'No income transactions found'
                               : 'No expense transactions found',
-                          style: tt.bodyMedium
-                              ?.copyWith(color: cs.onSurfaceVariant),
+                          style: tt.bodyMedium?.copyWith(
+                            color: cs.onSurfaceVariant,
+                          ),
                         ),
                       ),
                     )
@@ -421,8 +426,9 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
                           title: Text(t.merchantName ?? t.title),
                           subtitle: Text(
                             '${t.category} · ${TransactionCard.relativeDate(t.date)}',
-                            style: tt.bodySmall
-                                ?.copyWith(color: cs.onSurfaceVariant),
+                            style: tt.bodySmall?.copyWith(
+                              color: cs.onSurfaceVariant,
+                            ),
                           ),
                           trailing: Text(
                             formatCurrency(t.amount),
@@ -472,7 +478,9 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
                 Expanded(
                   child: Text(
                     isEditing ? 'Edit Reimbursement' : 'Link Reimbursement',
-                    style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                    style: tt.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 IconButton(
@@ -491,8 +499,9 @@ class _ReimbursementSheetState extends ConsumerState<ReimbursementSheet> {
             TextField(
               controller: _amountCtrl,
               autofocus: true,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               decoration: InputDecoration(
                 labelText: 'Amount',
                 prefixText: '\$ ',
@@ -647,11 +656,7 @@ class _TotalsCard extends StatelessWidget {
 }
 
 class _TotalsRow extends StatelessWidget {
-  const _TotalsRow({
-    required this.label,
-    required this.value,
-    this.style,
-  });
+  const _TotalsRow({required this.label, required this.value, this.style});
 
   final String label;
   final String value;
@@ -667,10 +672,9 @@ class _TotalsRow extends StatelessWidget {
         children: [
           Text(
             label,
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall
-                ?.copyWith(color: cs.onSurfaceVariant),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
           ),
           Text(value, style: style),
         ],
@@ -705,8 +709,9 @@ class _ReimbursementTile extends StatelessWidget {
     final counterpartId = isExpense
         ? reimbursement.incomeTransactionId
         : reimbursement.expenseTransactionId;
-    final counterpart =
-        allTransactions.where((t) => t.id == counterpartId).firstOrNull;
+    final counterpart = allTransactions
+        .where((t) => t.id == counterpartId)
+        .firstOrNull;
     final label = counterpart != null
         ? (counterpart.merchantName ?? counterpart.title)
         : counterpartId;
@@ -728,8 +733,7 @@ class _ReimbursementTile extends StatelessWidget {
                   if (reimbursement.notes?.isNotEmpty == true)
                     Text(
                       reimbursement.notes!,
-                      style: tt.bodySmall
-                          ?.copyWith(color: cs.onSurfaceVariant),
+                      style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                     ),
                 ],
               ),
@@ -746,14 +750,8 @@ class _ReimbursementTile extends StatelessWidget {
               onSelected: (action) =>
                   action == _TileAction.edit ? onEdit() : onDelete(),
               itemBuilder: (_) => const [
-                PopupMenuItem(
-                  value: _TileAction.edit,
-                  child: Text('Edit'),
-                ),
-                PopupMenuItem(
-                  value: _TileAction.delete,
-                  child: Text('Remove'),
-                ),
+                PopupMenuItem(value: _TileAction.edit, child: Text('Edit')),
+                PopupMenuItem(value: _TileAction.delete, child: Text('Remove')),
               ],
             ),
           ],

@@ -31,8 +31,18 @@ Color categoryColor(String name) =>
 // ── Month abbreviations ───────────────────────────────────────────────────────
 
 const _monthAbbr = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
 ];
 
 /// Derives a [ReportSummary] from a list of transactions and a [ReportPeriod].
@@ -50,19 +60,19 @@ class BuildReportSummaryUseCase {
       if (t.pending) return false;
       if (start == null) return true;
       return !t.date.isBefore(start);
-    }).toList()
-      ..sort((a, b) => b.date.compareTo(a.date)); // newest first
+    }).toList()..sort((a, b) => b.date.compareTo(a.date)); // newest first
 
     // Exclude transfers from budget totals.
     final budgetableTransactions = txns
-        .where((t) =>
-            t.type != TransactionType.transfer && t.category != 'Transfer')
+        .where(
+          (t) => t.type != TransactionType.transfer && t.category != 'Transfer',
+        )
         .toList();
 
-    final expenseList =
-        budgetableTransactions.where((t) => t.isExpense).toList();
-    final incomeList =
-        budgetableTransactions.where((t) => t.isIncome).toList();
+    final expenseList = budgetableTransactions
+        .where((t) => t.isExpense)
+        .toList();
+    final incomeList = budgetableTransactions.where((t) => t.isIncome).toList();
 
     // ── Totals ──────────────────────────────────────────────────────────────
     double income = 0;
@@ -77,10 +87,16 @@ class BuildReportSummaryUseCase {
 
     final largestExpense = expenseList.isEmpty
         ? null
-        : expenseList.reduce((a, b) => a.amount > b.amount ? a : b);
+        : expenseList.fold<Transaction>(
+            expenseList.first,
+            (prev, e) => e.amount > prev.amount ? e : prev,
+          );
     final largestIncome = incomeList.isEmpty
         ? null
-        : incomeList.reduce((a, b) => a.amount > b.amount ? a : b);
+        : incomeList.fold<Transaction>(
+            incomeList.first,
+            (prev, e) => e.amount > prev.amount ? e : prev,
+          );
 
     // ── Spending by category ─────────────────────────────────────────────────
     final spendMap = <String, (double, int)>{};
@@ -88,18 +104,19 @@ class BuildReportSummaryUseCase {
       final prev = spendMap[t.category] ?? (0.0, 0);
       spendMap[t.category] = (prev.$1 + t.amount, prev.$2 + 1);
     }
-    final spendingByCategory = (spendMap.entries.toList()
-          ..sort((a, b) => b.value.$1.compareTo(a.value.$1)))
-        .map(
-          (e) => ReportCategory(
-            name: e.key,
-            amount: e.value.$1,
-            percentage: expenses > 0 ? e.value.$1 / expenses * 100 : 0,
-            color: categoryColor(e.key),
-            count: e.value.$2,
-          ),
-        )
-        .toList();
+    final spendingByCategory =
+        (spendMap.entries.toList()
+              ..sort((a, b) => b.value.$1.compareTo(a.value.$1)))
+            .map(
+              (e) => ReportCategory(
+                name: e.key,
+                amount: e.value.$1,
+                percentage: expenses > 0 ? e.value.$1 / expenses * 100 : 0,
+                color: categoryColor(e.key),
+                count: e.value.$2,
+              ),
+            )
+            .toList();
 
     // ── Income by category ───────────────────────────────────────────────────
     final incomeMap = <String, (double, int)>{};
@@ -107,18 +124,19 @@ class BuildReportSummaryUseCase {
       final prev = incomeMap[t.category] ?? (0.0, 0);
       incomeMap[t.category] = (prev.$1 + t.amount, prev.$2 + 1);
     }
-    final incomeByCategory = (incomeMap.entries.toList()
-          ..sort((a, b) => b.value.$1.compareTo(a.value.$1)))
-        .map(
-          (e) => ReportCategory(
-            name: e.key,
-            amount: e.value.$1,
-            percentage: income > 0 ? e.value.$1 / income * 100 : 0,
-            color: categoryColor(e.key),
-            count: e.value.$2,
-          ),
-        )
-        .toList();
+    final incomeByCategory =
+        (incomeMap.entries.toList()
+              ..sort((a, b) => b.value.$1.compareTo(a.value.$1)))
+            .map(
+              (e) => ReportCategory(
+                name: e.key,
+                amount: e.value.$1,
+                percentage: income > 0 ? e.value.$1 / income * 100 : 0,
+                color: categoryColor(e.key),
+                count: e.value.$2,
+              ),
+            )
+            .toList();
 
     // ── Monthly cash flow (for bar chart) ────────────────────────────────────
     final flowMap = <String, (double, double)>{}; // key → (income, expenses)
@@ -131,19 +149,17 @@ class BuildReportSummaryUseCase {
         flowMap[key] = (prev.$1, prev.$2 + t.amount);
       }
     }
-    final monthlyFlow = (flowMap.keys.toList()..sort())
-        .map((k) {
-          final parts = k.split('-');
-          final month = int.parse(parts[1]);
-          final year = parts[0];
-          final data = flowMap[k]!;
-          return MonthlyFlow(
-            label: '${_monthAbbr[month - 1]} ${year.substring(2)}',
-            income: data.$1,
-            expenses: data.$2,
-          );
-        })
-        .toList();
+    final monthlyFlow = (flowMap.keys.toList()..sort()).map((k) {
+      final parts = k.split('-');
+      final month = int.parse(parts[1]);
+      final year = parts[0];
+      final data = flowMap[k]!;
+      return MonthlyFlow(
+        label: '${_monthAbbr[month - 1]} ${year.substring(2)}',
+        income: data.$1,
+        expenses: data.$2,
+      );
+    }).toList();
 
     return ReportSummary(
       totalIncome: income,

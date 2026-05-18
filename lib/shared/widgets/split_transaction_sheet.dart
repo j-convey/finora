@@ -57,8 +57,10 @@ class _SplitTransactionSheetState extends ConsumerState<SplitTransactionSheet> {
     super.dispose();
   }
 
-  double get _splitTotal =>
-      _rows.fold(0.0, (sum, r) => sum + (double.tryParse(r.amountCtrl.text) ?? 0.0));
+  double get _splitTotal => _rows.fold(
+    0.0,
+    (sum, r) => sum + (double.tryParse(r.amountCtrl.text) ?? 0.0),
+  );
 
   double get _remaining => widget.parent.amount - _splitTotal;
 
@@ -68,8 +70,11 @@ class _SplitTransactionSheetState extends ConsumerState<SplitTransactionSheet> {
   bool get _isValid {
     if (_rows.length < 2) return false;
     if (!_isBalanced) return false;
-    return _rows.every((r) => r.titleCtrl.text.trim().isNotEmpty &&
-        (double.tryParse(r.amountCtrl.text) ?? -1) > 0);
+    return _rows.every(
+      (r) =>
+          r.titleCtrl.text.trim().isNotEmpty &&
+          (double.tryParse(r.amountCtrl.text) ?? -1) > 0,
+    );
   }
 
   void _addRow() => setState(() => _rows.add(_SplitRowState()));
@@ -95,7 +100,9 @@ class _SplitTransactionSheetState extends ConsumerState<SplitTransactionSheet> {
             title: r.titleCtrl.text.trim(),
             amount: double.parse(r.amountCtrl.text),
             categoryId: r.category?.id,
-            notes: r.notesCtrl.text.trim().isEmpty ? null : r.notesCtrl.text.trim(),
+            notes: r.notesCtrl.text.trim().isEmpty
+                ? null
+                : r.notesCtrl.text.trim(),
           ),
         )
         .toList();
@@ -144,9 +151,10 @@ class _SplitTransactionSheetState extends ConsumerState<SplitTransactionSheet> {
           Row(
             children: [
               Expanded(
-                child: Text('Split Transaction',
-                    style: tt.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold)),
+                child: Text(
+                  'Split Transaction',
+                  style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
               ),
               IconButton(
                 icon: const Icon(Icons.close),
@@ -180,21 +188,22 @@ class _SplitTransactionSheetState extends ConsumerState<SplitTransactionSheet> {
                     children: [
                       Text(
                         widget.parent.merchantName ?? widget.parent.title,
-                        style: tt.bodyMedium
-                            ?.copyWith(fontWeight: FontWeight.w600),
+                        style: tt.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       Text(
                         widget.parent.category,
-                        style: tt.bodySmall
-                            ?.copyWith(color: cs.onSurfaceVariant),
+                        style: tt.bodySmall?.copyWith(
+                          color: cs.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),
                 ),
                 Text(
                   formatCurrency(widget.parent.amount),
-                  style: tt.titleSmall
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  style: tt.titleSmall?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -312,14 +321,16 @@ class _SplitRowWidget extends StatelessWidget {
               children: [
                 Text(
                   'Split ${index + 1}',
-                  style: tt.labelMedium
-                      ?.copyWith(color: cs.onSurfaceVariant),
+                  style: tt.labelMedium?.copyWith(color: cs.onSurfaceVariant),
                 ),
                 const Spacer(),
                 if (canRemove)
                   IconButton(
-                    icon: Icon(Icons.remove_circle_outline,
-                        size: 18, color: cs.error),
+                    icon: Icon(
+                      Icons.remove_circle_outline,
+                      size: 18,
+                      color: cs.error,
+                    ),
                     visualDensity: VisualDensity.compact,
                     onPressed: onRemove,
                     tooltip: 'Remove this split',
@@ -349,7 +360,8 @@ class _SplitRowWidget extends StatelessWidget {
                     controller: rowState.amountCtrl,
                     onChanged: (_) => onChanged(),
                     keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true),
+                      decimal: true,
+                    ),
                     decoration: const InputDecoration(
                       labelText: 'Amount',
                       prefixText: '\$',
@@ -405,31 +417,36 @@ class _CategoryDropdown extends StatelessWidget {
     final allItems = categories.expand((g) => g.categories).toList();
 
     // Effective display name: user selection → parent's name → first item.
-    final effectiveName = selected?.name ??
+    final effectiveName =
+        selected?.name ??
         allItems.where((c) => c.name == defaultName).firstOrNull?.name ??
         (allItems.isNotEmpty ? allItems.first.name : '');
 
     final items = <DropdownMenuItem<String>>[];
     for (final group in categories) {
-      items.add(DropdownMenuItem<String>(
-        enabled: false,
-        value: '__header__${group.group}',
-        child: Text(
-          group.group.toUpperCase(),
-          style: tt.labelSmall?.copyWith(
-            color: cs.onSurfaceVariant,
-            letterSpacing: 0.8,
+      items.add(
+        DropdownMenuItem<String>(
+          enabled: false,
+          value: '__header__${group.group}',
+          child: Text(
+            group.group.toUpperCase(),
+            style: tt.labelSmall?.copyWith(
+              color: cs.onSurfaceVariant,
+              letterSpacing: 0.8,
+            ),
           ),
         ),
-      ));
+      );
       for (final cat in group.categories) {
-        items.add(DropdownMenuItem<String>(
-          value: cat.name,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: Text(cat.name),
+        items.add(
+          DropdownMenuItem<String>(
+            value: cat.name,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: Text(cat.name),
+            ),
           ),
-        ));
+        );
       }
     }
 
@@ -495,14 +512,13 @@ class _BalanceBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: tt.bodySmall?.copyWith(color: barColor),
-          ),
+          Text(label, style: tt.bodySmall?.copyWith(color: barColor)),
           Text(
             '${formatCurrency(total)} / ${formatCurrency(parentAmount)}',
-            style: tt.bodySmall
-                ?.copyWith(color: barColor, fontWeight: FontWeight.w600),
+            style: tt.bodySmall?.copyWith(
+              color: barColor,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),

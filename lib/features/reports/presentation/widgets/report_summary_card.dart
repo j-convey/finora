@@ -53,15 +53,15 @@ class ReportSummaryCard extends ConsumerWidget {
               _Row(
                 label: 'Net cash flow',
                 value: mask(
-                    '${summary.netCashFlow >= 0 ? '+' : ''}${formatCurrency(summary.netCashFlow)}'),
+                  '${summary.netCashFlow >= 0 ? '+' : ''}${formatCurrency(summary.netCashFlow)}',
+                ),
                 valueColor: summary.netCashFlow >= 0
                     ? const Color(0xFF4CAF50)
                     : const Color(0xFFEF5350),
               ),
               _Row(
                 label: 'Savings rate',
-                value:
-                    '${(summary.savingsRate * 100).toStringAsFixed(1)}%',
+                value: '${(summary.savingsRate * 100).toStringAsFixed(1)}%',
               ),
             ],
             if (tab == 1 && summary.largestExpense != null)
@@ -73,7 +73,9 @@ class ReportSummaryCard extends ConsumerWidget {
             if (tab == 2 && summary.largestIncome != null)
               _Row(
                 label: 'Largest income',
-                value: mask('+${formatCurrency(summary.largestIncome!.amount)}'),
+                value: mask(
+                  '+${formatCurrency(summary.largestIncome!.amount)}',
+                ),
                 valueColor: const Color(0xFF4CAF50),
               ),
           ],

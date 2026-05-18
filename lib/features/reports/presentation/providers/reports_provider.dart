@@ -7,8 +7,9 @@ import 'package:finora/features/reports/domain/usecases/build_report_summary_use
 
 // ── Providers ─────────────────────────────────────────────────────────────────
 
-final reportPeriodProvider =
-    StateProvider<ReportPeriod>((ref) => ReportPeriod.last30Days);
+final reportPeriodProvider = StateProvider<ReportPeriod>(
+  (ref) => ReportPeriod.last30Days,
+);
 
 /// Derives a [ReportSummary] from [transactionsProvider] for the selected
 /// [reportPeriodProvider]. Re-computes automatically when either changes.

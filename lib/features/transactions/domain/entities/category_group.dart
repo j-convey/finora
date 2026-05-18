@@ -16,11 +16,11 @@ class CategoryGroup {
   final List<CategoryItem> categories;
 
   factory CategoryGroup.fromJson(Map<String, dynamic> json) => CategoryGroup(
-        group: json['group'] as String,
-        type: json['type'] as String,
-        categories: (json['categories'] as List<dynamic>)
-            .map(CategoryItem.fromJson)
-            .where((c) => c.name.isNotEmpty)
-            .toList(),
-      );
+    group: json['group'] as String,
+    type: json['type'] as String,
+    categories: (json['categories'] as List<dynamic>)
+        .map(CategoryItem.fromJson)
+        .where((c) => c.name.isNotEmpty)
+        .toList(),
+  );
 }

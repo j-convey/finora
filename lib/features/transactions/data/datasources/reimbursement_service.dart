@@ -53,10 +53,7 @@ class ReimbursementService {
   }) async {
     final response = await _dio.put<Map<String, dynamic>>(
       '/api/transactions/reimbursements/$reimbursementId',
-      data: {
-        if (amount != null) 'amount': amount,
-        'notes': notes,
-      },
+      data: {if (amount != null) 'amount': amount, 'notes': notes},
     );
     return ReimbursementModel.fromJson(response.data!);
   }

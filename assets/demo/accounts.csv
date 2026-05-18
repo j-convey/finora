@@ -1,4 +1,0 @@
-id,name,type,balance,available_balance,institution_name
-demo-acc-1,Chase Checking,checking,4823.50,4823.50,Chase
-demo-acc-2,Chase Savings,savings,18240.00,18240.00,Chase
-demo-acc-3,Discover Card,credit_card,-1345.20,,Discover

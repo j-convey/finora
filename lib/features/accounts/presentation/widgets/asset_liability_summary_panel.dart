@@ -63,9 +63,7 @@ class AssetLiabilitySummaryPanel extends ConsumerWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(4),
-              child: Row(
-                children: _buildAssetBars(assetsByType, assets),
-              ),
+              child: Row(children: _buildAssetBars(assetsByType, assets)),
             ),
           ),
           const SizedBox(height: 8),
@@ -180,9 +178,7 @@ class AssetLiabilitySummaryPanel extends ConsumerWidget {
       final percent = total > 0 ? (entry.value / total) * 100 : 0;
       return Expanded(
         flex: percent.toInt(),
-        child: Container(
-          color: colors[entry.key] ?? Colors.grey,
-        ),
+        child: Container(color: colors[entry.key] ?? Colors.grey),
       );
     }).toList();
   }
@@ -203,9 +199,7 @@ class AssetLiabilitySummaryPanel extends ConsumerWidget {
       final percent = total > 0 ? (entry.value / total) * 100 : 0;
       return Expanded(
         flex: percent.toInt(),
-        child: Container(
-          color: colors[entry.key] ?? Colors.grey,
-        ),
+        child: Container(color: colors[entry.key] ?? Colors.grey),
       );
     }).toList();
   }

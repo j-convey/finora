@@ -13,8 +13,7 @@ const _kThemeModeKey = 'themeMode';
 ///   Read:   ref.watch(themeModeProvider)
 ///   Write:  ref.read(themeModeProvider.notifier).setMode(ThemeMode.dark)
 class ThemeModeNotifier extends StateNotifier<ThemeMode> {
-  ThemeModeNotifier(this._prefs)
-      : super(_load(_prefs));
+  ThemeModeNotifier(this._prefs) : super(_load(_prefs));
 
   final SharedPreferences _prefs;
 
@@ -42,8 +41,9 @@ final prefsProvider = Provider<SharedPreferences>(
 );
 
 /// The main provider to watch/read throughout the app.
-final themeModeProvider =
-    StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
+final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((
+  ref,
+) {
   final prefs = ref.watch(prefsProvider);
   return ThemeModeNotifier(prefs);
 });

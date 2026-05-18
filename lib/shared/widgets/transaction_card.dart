@@ -22,7 +22,9 @@ class TransactionCard extends StatelessWidget {
   final VoidCallback? onCategoryTap;
 
   static String _accountLabel(Account a) {
-    final institution = a.institutionName?.isNotEmpty == true ? a.institutionName! : null;
+    final institution = a.institutionName?.isNotEmpty == true
+        ? a.institutionName!
+        : null;
     final parts = [if (institution != null) institution, a.name];
     return parts.join(' · ');
   }
@@ -45,10 +47,10 @@ class TransactionCard extends StatelessWidget {
     final amountColor = isMuted
         ? cs.onSurfaceVariant
         : isTransfer
-            ? cs.primary
-            : isIncome
-                ? const Color(0xFF4CAF50)
-                : cs.onSurface;
+        ? cs.primary
+        : isIncome
+        ? const Color(0xFF4CAF50)
+        : cs.onSurface;
     final amountPrefix = isTransfer ? '↔ ' : (isIncome ? '+' : '-');
 
     final tile = Card(
@@ -59,18 +61,18 @@ class TransactionCard extends StatelessWidget {
           backgroundColor: isTransfer
               ? cs.primary.withAlpha(isMuted ? 15 : 30)
               : isIncome
-                  ? const Color(0xFF4CAF50).withAlpha(isMuted ? 15 : 30)
-                  : cs.surfaceContainerHighest,
+              ? const Color(0xFF4CAF50).withAlpha(isMuted ? 15 : 30)
+              : cs.surfaceContainerHighest,
           child: Icon(
             transaction.icon,
             size: 20,
             color: isMuted
                 ? cs.onSurfaceVariant
                 : isTransfer
-                    ? cs.primary
-                    : isIncome
-                        ? const Color(0xFF4CAF50)
-                        : cs.onSurfaceVariant,
+                ? cs.primary
+                : isIncome
+                ? const Color(0xFF4CAF50)
+                : cs.onSurfaceVariant,
           ),
         ),
         title: Row(
@@ -87,8 +89,7 @@ class TransactionCard extends StatelessWidget {
             if (needsReview) ...[
               const SizedBox(width: 6),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.errorContainer,
                   borderRadius: BorderRadius.circular(4),
@@ -96,18 +97,17 @@ class TransactionCard extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.warning_amber_rounded,
-                        size: 12,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onErrorContainer),
+                    Icon(
+                      Icons.warning_amber_rounded,
+                      size: 12,
+                      color: Theme.of(context).colorScheme.onErrorContainer,
+                    ),
                     const SizedBox(width: 3),
                     Text(
                       'Review',
                       style: tt.labelSmall?.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onErrorContainer),
+                        color: Theme.of(context).colorScheme.onErrorContainer,
+                      ),
                     ),
                   ],
                 ),
@@ -115,8 +115,7 @@ class TransactionCard extends StatelessWidget {
             ] else if (isTransfer) ...[
               const SizedBox(width: 6),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: cs.primary.withAlpha(20),
                   borderRadius: BorderRadius.circular(4),
@@ -125,14 +124,15 @@ class TransactionCard extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.swap_horiz_outlined,
-                        size: 12,
-                        color: cs.primary),
+                    Icon(
+                      Icons.swap_horiz_outlined,
+                      size: 12,
+                      color: cs.primary,
+                    ),
                     const SizedBox(width: 3),
                     Text(
                       transaction.category,
-                      style: tt.labelSmall
-                          ?.copyWith(color: cs.primary),
+                      style: tt.labelSmall?.copyWith(color: cs.primary),
                     ),
                   ],
                 ),
@@ -140,8 +140,7 @@ class TransactionCard extends StatelessWidget {
             ] else if (isSplitParent) ...[
               const SizedBox(width: 6),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: cs.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(4),
@@ -149,15 +148,13 @@ class TransactionCard extends StatelessWidget {
                 ),
                 child: Text(
                   'Split',
-                  style: tt.labelSmall
-                      ?.copyWith(color: cs.onSurfaceVariant),
+                  style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
                 ),
               ),
             ] else if (isPending) ...[
               const SizedBox(width: 6),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: cs.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(4),
@@ -165,8 +162,7 @@ class TransactionCard extends StatelessWidget {
                 ),
                 child: Text(
                   'Pending',
-                  style: tt.labelSmall
-                      ?.copyWith(color: cs.onSurfaceVariant),
+                  style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
                 ),
               ),
             ],

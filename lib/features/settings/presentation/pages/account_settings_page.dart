@@ -47,23 +47,27 @@ class AccountSettingsPage extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            auth.isAuthenticated ? 'Connected' : 'Not connected',
+                            auth.isAuthenticated
+                                ? 'Connected'
+                                : 'Not connected',
                             style: tt.titleMedium,
                           ),
                           if (auth.serverUrl.isNotEmpty) ...[
                             const SizedBox(height: 2),
                             Text(
                               auth.serverUrl,
-                              style: tt.bodySmall
-                                  ?.copyWith(color: cs.onSurfaceVariant),
+                              style: tt.bodySmall?.copyWith(
+                                color: cs.onSurfaceVariant,
+                              ),
                             ),
                           ],
                           if (auth.user?.email != null) ...[
                             const SizedBox(height: 2),
                             Text(
                               auth.user!.email,
-                              style: tt.bodySmall
-                                  ?.copyWith(color: cs.onSurfaceVariant),
+                              style: tt.bodySmall?.copyWith(
+                                color: cs.onSurfaceVariant,
+                              ),
                             ),
                           ],
                         ],

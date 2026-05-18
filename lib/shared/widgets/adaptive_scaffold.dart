@@ -83,23 +83,26 @@ class MainShell extends ConsumerWidget {
               child: SafeArea(
                 bottom: false,
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 6,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.science_outlined,
-                          size: 14, color: Colors.white),
+                      const Icon(
+                        Icons.science_outlined,
+                        size: 14,
+                        color: Colors.white,
+                      ),
                       const SizedBox(width: 6),
                       Text(
                         'DEMO MODE — sample data only',
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelSmall
-                            ?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.5),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ],
                   ),
@@ -107,7 +110,9 @@ class MainShell extends ConsumerWidget {
               ),
             ),
           ),
-          Expanded(child: IndexedStack(index: index, children: _pages)),
+          Expanded(
+            child: IndexedStack(index: index, children: _pages),
+          ),
         ],
       );
     }
@@ -144,9 +149,8 @@ class _WideLayout extends ConsumerWidget {
             selectedIndex: selectedIndex,
             onTap: onTap,
             expanded: sidebarExpanded,
-            onToggle: () => ref
-                .read(sidebarExpandedProvider.notifier)
-                .state = !sidebarExpanded,
+            onToggle: () => ref.read(sidebarExpandedProvider.notifier).state =
+                !sidebarExpanded,
           ),
           const VerticalDivider(thickness: 1, width: 1),
           Expanded(child: body),
@@ -278,15 +282,10 @@ class _SidebarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final iconColor =
-        selected ? cs.onSecondaryContainer : cs.onSurfaceVariant;
+    final iconColor = selected ? cs.onSecondaryContainer : cs.onSurfaceVariant;
     final iconWidget = Transform.scale(
       scaleX: flipIcon ? -1 : 1,
-      child: Icon(
-        selected ? selectedIcon : icon,
-        color: iconColor,
-        size: 22,
-      ),
+      child: Icon(selected ? selectedIcon : icon, color: iconColor, size: 22),
     );
 
     return Tooltip(
@@ -301,20 +300,14 @@ class _SidebarItem extends StatelessWidget {
             duration: const Duration(milliseconds: 180),
             height: 44,
             decoration: BoxDecoration(
-              color:
-                  selected ? cs.secondaryContainer : Colors.transparent,
+              color: selected ? cs.secondaryContainer : Colors.transparent,
               borderRadius: BorderRadius.circular(10),
             ),
-            padding: EdgeInsets.symmetric(
-              horizontal: expanded ? 12 : 0,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: expanded ? 12 : 0),
             child: expanded
                 ? Row(
                     children: [
-                      SizedBox(
-                        width: 28,
-                        child: Center(child: iconWidget),
-                      ),
+                      SizedBox(width: 28, child: Center(child: iconWidget)),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
@@ -376,4 +369,3 @@ class _NarrowLayout extends StatelessWidget {
     );
   }
 }
-

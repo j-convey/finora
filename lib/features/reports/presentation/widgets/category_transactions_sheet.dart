@@ -28,17 +28,14 @@ class CategoryTransactionsSheet extends ConsumerWidget {
     final period = ref.watch(reportPeriodProvider);
     final start = period.start;
     final allTxns = ref.watch(transactionsProvider);
-    final accountsById = {
-      for (final a in ref.watch(accountsProvider)) a.id: a,
-    };
+    final accountsById = {for (final a in ref.watch(accountsProvider)) a.id: a};
 
     final txns = allTxns.where((t) {
       if (t.pending) return false;
       if (start != null && t.date.isBefore(start)) return false;
       if (isExpense ? !t.isExpense : !t.isIncome) return false;
       return t.category == category.name;
-    }).toList()
-      ..sort((a, b) => b.date.compareTo(a.date));
+    }).toList()..sort((a, b) => b.date.compareTo(a.date));
 
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
@@ -78,8 +75,9 @@ class CategoryTransactionsSheet extends ConsumerWidget {
                 Expanded(
                   child: Text(
                     category.name,
-                    style: tt.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
+                    style: tt.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 Column(
@@ -87,13 +85,15 @@ class CategoryTransactionsSheet extends ConsumerWidget {
                   children: [
                     Text(
                       formatCurrency(category.amount),
-                      style: tt.titleSmall
-                          ?.copyWith(fontWeight: FontWeight.bold),
+                      style: tt.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Text(
                       '${txns.length} transaction${txns.length == 1 ? '' : 's'}',
-                      style: tt.labelSmall
-                          ?.copyWith(color: cs.onSurfaceVariant),
+                      style: tt.labelSmall?.copyWith(
+                        color: cs.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -109,8 +109,9 @@ class CategoryTransactionsSheet extends ConsumerWidget {
                 ? Center(
                     child: Text(
                       'No transactions found',
-                      style: tt.bodyMedium
-                          ?.copyWith(color: cs.onSurfaceVariant),
+                      style: tt.bodyMedium?.copyWith(
+                        color: cs.onSurfaceVariant,
+                      ),
                     ),
                   )
                 : ListView.builder(
@@ -124,8 +125,7 @@ class CategoryTransactionsSheet extends ConsumerWidget {
                         account: t.accountId != null
                             ? accountsById[t.accountId]
                             : null,
-                        onTap: () =>
-                            showTransactionDetails(context, ref, t),
+                        onTap: () => showTransactionDetails(context, ref, t),
                         onCategoryTap: () =>
                             showCategoryPicker(context, ref, t),
                       );

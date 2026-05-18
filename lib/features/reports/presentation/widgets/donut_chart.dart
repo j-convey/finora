@@ -63,14 +63,12 @@ class _DonutChartState extends State<DonutChart> {
     var angle = math.atan2(dy, dx) + math.pi / 2;
     if (angle < 0) angle += 2 * math.pi;
 
-    final total =
-        widget.categories.fold(0.0, (s, c) => s + c.amount);
+    final total = widget.categories.fold(0.0, (s, c) => s + c.amount);
     if (total <= 0) return null;
 
     var startAngle = 0.0;
     for (int i = 0; i < widget.categories.length; i++) {
-      final sweep =
-          (widget.categories[i].amount / total) * 2 * math.pi;
+      final sweep = (widget.categories[i].amount / total) * 2 * math.pi;
       if (angle >= startAngle && angle < startAngle + sweep) return i;
       startAngle += sweep;
     }
@@ -97,13 +95,15 @@ class _DonutChartState extends State<DonutChart> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.donut_large_outlined,
-                  size: 48, color: cs.onSurfaceVariant),
+              Icon(
+                Icons.donut_large_outlined,
+                size: 48,
+                color: cs.onSurfaceVariant,
+              ),
               const SizedBox(height: 8),
               Text(
                 'No data for this period',
-                style:
-                    tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+                style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
               ),
             ],
           ),
@@ -125,8 +125,7 @@ class _DonutChartState extends State<DonutChart> {
                   onTapDown: (details) =>
                       _handleTap(details.localPosition, constraints),
                   child: CustomPaint(
-                    size: Size(
-                        constraints.maxWidth, constraints.maxHeight),
+                    size: Size(constraints.maxWidth, constraints.maxHeight),
                     painter: _DonutPainter(
                       categories: widget.categories,
                       selectedIndex: _selectedIndex,
@@ -138,12 +137,14 @@ class _DonutChartState extends State<DonutChart> {
                           Text(
                             _compact(widget.total),
                             style: tt.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold),
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           Text(
                             widget.centerLabel,
-                            style: tt.labelSmall
-                                ?.copyWith(color: cs.onSurfaceVariant),
+                            style: tt.labelSmall?.copyWith(
+                              color: cs.onSurfaceVariant,
+                            ),
                           ),
                         ],
                       ),
@@ -166,8 +167,7 @@ class _DonutChartState extends State<DonutChart> {
                     .take(7)
                     .map(
                       (c) => Padding(
-                        padding:
-                            const EdgeInsets.symmetric(vertical: 3.5),
+                        padding: const EdgeInsets.symmetric(vertical: 3.5),
                         child: Row(
                           children: [
                             Container(

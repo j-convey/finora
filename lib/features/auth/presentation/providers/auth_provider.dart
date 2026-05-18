@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/auth_tokens.dart';
 import '../../data/models/user_model.dart';
+import '../../../../core/providers/demo_mode_provider.dart';
 import '../../data/datasources/token_storage_service.dart';
 
 // ── Supporting types ──────────────────────────────────────────────────────────
@@ -45,6 +46,7 @@ class AuthState {
     this.user,
     this.isLoading = false,
     this.error,
+    this.isDemoModeActive = false,
   });
 
   final AuthStatus status;
@@ -56,8 +58,28 @@ class AuthState {
   final UserModel? user;
   final bool isLoading;
   final String? error;
+  final bool isDemoModeActive;
 
-  bool get isAuthenticated => status == AuthStatus.authenticated;
+  bool get isAuthenticated =>
+      status == AuthStatus.authenticated || isDemoModeActive;
+
+  UserModel? get activeUser {
+    if (isDemoModeActive) {
+      // Use real user info if we have it, so the UI shows "You (Demo)"
+      if (user != null) {
+        return user!.copyWith(fullName: '${user!.fullName ?? 'User'} (Demo)');
+      }
+      return UserModel(
+        id: 9999,
+        householdId: 1,
+        email: 'demo@finora.app',
+        fullName: 'Demo User',
+        isActive: true,
+        createdAt: DateTime.now(),
+      );
+    }
+    return user;
+  }
 
   AuthState copyWith({
     AuthStatus? status,
@@ -67,20 +89,26 @@ class AuthState {
     bool? isLoading,
     String? error,
     bool clearError = false,
-  }) =>
-      AuthState(
-        status: status ?? this.status,
-        serverUrl: serverUrl ?? this.serverUrl,
-        user: clearUser ? null : user ?? this.user,
-        isLoading: isLoading ?? this.isLoading,
-        error: clearError ? null : error ?? this.error,
-      );
+    bool? isDemoModeActive,
+  }) => AuthState(
+    status: status ?? this.status,
+    serverUrl: serverUrl ?? this.serverUrl,
+    user: clearUser ? null : user ?? this.user,
+    isLoading: isLoading ?? this.isLoading,
+    error: clearError ? null : error ?? this.error,
+    isDemoModeActive: isDemoModeActive ?? this.isDemoModeActive,
+  );
 }
 
 // ── Notifier ──────────────────────────────────────────────────────────────────
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier(this._ref) : super(const AuthState());
+  AuthNotifier(this._ref)
+    : super(AuthState(isDemoModeActive: _ref.read(demoModeProvider))) {
+    _ref.listen<bool>(demoModeProvider, (previous, isDemoMode) {
+      state = state.copyWith(isDemoModeActive: isDemoMode);
+    }, fireImmediately: true);
+  }
 
   final Ref _ref;
   TokenStorageService get _storage => _ref.read(tokenStorageProvider);
@@ -127,12 +155,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
           if (fullName != null && fullName.isNotEmpty) 'full_name': fullName,
         },
       );
-      
+
       // Handle wrapped response (server might return {"data": {...}})
       final tokenData = response.data is Map<String, dynamic>
           ? (response.data as Map<String, dynamic>)['data'] ?? response.data
           : response.data;
-      
+
       final tokens = AuthTokens.fromJson(tokenData as Map<String, dynamic>);
       await _storage.saveTokens(
         accessToken: tokens.accessToken,
@@ -150,10 +178,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   /// POST /api/auth/login
-  Future<bool> login({
-    required String email,
-    required String password,
-  }) async {
+  Future<bool> login({required String email, required String password}) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final dio = _buildDio();
@@ -162,12 +187,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
         data: {'email': email, 'password': password},
       );
       print('DEBUG: Login response: ${response.data}');
-      
+
       // Handle wrapped response (server might return {"data": {...}})
       final tokenData = response.data is Map<String, dynamic>
           ? (response.data as Map<String, dynamic>)['data'] ?? response.data
           : response.data;
-      
+
       final tokens = AuthTokens.fromJson(tokenData as Map<String, dynamic>);
       await _storage.saveTokens(
         accessToken: tokens.accessToken,
@@ -176,7 +201,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await _fetchCurrentUser();
       return true;
     } on DioException catch (e) {
-      print('DEBUG: DioException in login: ${e.message}, status: ${e.response?.statusCode}');
+      print(
+        'DEBUG: DioException in login: ${e.message}, status: ${e.response?.statusCode}',
+      );
       state = state.copyWith(isLoading: false, error: _extractError(e));
       return false;
     } catch (e) {
@@ -236,9 +263,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
           ),
         });
       } else {
-        data = {
-          if (fullName != null) 'full_name': fullName,
-        };
+        data = {if (fullName != null) 'full_name': fullName};
       }
 
       final response = await dio.patch<Map<String, dynamic>>(
@@ -288,11 +313,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<ServerProbeResult> probeServer(String url) async {
     final normalised = url.startsWith('http') ? url : 'http://$url';
     try {
-      final dio = Dio(BaseOptions(
-        baseUrl: normalised,
-        connectTimeout: const Duration(seconds: 6),
-        receiveTimeout: const Duration(seconds: 6),
-      ));
+      final dio = Dio(
+        BaseOptions(
+          baseUrl: normalised,
+          connectTimeout: const Duration(seconds: 6),
+          receiveTimeout: const Duration(seconds: 6),
+        ),
+      );
       // Use a syntactically valid email so Pydantic passes validation and the
       // handler actually runs the user-count check.  If users exist → 409.
       // If no users yet → 422 (missing password field) after the count passes.
@@ -337,12 +364,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
       dio.options.headers['Authorization'] = 'Bearer $accessToken';
       final response = await dio.get<dynamic>('/api/users/me');
       print('DEBUG: /api/users/me response: ${response.data}');
-      
+
       // Handle wrapped response (server might return {"data": {...}})
       final userData = response.data is Map<String, dynamic>
           ? (response.data as Map<String, dynamic>)['data'] ?? response.data
           : response.data;
-      
+
       final user = UserModel.fromJson(userData as Map<String, dynamic>);
       state = state.copyWith(
         isLoading: false,
@@ -350,7 +377,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
         user: user,
       );
     } on DioException catch (e) {
-      print('DEBUG: DioException in _fetchCurrentUser: ${e.message}, status: ${e.response?.statusCode}, data: ${e.response?.data}');
+      print(
+        'DEBUG: DioException in _fetchCurrentUser: ${e.message}, status: ${e.response?.statusCode}, data: ${e.response?.data}',
+      );
       if (e.response?.statusCode == 401) {
         final refreshed = await _tryRefreshTokens();
         if (refreshed) {
@@ -390,12 +419,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
         '/api/auth/refresh',
         data: {'refresh_token': refreshToken},
       );
-      
+
       // Handle wrapped response (server might return {"data": {...}})
       final tokenData = response.data is Map<String, dynamic>
           ? (response.data as Map<String, dynamic>)['data'] ?? response.data
           : response.data;
-      
+
       final tokens = AuthTokens.fromJson(tokenData as Map<String, dynamic>);
       await _storage.saveTokens(
         accessToken: tokens.accessToken,
@@ -409,13 +438,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Dio _buildDio() => Dio(
-        BaseOptions(
-          baseUrl: state.serverUrl,
-          connectTimeout: const Duration(seconds: 10),
-          receiveTimeout: const Duration(seconds: 10),
-          headers: {'Content-Type': 'application/json'},
-        ),
-      );
+    BaseOptions(
+      baseUrl: state.serverUrl,
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+      headers: {'Content-Type': 'application/json'},
+    ),
+  );
 
   static String _extractError(DioException e) {
     final data = e.response?.data;

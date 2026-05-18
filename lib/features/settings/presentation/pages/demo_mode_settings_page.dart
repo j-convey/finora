@@ -2,12 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/providers/demo_mode_provider.dart';
-import '../../../accounts/presentation/providers/accounts_provider.dart';
-import '../../../accounts/presentation/providers/net_worth_history_provider.dart';
-import '../../../budgets/presentation/providers/budgets_provider.dart';
-import '../../../subscriptions/presentation/providers/subscriptions_provider.dart';
-import '../../../transactions/presentation/providers/categories_provider.dart';
-import '../../../transactions/presentation/providers/transactions_provider.dart';
+import '../../../../core/services/demo_mode_service.dart';
 
 class DemoModeSettingsPage extends ConsumerStatefulWidget {
   const DemoModeSettingsPage({super.key});
@@ -19,26 +14,39 @@ class DemoModeSettingsPage extends ConsumerStatefulWidget {
 
 class _DemoModeSettingsPageState extends ConsumerState<DemoModeSettingsPage> {
   bool _isLoading = false;
+  String? _serverStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkServerStatus();
+  }
+
+  Future<void> _checkServerStatus() async {
+    final status = await ref
+        .read(demoModeServiceProvider)
+        .getServerDemoStatus();
+    if (mounted) setState(() => _serverStatus = status);
+  }
 
   Future<void> _toggle(bool enable) async {
     setState(() => _isLoading = true);
-    ref.read(demoModeProvider.notifier).state = enable;
-    // apiClientProvider rebuilds automatically because it watches demoModeProvider.
-    // Trigger a full data resync so every provider picks up either demo or
-    // real data immediately.
+    final demoModeService = ref.read(demoModeServiceProvider);
+
     try {
-      await Future.wait([
-        ref.read(accountsProvider.notifier).sync(),
-        ref.read(transactionsProvider.notifier).sync(),
-        ref.read(budgetsProvider.notifier).sync(),
-        ref.read(subscriptionsProvider.notifier).sync(),
-        ref.read(categoryGroupsProvider.notifier).sync(),
-        ref.read(netWorthHistoryProvider.notifier).fetch(),
-      ]);
+      await demoModeService.toggleDemoMode(enable);
     } catch (_) {
-      // Swallow errors from the real server when exiting demo mode with no
-      // connectivity — the user can manually sync later.
+      // Typically errors like 429 are swallowed by the service,
+      // but if any bubble up, we handle them.
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to toggle demo mode. Please try again.'),
+          ),
+        );
+      }
     }
+
     if (mounted) setState(() => _isLoading = false);
   }
 
@@ -133,21 +141,41 @@ class _DemoModeSettingsPageState extends ConsumerState<DemoModeSettingsPage> {
             const SizedBox(height: 32),
             const Divider(),
             const SizedBox(height: 8),
-            Text(
-              'Demo data',
-              style: tt.labelMedium?.copyWith(
-                  color: cs.primary, fontWeight: FontWeight.w600),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Demo data',
+                  style: tt.labelMedium?.copyWith(
+                    color: cs.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (_serverStatus != null)
+                  Text(
+                    'Server: $_serverStatus',
+                    style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
+                  ),
+              ],
             ),
             const SizedBox(height: 8),
             _demoInfoRow(
-                context, Icons.account_balance_wallet_outlined, '3 accounts'),
+              context,
+              Icons.account_balance_wallet_outlined,
+              '3 accounts',
+            ),
             _demoInfoRow(
-                context, Icons.credit_card_outlined, '35 transactions'),
-            _demoInfoRow(
-                context, Icons.account_balance_outlined, '4 budgets'),
+              context,
+              Icons.credit_card_outlined,
+              '35 transactions',
+            ),
+            _demoInfoRow(context, Icons.account_balance_outlined, '4 budgets'),
             _demoInfoRow(context, Icons.repeat_outlined, '3 subscriptions'),
-            _demoInfoRow(context, Icons.timeline_outlined,
-                '6 months net worth history'),
+            _demoInfoRow(
+              context,
+              Icons.timeline_outlined,
+              '6 months net worth history',
+            ),
           ],
         ],
       ),

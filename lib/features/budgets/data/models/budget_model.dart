@@ -35,15 +35,14 @@ class BudgetModel {
     double? spent,
     Color? color,
     IconData? icon,
-  }) =>
-      BudgetModel(
-        id: id ?? this.id,
-        category: category ?? this.category,
-        allocated: allocated ?? this.allocated,
-        spent: spent ?? this.spent,
-        color: color ?? this.color,
-        icon: icon ?? this.icon,
-      );
+  }) => BudgetModel(
+    id: id ?? this.id,
+    category: category ?? this.category,
+    allocated: allocated ?? this.allocated,
+    spent: spent ?? this.spent,
+    color: color ?? this.color,
+    icon: icon ?? this.icon,
+  );
 
   factory BudgetModel.fromJson(Map<String, dynamic> json) {
     final category = json['category'] as String;
@@ -63,16 +62,16 @@ class BudgetModel {
   }
 
   static IconData iconForCategory(String category) => switch (category) {
-        'Groceries' => Icons.shopping_basket_outlined,
-        'Dining' => Icons.restaurant_outlined,
-        'Transport' => Icons.directions_car_outlined,
-        'Entertainment' => Icons.movie_outlined,
-        'Utilities' => Icons.bolt_outlined,
-        'Health' => Icons.favorite_border,
-        'Shopping' => Icons.shopping_bag_outlined,
-        'Subscriptions' => Icons.repeat_outlined,
-        'Rent' => Icons.home_outlined,
-        'Travel' => Icons.flight_outlined,
-        _ => Icons.category_outlined,
-      };
+    'Groceries' => Icons.shopping_basket_outlined,
+    'Dining' => Icons.restaurant_outlined,
+    'Transport' => Icons.directions_car_outlined,
+    'Entertainment' => Icons.movie_outlined,
+    'Utilities' => Icons.bolt_outlined,
+    'Health' => Icons.favorite_border,
+    'Shopping' => Icons.shopping_bag_outlined,
+    'Subscriptions' => Icons.repeat_outlined,
+    'Rent' => Icons.home_outlined,
+    'Travel' => Icons.flight_outlined,
+    _ => Icons.category_outlined,
+  };
 }

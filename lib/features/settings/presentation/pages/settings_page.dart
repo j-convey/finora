@@ -44,8 +44,8 @@ class SettingsPage extends ConsumerWidget {
 
     final bankLabel = simplefin.isConnected
         ? (simplefin.connectedInstitutions.isEmpty
-            ? 'Connected'
-            : simplefin.connectedInstitutions.join(', '))
+              ? 'Connected'
+              : simplefin.connectedInstitutions.join(', '))
         : 'Not connected';
 
     return Scaffold(
@@ -94,8 +94,7 @@ class SettingsPage extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (_) => const AccountSettingsPage()),
+              MaterialPageRoute(builder: (_) => const AccountSettingsPage()),
             ),
           ),
           const Divider(),
@@ -113,8 +112,7 @@ class SettingsPage extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (_) => const BankConnectionsPage()),
+              MaterialPageRoute(builder: (_) => const BankConnectionsPage()),
             ),
           ),
           const Divider(),
@@ -127,8 +125,7 @@ class SettingsPage extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (_) => const AppearanceSettingsPage()),
+              MaterialPageRoute(builder: (_) => const AppearanceSettingsPage()),
             ),
           ),
           const Divider(),
@@ -142,7 +139,8 @@ class SettingsPage extends ConsumerWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (_) => const NotificationsSettingsPage()),
+                builder: (_) => const NotificationsSettingsPage(),
+              ),
             ),
           ),
           const Divider(),
@@ -172,14 +170,15 @@ class SettingsPage extends ConsumerWidget {
                   ? const TextStyle(color: Color(0xFFE65100))
                   : null,
             ),
-            subtitle: Text(isDemoMode ? 'Active — tap to exit' : 'Explore with sample data'),
+            subtitle: Text(
+              isDemoMode ? 'Active — tap to exit' : 'Explore with sample data',
+            ),
             trailing: isDemoMode
                 ? const Icon(Icons.circle, color: Color(0xFFE65100), size: 10)
                 : const Icon(Icons.chevron_right),
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (_) => const DemoModeSettingsPage()),
+              MaterialPageRoute(builder: (_) => const DemoModeSettingsPage()),
             ),
           ),
           const Divider(),
@@ -201,4 +200,3 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 }
-

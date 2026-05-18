@@ -5,8 +5,7 @@ import '../../data/models/net_worth_history_model.dart';
 
 class NetWorthHistoryNotifier
     extends StateNotifier<AsyncValue<NetWorthHistory>> {
-  NetWorthHistoryNotifier(this._ref)
-      : super(const AsyncValue.loading());
+  NetWorthHistoryNotifier(this._ref) : super(const AsyncValue.loading());
 
   final Ref _ref;
 
@@ -33,5 +32,5 @@ class NetWorthHistoryNotifier
 
 final netWorthHistoryProvider =
     StateNotifierProvider<NetWorthHistoryNotifier, AsyncValue<NetWorthHistory>>(
-  (ref) => NetWorthHistoryNotifier(ref),
-);
+      (ref) => NetWorthHistoryNotifier(ref),
+    );

@@ -84,10 +84,7 @@ class _CashFlowPainter extends CustomPainter {
     final chartH = size.height - _bottomPad - _topPad;
     final chartW = size.width - _leftPad;
 
-    final labelStyle = TextStyle(
-      color: labelColor,
-      fontSize: labelFontSize,
-    );
+    final labelStyle = TextStyle(color: labelColor, fontSize: labelFontSize);
 
     // ── Grid lines + Y-axis labels ─────────────────────────────────────────
     final gridPaint = Paint()
@@ -100,8 +97,14 @@ class _CashFlowPainter extends CustomPainter {
       canvas.drawLine(Offset(_leftPad, y), Offset(size.width, y), gridPaint);
 
       final label = _compactY(maxValue * frac);
-      _text(canvas, label, labelStyle,
-          Offset(0, y - labelFontSize / 2), _leftPad - 4, TextAlign.right);
+      _text(
+        canvas,
+        label,
+        labelStyle,
+        Offset(0, y - labelFontSize / 2),
+        _leftPad - 4,
+        TextAlign.right,
+      );
     }
 
     // ── Bars ───────────────────────────────────────────────────────────────
@@ -122,18 +125,28 @@ class _CashFlowPainter extends CustomPainter {
       final ih = (m.income / maxValue) * chartH;
       final iRect = Rect.fromLTWH(gx, _topPad + chartH - ih, barW, ih);
       canvas.drawRRect(
-        RRect.fromRectAndCorners(iRect,
-            topLeft: topRadius, topRight: topRadius),
+        RRect.fromRectAndCorners(
+          iRect,
+          topLeft: topRadius,
+          topRight: topRadius,
+        ),
         incomePaint,
       );
 
       // Expense bar
       final eh = (m.expenses / maxValue) * chartH;
       final eRect = Rect.fromLTWH(
-          gx + barW + barGap, _topPad + chartH - eh, barW, eh);
+        gx + barW + barGap,
+        _topPad + chartH - eh,
+        barW,
+        eh,
+      );
       canvas.drawRRect(
-        RRect.fromRectAndCorners(eRect,
-            topLeft: topRadius, topRight: topRadius),
+        RRect.fromRectAndCorners(
+          eRect,
+          topLeft: topRadius,
+          topRight: topRadius,
+        ),
         expensePaint,
       );
 
@@ -152,8 +165,14 @@ class _CashFlowPainter extends CustomPainter {
     }
   }
 
-  void _text(Canvas canvas, String text, TextStyle style, Offset offset,
-      double maxWidth, TextAlign align) {
+  void _text(
+    Canvas canvas,
+    String text,
+    TextStyle style,
+    Offset offset,
+    double maxWidth,
+    TextAlign align,
+  ) {
     final tp = TextPainter(
       text: TextSpan(text: text, style: style),
       textDirection: ui.TextDirection.ltr,

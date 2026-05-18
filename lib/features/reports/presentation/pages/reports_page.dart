@@ -47,7 +47,8 @@ class _ReportsPageState extends ConsumerState<ReportsPage>
   Widget build(BuildContext context) {
     final period = ref.watch(reportPeriodProvider);
     final summary = ref.watch(reportSummaryProvider);
-    final isMobilePlatform = Theme.of(context).platform == TargetPlatform.android ||
+    final isMobilePlatform =
+        Theme.of(context).platform == TargetPlatform.android ||
         Theme.of(context).platform == TargetPlatform.iOS;
 
     return Scaffold(
@@ -67,9 +68,14 @@ class _ReportsPageState extends ConsumerState<ReportsPage>
             builder: (context, ref, _) {
               final hidden = ref.watch(hideAmountsProvider);
               return IconButton(
-                icon: Icon(hidden ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                icon: Icon(
+                  hidden
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                ),
                 tooltip: hidden ? 'Show amounts' : 'Hide amounts',
-                onPressed: () => ref.read(hideAmountsProvider.notifier).state = !hidden,
+                onPressed: () =>
+                    ref.read(hideAmountsProvider.notifier).state = !hidden,
               );
             },
           ),
@@ -172,8 +178,9 @@ class _CashFlowTab extends ConsumerWidget {
                     children: [
                       Text(
                         'Net Cash Flow',
-                        style: tt.labelMedium
-                            ?.copyWith(color: cs.onSurfaceVariant),
+                        style: tt.labelMedium?.copyWith(
+                          color: cs.onSurfaceVariant,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -195,13 +202,17 @@ class _CashFlowTab extends ConsumerWidget {
                   children: [
                     _InlineStat(
                       label: 'Income',
-                      value: hidden ? '••••••' : '+${formatCurrency(summary.totalIncome)}',
+                      value: hidden
+                          ? '••••••'
+                          : '+${formatCurrency(summary.totalIncome)}',
                       color: const Color(0xFF4CAF50),
                     ),
                     const SizedBox(height: 4),
                     _InlineStat(
                       label: 'Expenses',
-                      value: hidden ? '••••••' : formatCurrency(summary.totalExpenses),
+                      value: hidden
+                          ? '••••••'
+                          : formatCurrency(summary.totalExpenses),
                       color: const Color(0xFFEF5350),
                     ),
                   ],
@@ -218,11 +229,9 @@ class _CashFlowTab extends ConsumerWidget {
             children: [
               Text('Monthly breakdown', style: tt.titleSmall),
               const Spacer(),
-              _LegendDot(
-                  color: const Color(0xFF4CAF50), label: 'Income'),
+              _LegendDot(color: const Color(0xFF4CAF50), label: 'Income'),
               const SizedBox(width: 12),
-              _LegendDot(
-                  color: const Color(0xFFEF5350), label: 'Expenses'),
+              _LegendDot(color: const Color(0xFFEF5350), label: 'Expenses'),
             ],
           ),
           const SizedBox(height: 8),
@@ -258,12 +267,18 @@ class _InlineStat extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(label,
-            style: tt.labelSmall?.copyWith(color: color.withAlpha(180))),
+        Text(
+          label,
+          style: tt.labelSmall?.copyWith(color: color.withAlpha(180)),
+        ),
         const SizedBox(width: 4),
-        Text(value,
-            style: tt.labelSmall
-                ?.copyWith(color: color, fontWeight: FontWeight.bold)),
+        Text(
+          value,
+          style: tt.labelSmall?.copyWith(
+            color: color,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ],
     );
   }
@@ -367,17 +382,16 @@ class _CategoryTabState extends ConsumerState<_CategoryTab> {
           const SizedBox(height: 8),
           Card(
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 children: [
-                  ...displayedCats
-                      .map((c) => CategoryLegendTile(category: c)),
+                  ...displayedCats.map((c) => CategoryLegendTile(category: c)),
                   if (widget.categories.length > 8) ...[
                     const Divider(height: 8),
                     TextButton(
-                      onPressed: () =>
-                          setState(() => _showAllCategories = !_showAllCategories),
+                      onPressed: () => setState(
+                        () => _showAllCategories = !_showAllCategories,
+                      ),
                       child: Text(
                         _showAllCategories
                             ? 'Show less'
@@ -403,13 +417,14 @@ class _CategoryTabState extends ConsumerState<_CategoryTab> {
             style: tt.titleSmall,
           ),
           const SizedBox(height: 8),
-          ...widget.recentTransactions
-              .map((t) => TransactionCard(
-                    transaction: t,
-                    account: t.accountId != null ? accountsById[t.accountId] : null,
-                    onTap: () => showTransactionDetails(context, ref, t),
-                    onCategoryTap: () => showCategoryPicker(context, ref, t),
-                  )),
+          ...widget.recentTransactions.map(
+            (t) => TransactionCard(
+              transaction: t,
+              account: t.accountId != null ? accountsById[t.accountId] : null,
+              onTap: () => showTransactionDetails(context, ref, t),
+              onCategoryTap: () => showCategoryPicker(context, ref, t),
+            ),
+          ),
         ],
       ],
     );

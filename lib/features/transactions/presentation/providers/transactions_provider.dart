@@ -33,7 +33,11 @@ class TransactionsNotifier extends StateNotifier<List<Transaction>> {
     state = [];
   }
 
-  Future<void> updateCategory(String id, int categoryId, String categoryName) async {
+  Future<void> updateCategory(
+    String id,
+    int categoryId,
+    String categoryName,
+  ) async {
     final repository = _ref.read(transactionsRepositoryProvider);
     // Optimistic update — show the new name immediately.
     state = state
@@ -64,9 +68,7 @@ class TransactionsNotifier extends StateNotifier<List<Transaction>> {
   Future<void> updateType(String id, TransactionType type) async {
     final repository = _ref.read(transactionsRepositoryProvider);
     // Optimistic update
-    state = state
-        .map((t) => t.id == id ? t.copyWith(type: type) : t)
-        .toList();
+    state = state.map((t) => t.id == id ? t.copyWith(type: type) : t).toList();
     try {
       await repository.updateTransaction(id, {'type': type.toJson()});
     } catch (_) {
@@ -86,7 +88,9 @@ class TransactionsNotifier extends StateNotifier<List<Transaction>> {
         .toList();
     // Append child splits (de-duplicate in case of retry)
     final existingIds = state.map((t) => t.id).toSet();
-    final newChildren = children.where((c) => !existingIds.contains(c.id)).toList();
+    final newChildren = children
+        .where((c) => !existingIds.contains(c.id))
+        .toList();
     state = [...state, ...newChildren];
   }
 
@@ -97,16 +101,17 @@ class TransactionsNotifier extends StateNotifier<List<Transaction>> {
     state = state.where((t) => t.parentTransactionId != transactionId).toList();
     // Restore parent to normal
     state = state
-        .map((t) => t.id == transactionId ? t.copyWith(isSplitParent: false) : t)
+        .map(
+          (t) => t.id == transactionId ? t.copyWith(isSplitParent: false) : t,
+        )
         .toList();
   }
 
   void clearReviewFlag(String transactionId) {
     state = state
         .map(
-          (t) => t.id == transactionId
-              ? t.copyWith(requiresUserReview: false)
-              : t,
+          (t) =>
+              t.id == transactionId ? t.copyWith(requiresUserReview: false) : t,
         )
         .toList();
   }
@@ -114,5 +119,5 @@ class TransactionsNotifier extends StateNotifier<List<Transaction>> {
 
 final transactionsProvider =
     StateNotifierProvider<TransactionsNotifier, List<Transaction>>(
-  (ref) => TransactionsNotifier(ref),
-);
+      (ref) => TransactionsNotifier(ref),
+    );

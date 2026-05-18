@@ -79,8 +79,7 @@ class ReimbursementListResponse {
         allocatedAmount: (json['allocated_amount'] as num).toDouble(),
         remainingAmount: (json['remaining_amount'] as num).toDouble(),
         reimbursements: (json['reimbursements'] as List<dynamic>)
-            .map((j) =>
-                ReimbursementModel.fromJson(j as Map<String, dynamic>))
+            .map((j) => ReimbursementModel.fromJson(j as Map<String, dynamic>))
             .toList(),
       );
 }

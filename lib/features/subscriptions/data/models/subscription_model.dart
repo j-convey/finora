@@ -46,10 +46,14 @@ class SubscriptionModel {
   String get recurrenceLabel {
     final interval = recurrenceInterval > 1 ? '$recurrenceInterval ' : '';
     return switch (recurrenceUnit) {
-      RecurrenceUnit.day => '${interval}day${recurrenceInterval > 1 ? 's' : ''}',
-      RecurrenceUnit.week => '${interval}week${recurrenceInterval > 1 ? 's' : ''}',
-      RecurrenceUnit.month => '${interval}month${recurrenceInterval > 1 ? 's' : ''}',
-      RecurrenceUnit.year => '${interval}year${recurrenceInterval > 1 ? 's' : ''}',
+      RecurrenceUnit.day =>
+        '${interval}day${recurrenceInterval > 1 ? 's' : ''}',
+      RecurrenceUnit.week =>
+        '${interval}week${recurrenceInterval > 1 ? 's' : ''}',
+      RecurrenceUnit.month =>
+        '${interval}month${recurrenceInterval > 1 ? 's' : ''}',
+      RecurrenceUnit.year =>
+        '${interval}year${recurrenceInterval > 1 ? 's' : ''}',
     };
   }
 
@@ -66,13 +70,15 @@ class SubscriptionModel {
   };
 
   static SubscriptionStatus _parseStatus(String value) {
-    return SubscriptionStatus.values
-        .firstWhere((s) => s.toString().split('.').last == value);
+    return SubscriptionStatus.values.firstWhere(
+      (s) => s.toString().split('.').last == value,
+    );
   }
 
   static RecurrenceUnit _parseRecurrenceUnit(String value) {
-    return RecurrenceUnit.values
-        .firstWhere((u) => u.toString().split('.').last == value);
+    return RecurrenceUnit.values.firstWhere(
+      (u) => u.toString().split('.').last == value,
+    );
   }
 
   SubscriptionModel copyWith({
@@ -93,26 +99,25 @@ class SubscriptionModel {
     String? matchingNotes,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) =>
-      SubscriptionModel(
-        id: id ?? this.id,
-        name: name ?? this.name,
-        merchantName: merchantName ?? this.merchantName,
-        category: category ?? this.category,
-        expectedAmount: expectedAmount ?? this.expectedAmount,
-        minAmount: minAmount ?? this.minAmount,
-        maxAmount: maxAmount ?? this.maxAmount,
-        recurrenceInterval: recurrenceInterval ?? this.recurrenceInterval,
-        recurrenceUnit: recurrenceUnit ?? this.recurrenceUnit,
-        startDate: startDate ?? this.startDate,
-        endDate: endDate ?? this.endDate,
-        nextDueDate: nextDueDate ?? this.nextDueDate,
-        status: status ?? this.status,
-        autoLinkEnabled: autoLinkEnabled ?? this.autoLinkEnabled,
-        matchingNotes: matchingNotes ?? this.matchingNotes,
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-      );
+  }) => SubscriptionModel(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    merchantName: merchantName ?? this.merchantName,
+    category: category ?? this.category,
+    expectedAmount: expectedAmount ?? this.expectedAmount,
+    minAmount: minAmount ?? this.minAmount,
+    maxAmount: maxAmount ?? this.maxAmount,
+    recurrenceInterval: recurrenceInterval ?? this.recurrenceInterval,
+    recurrenceUnit: recurrenceUnit ?? this.recurrenceUnit,
+    startDate: startDate ?? this.startDate,
+    endDate: endDate ?? this.endDate,
+    nextDueDate: nextDueDate ?? this.nextDueDate,
+    status: status ?? this.status,
+    autoLinkEnabled: autoLinkEnabled ?? this.autoLinkEnabled,
+    matchingNotes: matchingNotes ?? this.matchingNotes,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
 
   factory SubscriptionModel.fromJson(Map<String, dynamic> json) {
     return SubscriptionModel(
@@ -130,8 +135,9 @@ class SubscriptionModel {
           ? (json['max_amount'] as num).toDouble()
           : null,
       recurrenceInterval: json['recurrence_interval'] as int? ?? 1,
-      recurrenceUnit:
-          _parseRecurrenceUnit(json['recurrence_unit'] as String? ?? 'month'),
+      recurrenceUnit: _parseRecurrenceUnit(
+        json['recurrence_unit'] as String? ?? 'month',
+      ),
       startDate: json['start_date'] != null
           ? DateTime.parse(json['start_date'] as String)
           : null,

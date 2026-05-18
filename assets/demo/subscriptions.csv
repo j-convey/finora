@@ -1,4 +1,0 @@
-id,name,merchant_name,category,expected_amount,recurrence_interval,recurrence_unit,start_date,next_due_date,status,auto_link_enabled
-demo-sub-1,Netflix,Netflix,Subscriptions,15.99,1,month,2024-01-05,2026-06-05,active,true
-demo-sub-2,Spotify,Spotify,Subscriptions,9.99,1,month,2024-03-15,2026-06-15,active,true
-demo-sub-3,Amazon Prime,Amazon,Subscriptions,14.99,1,month,2023-12-01,2026-06-01,active,false

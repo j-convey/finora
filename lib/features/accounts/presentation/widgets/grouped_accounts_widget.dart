@@ -46,8 +46,9 @@ class _GroupedAccountsWidgetState extends State<GroupedAccountsWidget> {
       AccountType.investment,
     ];
 
-    final sortedTypes =
-        typeOrder.where((t) => groupedAccounts.containsKey(t)).toList();
+    final sortedTypes = typeOrder
+        .where((t) => groupedAccounts.containsKey(t))
+        .toList();
 
     return Column(
       children: sortedTypes.map((type) {
@@ -105,11 +106,7 @@ class _AccountGroup extends ConsumerWidget {
             onExpansionChanged: onExpandChanged,
             title: Row(
               children: [
-                Icon(
-                  type.icon,
-                  size: 24,
-                  color: cs.primary,
-                ),
+                Icon(type.icon, size: 24, color: cs.primary),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -117,13 +114,15 @@ class _AccountGroup extends ConsumerWidget {
                     children: [
                       Text(
                         type.label,
-                        style: tt.bodyLarge
-                            ?.copyWith(fontWeight: FontWeight.w500),
+                        style: tt.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       Text(
                         '${accounts.length} ${accounts.length == 1 ? 'account' : 'accounts'}',
-                        style: tt.labelSmall
-                            ?.copyWith(color: cs.onSurfaceVariant),
+                        style: tt.labelSmall?.copyWith(
+                          color: cs.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),
@@ -142,10 +141,12 @@ class _AccountGroup extends ConsumerWidget {
               ],
             ),
             children: accounts
-                .map((a) => _AccountListItem(
-                      account: a,
-                      onTypeChanged: onTypeChanged,
-                    ))
+                .map(
+                  (a) => _AccountListItem(
+                    account: a,
+                    onTypeChanged: onTypeChanged,
+                  ),
+                )
                 .toList(),
           ),
         ),
@@ -156,10 +157,7 @@ class _AccountGroup extends ConsumerWidget {
 }
 
 class _AccountListItem extends ConsumerWidget {
-  const _AccountListItem({
-    required this.account,
-    this.onTypeChanged,
-  });
+  const _AccountListItem({required this.account, this.onTypeChanged});
 
   final Account account;
   final void Function(Account account, AccountType newType)? onTypeChanged;
@@ -188,22 +186,21 @@ class _AccountListItem extends ConsumerWidget {
         children: [
           CircleAvatar(
             backgroundColor: color.withAlpha(30),
-            child: Icon(account.icon,
-                color: color, size: 20),
+            child: Icon(account.icon, color: color, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(account.name,
-                    style: tt.bodyMedium
-                        ?.copyWith(fontWeight: FontWeight.w500)),
+                Text(
+                  account.name,
+                  style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+                ),
                 if (account.institutionName != null)
                   Text(
                     account.institutionName!,
-                    style: tt.labelSmall
-                        ?.copyWith(color: cs.onSurfaceVariant),
+                    style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
                   ),
                 if (!hidden &&
                     account.availableBalance != null &&
@@ -211,8 +208,7 @@ class _AccountListItem extends ConsumerWidget {
                         account.type == AccountType.savings))
                   Text(
                     'Available: ${formatCurrency(account.availableBalance!)}',
-                    style: tt.labelSmall
-                        ?.copyWith(color: cs.onSurfaceVariant),
+                    style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
                   ),
               ],
             ),
@@ -230,16 +226,18 @@ class _AccountListItem extends ConsumerWidget {
               if (account.updatedAt != null)
                 Text(
                   _relativeTime(account.updatedAt!),
-                  style: tt.labelSmall
-                      ?.copyWith(color: cs.onSurfaceVariant),
+                  style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
                 ),
             ],
           ),
           if (onTypeChanged != null) ...[
             const SizedBox(width: 8),
             IconButton(
-              icon: Icon(Icons.edit_outlined,
-                  size: 18, color: cs.onSurfaceVariant),
+              icon: Icon(
+                Icons.edit_outlined,
+                size: 18,
+                color: cs.onSurfaceVariant,
+              ),
               tooltip: 'Change account type',
               onPressed: () => _showTypePicker(context),
               visualDensity: VisualDensity.compact,
@@ -289,9 +287,7 @@ class _AccountTypePickerDialog extends StatelessWidget {
                 color: selected ? cs.primary : null,
               ),
             ),
-            trailing: selected
-                ? Icon(Icons.check, color: cs.primary)
-                : null,
+            trailing: selected ? Icon(Icons.check, color: cs.primary) : null,
             onTap: () => Navigator.of(context).pop(type),
           );
         }).toList(),

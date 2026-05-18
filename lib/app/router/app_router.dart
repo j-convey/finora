@@ -17,7 +17,7 @@ class _AuthStatusNotifier extends ChangeNotifier {
   _AuthStatusNotifier(Ref ref) {
     ref.listen<AuthStatus>(
       authProvider.select((s) => s.status),
-      (_, _) => notifyListeners(),
+      (previous, next) => notifyListeners(),
     );
   }
 }
@@ -49,14 +49,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/setup',
-        builder: (context, state) => const SetupPage(),
-      ),
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => const MainShell(),
-      ),
+      GoRoute(path: '/setup', builder: (context, state) => const SetupPage()),
+      GoRoute(path: '/home', builder: (context, state) => const MainShell()),
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsPage(),
@@ -72,4 +66,3 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
-
