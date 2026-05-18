@@ -29,10 +29,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final password = _passwordController.text;
     if (email.isEmpty || password.isEmpty) return;
 
-    await ref.read(authProvider.notifier).login(
-          email: email,
-          password: password,
-        );
+    await ref
+        .read(authProvider.notifier)
+        .login(email: email, password: password);
     // On success the router redirect handles navigation to /home.
   }
 
@@ -89,9 +88,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     prefixIcon: const Icon(Icons.lock_outline),
                     border: const OutlineInputBorder(),
                     suffixIcon: IconButton(
-                      icon: Icon(_obscurePassword
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined),
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                      ),
                       onPressed: () =>
                           setState(() => _obscurePassword = !_obscurePassword),
                     ),
@@ -137,14 +138,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           try {
                             await demoService.toggleDemoMode(true);
                           } catch (e, st) {
-                            debugPrint('ERROR: Failed to enter demo mode from login page.');
+                            debugPrint(
+                              'ERROR: Failed to enter demo mode from login page.',
+                            );
                             debugPrint('Exception: $e');
                             debugPrint('StackTrace: $st');
                             if (!context.mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                    'Failed to enter demo mode. Try again. Error: $e'),
+                                  'Failed to enter demo mode. Try again. Error: $e',
+                                ),
                               ),
                             );
                           }

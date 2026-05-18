@@ -49,14 +49,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/setup',
-        builder: (context, state) => const SetupPage(),
-      ),
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => const MainShell(),
-      ),
+      GoRoute(path: '/setup', builder: (context, state) => const SetupPage()),
+      GoRoute(path: '/home', builder: (context, state) => const MainShell()),
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsPage(),

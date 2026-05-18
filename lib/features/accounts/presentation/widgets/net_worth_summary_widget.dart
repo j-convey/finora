@@ -31,11 +31,13 @@ class NetWorthSummaryWidget extends ConsumerWidget {
 
     // Calculate change and percentage
     final change = currentNetWorth - previousNetWorth;
-    final changePercentage =
-        previousNetWorth != 0 ? (change / previousNetWorth.abs()) * 100 : 0.0;
+    final changePercentage = previousNetWorth != 0
+        ? (change / previousNetWorth.abs()) * 100
+        : 0.0;
     final isPositive = change >= 0;
-    final changeColor =
-        isPositive ? const Color(0xFF4CAF50) : const Color(0xFFEF5350);
+    final changeColor = isPositive
+        ? const Color(0xFF4CAF50)
+        : const Color(0xFFEF5350);
 
     return Card(
       color: cs.primaryContainer,
@@ -44,9 +46,12 @@ class NetWorthSummaryWidget extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('NET WORTH',
-                style: tt.labelSmall
-                    ?.copyWith(color: cs.onPrimaryContainer.withAlpha(178))),
+            Text(
+              'NET WORTH',
+              style: tt.labelSmall?.copyWith(
+                color: cs.onPrimaryContainer.withAlpha(178),
+              ),
+            ),
             const SizedBox(height: 8),
             MaskedAmount(
               currentNetWorth,
@@ -74,8 +79,9 @@ class NetWorthSummaryWidget extends ConsumerWidget {
                 Flexible(
                   child: Text(
                     '1 month change',
-                    style: tt.labelSmall
-                        ?.copyWith(color: cs.onPrimaryContainer.withAlpha(178)),
+                    style: tt.labelSmall?.copyWith(
+                      color: cs.onPrimaryContainer.withAlpha(178),
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),

@@ -10,11 +10,7 @@ class BankConnectionsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(title: const Text('Bank Connections')),
-      body: ListView(
-        children: const [
-          _SimplefinSection(),
-        ],
-      ),
+      body: ListView(children: const [_SimplefinSection()]),
     );
   }
 }
@@ -86,12 +82,15 @@ class _SimplefinSection extends ConsumerWidget {
                   itemBuilder: (_) => const [
                     PopupMenuItem(value: 'fetch', child: Text('Fetch latest')),
                     PopupMenuItem(
-                        value: 'disconnect', child: Text('Disconnect')),
+                      value: 'disconnect',
+                      child: Text('Disconnect'),
+                    ),
                   ],
                 )
               : TextButton(
-                  onPressed:
-                      isBusy ? null : () => _showConnectSheet(context, ref),
+                  onPressed: isBusy
+                      ? null
+                      : () => _showConnectSheet(context, ref),
                   child: const Text('Connect'),
                 ),
         ),
@@ -232,8 +231,9 @@ class _ConnectSimplefinSheetState extends State<_ConnectSimplefinSheet> {
               children: [
                 Text(
                   'How to get your Setup Token:',
-                  style:
-                      tt.labelMedium?.copyWith(color: cs.onSecondaryContainer),
+                  style: tt.labelMedium?.copyWith(
+                    color: cs.onSecondaryContainer,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(

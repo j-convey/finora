@@ -26,7 +26,8 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
     final filters = ref.watch(transactionFiltersProvider);
     final accounts = ref.watch(accountsProvider);
     final accountsById = {for (final a in accounts) a.id: a};
-    final isMobile = Theme.of(context).platform == TargetPlatform.android ||
+    final isMobile =
+        Theme.of(context).platform == TargetPlatform.android ||
         Theme.of(context).platform == TargetPlatform.iOS;
 
     // 1. Filter
@@ -38,7 +39,8 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
       // Search
       if (filters.search.isNotEmpty) {
         final q = filters.search.toLowerCase();
-        final match = t.title.toLowerCase().contains(q) ||
+        final match =
+            t.title.toLowerCase().contains(q) ||
             t.category.toLowerCase().contains(q);
         if (!match) return false;
       }
@@ -79,7 +81,8 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
     }
 
     // 3. Grouping (only if sorted by date)
-    final isSortedByDate = filters.sortBy == TransactionSort.latest ||
+    final isSortedByDate =
+        filters.sortBy == TransactionSort.latest ||
         filters.sortBy == TransactionSort.oldest;
 
     final grouped = <String, List<Transaction>>{};
@@ -92,8 +95,9 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
 
     // Budget totals exclude split parents (ghost rows) and transfers.
     // Only real leaf transactions and unsplit transactions are counted.
-    final budgetable = all
-        .where((t) => !t.isSplitParent && t.type != TransactionType.transfer);
+    final budgetable = all.where(
+      (t) => !t.isSplitParent && t.type != TransactionType.transfer,
+    );
     final totalIncome = budgetable
         .where((t) => t.isIncome && !t.pending)
         .fold(0.0, (s, t) => s + t.amount);
@@ -183,12 +187,12 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
                       padding: const EdgeInsets.only(bottom: 4, top: 8),
                       child: Text(
                         entry.key,
-                        style:
-                            Theme.of(context).textTheme.labelMedium?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
+                            ),
                       ),
                     ),
                     ...entry.value.map(
@@ -263,7 +267,7 @@ class _FilterSheet extends ConsumerWidget {
       'September',
       'October',
       'November',
-      'December'
+      'December',
     ];
 
     return DraggableScrollableSheet(
@@ -323,15 +327,18 @@ class _FilterSheet extends ConsumerWidget {
                 value: null,
                 child: Text('All Accounts', overflow: TextOverflow.ellipsis),
               ),
-              ...accounts.map((a) => DropdownMenuItem(
-                    value: a.id,
-                    child: Text(a.name, overflow: TextOverflow.ellipsis),
-                  )),
+              ...accounts.map(
+                (a) => DropdownMenuItem(
+                  value: a.id,
+                  child: Text(a.name, overflow: TextOverflow.ellipsis),
+                ),
+              ),
             ],
             onChanged: (v) => ref
                 .read(transactionFiltersProvider.notifier)
                 .update(
-                    (s) => s.copyWith(accountId: v, clearAccountId: v == null)),
+                  (s) => s.copyWith(accountId: v, clearAccountId: v == null),
+                ),
           ),
           const SizedBox(height: 24),
 
@@ -350,15 +357,18 @@ class _FilterSheet extends ConsumerWidget {
                 value: null,
                 child: Text('All Categories', overflow: TextOverflow.ellipsis),
               ),
-              ...categories.map((c) => DropdownMenuItem(
-                    value: c,
-                    child: Text(c, overflow: TextOverflow.ellipsis),
-                  )),
+              ...categories.map(
+                (c) => DropdownMenuItem(
+                  value: c,
+                  child: Text(c, overflow: TextOverflow.ellipsis),
+                ),
+              ),
             ],
             onChanged: (v) => ref
                 .read(transactionFiltersProvider.notifier)
                 .update(
-                    (s) => s.copyWith(category: v, clearCategory: v == null)),
+                  (s) => s.copyWith(category: v, clearCategory: v == null),
+                ),
           ),
           const SizedBox(height: 24),
 
@@ -383,16 +393,21 @@ class _FilterSheet extends ConsumerWidget {
                           value: null,
                           child: Text('All', overflow: TextOverflow.ellipsis),
                         ),
-                        ...List.generate(12, (i) => i + 1).map((m) =>
-                            DropdownMenuItem(
-                                value: m,
-                                child: Text(months[m - 1],
-                                    overflow: TextOverflow.ellipsis))),
+                        ...List.generate(12, (i) => i + 1).map(
+                          (m) => DropdownMenuItem(
+                            value: m,
+                            child: Text(
+                              months[m - 1],
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
                       ],
                       onChanged: (v) => ref
                           .read(transactionFiltersProvider.notifier)
-                          .update((s) =>
-                              s.copyWith(month: v, clearMonth: v == null)),
+                          .update(
+                            (s) => s.copyWith(month: v, clearMonth: v == null),
+                          ),
                     ),
                   ],
                 ),
@@ -416,15 +431,21 @@ class _FilterSheet extends ConsumerWidget {
                           value: null,
                           child: Text('All', overflow: TextOverflow.ellipsis),
                         ),
-                        ...years.map((y) => DropdownMenuItem(
+                        ...years.map(
+                          (y) => DropdownMenuItem(
                             value: y,
-                            child: Text(y.toString(),
-                                overflow: TextOverflow.ellipsis))),
+                            child: Text(
+                              y.toString(),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
                       ],
                       onChanged: (v) => ref
                           .read(transactionFiltersProvider.notifier)
                           .update(
-                              (s) => s.copyWith(year: v, clearYear: v == null)),
+                            (s) => s.copyWith(year: v, clearYear: v == null),
+                          ),
                     ),
                   ],
                 ),
@@ -444,8 +465,11 @@ class _FilterSheet extends ConsumerWidget {
 }
 
 class _SummaryTile extends StatelessWidget {
-  const _SummaryTile(
-      {required this.label, required this.value, required this.color});
+  const _SummaryTile({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
   final String label;
   final String value;
   final Color color;
@@ -459,13 +483,20 @@ class _SummaryTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label,
-                style: tt.labelSmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant)),
+            Text(
+              label,
+              style: tt.labelSmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
             const SizedBox(height: 2),
-            Text(value,
-                style: tt.titleSmall
-                    ?.copyWith(color: color, fontWeight: FontWeight.bold)),
+            Text(
+              value,
+              style: tt.titleSmall?.copyWith(
+                color: color,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
       ),

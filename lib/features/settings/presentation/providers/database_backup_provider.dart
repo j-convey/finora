@@ -32,11 +32,10 @@ class DatabaseBackupState {
   DatabaseBackupState copyWith({
     DatabaseBackupStatus? status,
     String? errorMessage,
-  }) =>
-      DatabaseBackupState(
-        status: status ?? this.status,
-        errorMessage: errorMessage,
-      );
+  }) => DatabaseBackupState(
+    status: status ?? this.status,
+    errorMessage: errorMessage,
+  );
 }
 
 // ── Notifier ──────────────────────────────────────────────────────────────────
@@ -55,8 +54,9 @@ class DatabaseBackupNotifier extends StateNotifier<DatabaseBackupState> {
     );
     try {
       final dio = _ref.read(apiClientProvider);
-      final res =
-          await dio.get<Map<String, dynamic>>('/api/admin/export-database');
+      final res = await dio.get<Map<String, dynamic>>(
+        '/api/admin/export-database',
+      );
 
       final jsonString = const JsonEncoder.withIndent('  ').convert(res.data);
 
@@ -119,7 +119,8 @@ class DatabaseBackupNotifier extends StateNotifier<DatabaseBackupState> {
       final ok = res.data?['ok'] as bool? ?? false;
       if (!ok) {
         throw Exception(
-            res.data?['detail'] as String? ?? 'Import failed on server');
+          res.data?['detail'] as String? ?? 'Import failed on server',
+        );
       }
 
       // Refresh all providers so the UI shows the newly imported data.
@@ -146,5 +147,5 @@ class DatabaseBackupNotifier extends StateNotifier<DatabaseBackupState> {
 
 final databaseBackupProvider =
     StateNotifierProvider<DatabaseBackupNotifier, DatabaseBackupState>(
-  (ref) => DatabaseBackupNotifier(ref),
-);
+      (ref) => DatabaseBackupNotifier(ref),
+    );

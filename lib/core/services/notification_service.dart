@@ -15,15 +15,17 @@ class NotificationService {
   static Future<void> init() async {
     if (_initialized) return;
 
-    const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const darwinSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
     );
-    const linuxSettings =
-        LinuxInitializationSettings(defaultActionName: 'Open');
+    const linuxSettings = LinuxInitializationSettings(
+      defaultActionName: 'Open',
+    );
 
     await _plugin.initialize(
       const InitializationSettings(
@@ -38,7 +40,8 @@ class NotificationService {
     if (Platform.isIOS || Platform.isMacOS) {
       await _plugin
           .resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin>()
+            IOSFlutterLocalNotificationsPlugin
+          >()
           ?.requestPermissions(alert: true, badge: true, sound: true);
     }
 
@@ -46,7 +49,8 @@ class NotificationService {
     if (Platform.isAndroid) {
       await _plugin
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
+            AndroidFlutterLocalNotificationsPlugin
+          >()
           ?.requestNotificationsPermission();
     }
 
@@ -61,8 +65,9 @@ class NotificationService {
   }) async {
     if (!_initialized) await init();
 
-    final body =
-        accountName != null ? '\$$amount on $accountName' : '\$$amount';
+    final body = accountName != null
+        ? '\$$amount on $accountName'
+        : '\$$amount';
 
     const androidDetails = AndroidNotificationDetails(
       'charges',

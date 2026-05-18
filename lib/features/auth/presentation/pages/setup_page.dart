@@ -93,10 +93,9 @@ class _SetupPageState extends ConsumerState<SetupPage> {
     final password = _passwordController.text;
     if (email.isEmpty || password.isEmpty) return;
     ref.read(authProvider.notifier).clearError();
-    await ref.read(authProvider.notifier).login(
-          email: email,
-          password: password,
-        );
+    await ref
+        .read(authProvider.notifier)
+        .login(email: email, password: password);
     // Router redirect takes over on success.
   }
 
@@ -105,10 +104,9 @@ class _SetupPageState extends ConsumerState<SetupPage> {
     final password = _passwordController.text;
     if (email.isEmpty || password.isEmpty) return;
     ref.read(authProvider.notifier).clearError();
-    await ref.read(authProvider.notifier).register(
-          email: email,
-          password: password,
-        );
+    await ref
+        .read(authProvider.notifier)
+        .register(email: email, password: password);
     // Router redirect takes over on success.
   }
 
@@ -161,17 +159,21 @@ class _SetupPageState extends ConsumerState<SetupPage> {
                     border: const OutlineInputBorder(),
                     suffixIcon: switch (_serverState) {
                       _ServerState.checking => const Padding(
-                          padding: EdgeInsets.all(12),
-                          child: SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
+                        padding: EdgeInsets.all(12),
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
                         ),
-                      _ServerState.ok => Icon(Icons.check_circle,
-                          color: const Color(0xFF4CAF50)),
-                      _ServerState.error =>
-                        Icon(Icons.error_outline, color: cs.error),
+                      ),
+                      _ServerState.ok => Icon(
+                        Icons.check_circle,
+                        color: const Color(0xFF4CAF50),
+                      ),
+                      _ServerState.error => Icon(
+                        Icons.error_outline,
+                        color: cs.error,
+                      ),
                       _ServerState.idle => null,
                     },
                   ),
@@ -231,11 +233,14 @@ class _SetupPageState extends ConsumerState<SetupPage> {
                                 prefixIcon: const Icon(Icons.lock_outline),
                                 border: const OutlineInputBorder(),
                                 suffixIcon: IconButton(
-                                  icon: Icon(_obscurePassword
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined),
-                                  onPressed: () => setState(() =>
-                                      _obscurePassword = !_obscurePassword),
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                  ),
+                                  onPressed: () => setState(
+                                    () => _obscurePassword = !_obscurePassword,
+                                  ),
                                 ),
                               ),
                               onSubmitted: (_) => _login(),
@@ -255,7 +260,8 @@ class _SetupPageState extends ConsumerState<SetupPage> {
                                       height: 20,
                                       width: 20,
                                       child: CircularProgressIndicator(
-                                          strokeWidth: 2),
+                                        strokeWidth: 2,
+                                      ),
                                     )
                                   : const Text('Sign In'),
                             ),
@@ -266,7 +272,8 @@ class _SetupPageState extends ConsumerState<SetupPage> {
                                 onPressed: isLoading ? null : _register,
                                 icon: const Icon(Icons.person_add_outlined),
                                 label: const Text(
-                                    'First Time Setup — Create Account'),
+                                  'First Time Setup — Create Account',
+                                ),
                               ),
                             ],
                           ],

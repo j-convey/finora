@@ -36,12 +36,13 @@ class BudgetsPage extends ConsumerWidget {
     final tt = Theme.of(context).textTheme;
     final isMobilePlatform =
         Theme.of(context).platform == TargetPlatform.android ||
-            Theme.of(context).platform == TargetPlatform.iOS;
+        Theme.of(context).platform == TargetPlatform.iOS;
 
     final totalAllocated = budgets.fold(0.0, (s, b) => s + b.allocated);
     final totalSpent = budgets.fold(0.0, (s, b) => s + b.spent);
-    final overallProgress =
-        totalAllocated > 0 ? (totalSpent / totalAllocated) : 0.0;
+    final overallProgress = totalAllocated > 0
+        ? (totalSpent / totalAllocated)
+        : 0.0;
 
     return Scaffold(
       appBar: AppBar(
@@ -70,7 +71,8 @@ class BudgetsPage extends ConsumerWidget {
       ),
       body: budgets.isEmpty
           ? _EmptyState(
-              onAdd: () => _showBudgetSheet(context, ref, existing: null))
+              onAdd: () => _showBudgetSheet(context, ref, existing: null),
+            )
           : ListView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 88),
               children: [
@@ -87,8 +89,9 @@ class BudgetsPage extends ConsumerWidget {
                           children: [
                             Text(
                               'Monthly Budget',
-                              style: tt.titleMedium
-                                  ?.copyWith(color: cs.onPrimaryContainer),
+                              style: tt.titleMedium?.copyWith(
+                                color: cs.onPrimaryContainer,
+                              ),
                             ),
                             Text(
                               '${(overallProgress * 100).toStringAsFixed(0)}% used',
@@ -116,8 +119,9 @@ class BudgetsPage extends ConsumerWidget {
                           children: [
                             Text(
                               '${formatCurrency(totalSpent)} spent',
-                              style: tt.bodySmall
-                                  ?.copyWith(color: cs.onPrimaryContainer),
+                              style: tt.bodySmall?.copyWith(
+                                color: cs.onPrimaryContainer,
+                              ),
                             ),
                             Text(
                               '${formatCurrency(totalAllocated - totalSpent)} remaining',
@@ -156,11 +160,7 @@ class BudgetsPage extends ConsumerWidget {
     );
   }
 
-  void _confirmDelete(
-    BuildContext context,
-    WidgetRef ref,
-    BudgetModel budget,
-  ) {
+  void _confirmDelete(BuildContext context, WidgetRef ref, BudgetModel budget) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -313,11 +313,7 @@ class _BudgetCard extends ConsumerWidget {
                   child: CircleAvatar(
                     radius: 14,
                     backgroundColor: Colors.white.withAlpha(40),
-                    child: Icon(
-                      budget.icon,
-                      size: 16,
-                      color: Colors.white,
-                    ),
+                    child: Icon(budget.icon, size: 16, color: Colors.white),
                   ),
                 ),
               ],
@@ -381,13 +377,17 @@ class _BudgetSheetState extends State<_BudgetSheet> {
     });
     try {
       if (_isEditing) {
-        await widget.ref.read(budgetsProvider.notifier).update(
+        await widget.ref
+            .read(budgetsProvider.notifier)
+            .update(
               widget.existing!.id,
               allocated: amount,
               colorHex: _selectedColorHex,
             );
       } else {
-        await widget.ref.read(budgetsProvider.notifier).create(
+        await widget.ref
+            .read(budgetsProvider.notifier)
+            .create(
               category: category,
               allocated: amount,
               colorHex: _selectedColorHex,
@@ -479,7 +479,7 @@ class _BudgetSheetState extends State<_BudgetSheet> {
                             BoxShadow(
                               color: preset.color.withAlpha(120),
                               blurRadius: 6,
-                            )
+                            ),
                           ]
                         : null,
                   ),
@@ -492,10 +492,7 @@ class _BudgetSheetState extends State<_BudgetSheet> {
           ),
           if (_error != null) ...[
             const SizedBox(height: 10),
-            Text(
-              _error!,
-              style: tt.bodySmall?.copyWith(color: cs.error),
-            ),
+            Text(_error!, style: tt.bodySmall?.copyWith(color: cs.error)),
           ],
           const SizedBox(height: 20),
           FilledButton(
@@ -528,8 +525,11 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.donut_large_outlined,
-              size: 64, color: cs.onSurfaceVariant),
+          Icon(
+            Icons.donut_large_outlined,
+            size: 64,
+            color: cs.onSurfaceVariant,
+          ),
           const SizedBox(height: 16),
           Text('No budgets yet', style: tt.titleMedium),
           const SizedBox(height: 8),

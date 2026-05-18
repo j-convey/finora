@@ -28,9 +28,9 @@ void showTransactionDetails(
 ) {
   final account = transaction.accountId != null
       ? ref
-          .read(accountsProvider)
-          .where((a) => a.id == transaction.accountId)
-          .firstOrNull
+            .read(accountsProvider)
+            .where((a) => a.id == transaction.accountId)
+            .firstOrNull
       : null;
   showModalBottomSheet(
     context: context,
@@ -63,28 +63,28 @@ void showCategoryPicker(
             .read(transactionsProvider.notifier)
             .updateCategory(transaction.id, item.id, item.name)
             .catchError((Object e) {
-          if (context.mounted) {
-            String detail = e.toString();
-            if (e is DioException) {
-              final data = e.response?.data;
-              if (data is Map && data['detail'] != null) {
-                detail = data['detail'].toString();
-              } else if (data != null) {
-                detail = data.toString();
-              } else {
-                detail =
-                    '${e.response?.statusCode} ${e.response?.statusMessage}';
+              if (context.mounted) {
+                String detail = e.toString();
+                if (e is DioException) {
+                  final data = e.response?.data;
+                  if (data is Map && data['detail'] != null) {
+                    detail = data['detail'].toString();
+                  } else if (data != null) {
+                    detail = data.toString();
+                  } else {
+                    detail =
+                        '${e.response?.statusCode} ${e.response?.statusMessage}';
+                  }
+                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Category update failed: $detail'),
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                    duration: const Duration(seconds: 8),
+                  ),
+                );
               }
-            }
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Category update failed: $detail'),
-                backgroundColor: Theme.of(context).colorScheme.error,
-                duration: const Duration(seconds: 8),
-              ),
-            );
-          }
-        });
+            });
       },
     ),
   );
@@ -155,8 +155,9 @@ class _TransactionDetailsSheetState
   @override
   void initState() {
     super.initState();
-    _notesController =
-        TextEditingController(text: widget.transaction.notes ?? '');
+    _notesController = TextEditingController(
+      text: widget.transaction.notes ?? '',
+    );
   }
 
   @override
@@ -230,16 +231,16 @@ class _TransactionDetailsSheetState
     final amountColor = transaction.pending
         ? cs.onSurfaceVariant
         : isIncome
-            ? const Color(0xFF4CAF50)
-            : cs.onSurface;
+        ? const Color(0xFF4CAF50)
+        : cs.onSurface;
     final amountPrefix = isIncome ? '+' : '-';
 
     // Look up parent when this is a child split
     final allTransactions = ref.watch(transactionsProvider);
     final parentTransaction = transaction.isSplitChild
         ? allTransactions
-            .where((t) => t.id == transaction.parentTransactionId)
-            .firstOrNull
+              .where((t) => t.id == transaction.parentTransactionId)
+              .firstOrNull
         : null;
     final parentNeedsReview = transaction.isSplitParent
         ? transaction.requiresUserReview
@@ -284,16 +285,21 @@ class _TransactionDetailsSheetState
             if (transaction.isSplitParent && !parentNeedsReview)
               Container(
                 margin: const EdgeInsets.only(bottom: 12),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: cs.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.call_split,
-                        size: 16, color: cs.onSurfaceVariant),
+                    Icon(
+                      Icons.call_split,
+                      size: 16,
+                      color: cs.onSurfaceVariant,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       'This transaction has been split',
@@ -306,23 +312,29 @@ class _TransactionDetailsSheetState
             if (transaction.isSplitChild && parentTransaction != null)
               Container(
                 margin: const EdgeInsets.only(bottom: 12),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: cs.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.account_tree_outlined,
-                        size: 16, color: cs.onSurfaceVariant),
+                    Icon(
+                      Icons.account_tree_outlined,
+                      size: 16,
+                      color: cs.onSurfaceVariant,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         'Part of: ${parentTransaction.merchantName ?? parentTransaction.title} '
                         '(${formatCurrency(parentTransaction.amount)})',
-                        style:
-                            tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                        style: tt.bodySmall?.copyWith(
+                          color: cs.onSurfaceVariant,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -335,10 +347,7 @@ class _TransactionDetailsSheetState
                 CircleAvatar(
                   radius: 22,
                   backgroundColor: cs.surfaceContainerHighest,
-                  child: Icon(
-                    transaction.icon,
-                    color: cs.onSurfaceVariant,
-                  ),
+                  child: Icon(transaction.icon, color: cs.onSurfaceVariant),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -347,13 +356,15 @@ class _TransactionDetailsSheetState
                     children: [
                       Text(
                         transaction.merchantName ?? transaction.title,
-                        style: tt.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
+                        style: tt.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       Text(
                         _formatFullDate(transaction.date),
-                        style:
-                            tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                        style: tt.bodySmall?.copyWith(
+                          color: cs.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),
@@ -374,9 +385,10 @@ class _TransactionDetailsSheetState
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Amount',
-                      style:
-                          tt.labelMedium?.copyWith(color: cs.onSurfaceVariant)),
+                  Text(
+                    'Amount',
+                    style: tt.labelMedium?.copyWith(color: cs.onSurfaceVariant),
+                  ),
                   Text(
                     '$amountPrefix${formatCurrency(transaction.amount)}',
                     style: tt.titleLarge?.copyWith(
@@ -391,11 +403,7 @@ class _TransactionDetailsSheetState
             _DetailRow(
               label: 'Category',
               value: transaction.category,
-              leading: Icon(
-                transaction.icon,
-                size: 18,
-                color: cs.primary,
-              ),
+              leading: Icon(transaction.icon, size: 18, color: cs.primary),
             ),
             if (_accountLabel() != null)
               _DetailRow(label: 'Account', value: _accountLabel()!),
@@ -421,8 +429,9 @@ class _TransactionDetailsSheetState
                       children: [
                         Text(
                           'Notes',
-                          style: tt.labelMedium
-                              ?.copyWith(color: cs.onSurfaceVariant),
+                          style: tt.labelMedium?.copyWith(
+                            color: cs.onSurfaceVariant,
+                          ),
                         ),
                         const SizedBox(height: 6),
                         TextField(
@@ -436,7 +445,9 @@ class _TransactionDetailsSheetState
                               borderRadius: BorderRadius.circular(8),
                             ),
                             contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 10),
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -470,8 +481,9 @@ class _TransactionDetailsSheetState
                             width: 130,
                             child: Text(
                               'Notes',
-                              style: tt.labelMedium
-                                  ?.copyWith(color: cs.onSurfaceVariant),
+                              style: tt.labelMedium?.copyWith(
+                                color: cs.onSurfaceVariant,
+                              ),
                             ),
                           ),
                           Expanded(
@@ -489,8 +501,11 @@ class _TransactionDetailsSheetState
                               ),
                             ),
                           ),
-                          Icon(Icons.edit_outlined,
-                              size: 16, color: cs.onSurfaceVariant),
+                          Icon(
+                            Icons.edit_outlined,
+                            size: 16,
+                            color: cs.onSurfaceVariant,
+                          ),
                         ],
                       ),
                     ),
@@ -524,8 +539,9 @@ class _TransactionDetailsSheetState
                   const SizedBox(width: 8),
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed:
-                          _unsplitting ? null : () => _confirmUnsplit(context),
+                      onPressed: _unsplitting
+                          ? null
+                          : () => _confirmUnsplit(context),
                       icon: _unsplitting
                           ? const SizedBox(
                               width: 16,
@@ -626,8 +642,11 @@ class _ReviewBanner extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.warning_amber_rounded,
-                  size: 18, color: cs.onErrorContainer),
+              Icon(
+                Icons.warning_amber_rounded,
+                size: 18,
+                color: cs.onErrorContainer,
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -675,11 +694,7 @@ class _ReviewBanner extends StatelessWidget {
 // ── Detail row ───────────────────────────────────────────────────────────────
 
 class _DetailRow extends StatelessWidget {
-  const _DetailRow({
-    required this.label,
-    required this.value,
-    this.leading,
-  });
+  const _DetailRow({required this.label, required this.value, this.leading});
 
   final String label;
   final String value;
@@ -701,13 +716,8 @@ class _DetailRow extends StatelessWidget {
               style: tt.labelMedium?.copyWith(color: cs.onSurfaceVariant),
             ),
           ),
-          if (leading != null) ...[
-            leading!,
-            const SizedBox(width: 6),
-          ],
-          Expanded(
-            child: Text(value, style: tt.bodyMedium),
-          ),
+          if (leading != null) ...[leading!, const SizedBox(width: 6)],
+          Expanded(child: Text(value, style: tt.bodyMedium)),
         ],
       ),
     );
@@ -745,11 +755,9 @@ class _CategoryPickerSheetState extends ConsumerState<CategoryPickerSheet> {
     final isSearching = _query.isNotEmpty;
     final flatFiltered = isSearching
         ? groups
-            .expand((g) => g.categories)
-            .where(
-              (c) => c.name.toLowerCase().contains(_query.toLowerCase()),
-            )
-            .toList()
+              .expand((g) => g.categories)
+              .where((c) => c.name.toLowerCase().contains(_query.toLowerCase()))
+              .toList()
         : const <CategoryItem>[];
 
     // Build a flat list of items for the grouped view.
@@ -799,8 +807,9 @@ class _CategoryPickerSheetState extends ConsumerState<CategoryPickerSheet> {
                       child: Center(
                         child: Text(
                           'No categories found',
-                          style: tt.bodySmall
-                              ?.copyWith(color: cs.onSurfaceVariant),
+                          style: tt.bodySmall?.copyWith(
+                            color: cs.onSurfaceVariant,
+                          ),
                         ),
                       ),
                     )
@@ -813,8 +822,9 @@ class _CategoryPickerSheetState extends ConsumerState<CategoryPickerSheet> {
                           return ListTile(
                             leading: Icon(
                               TransactionUIHelper.iconForCategory(cat.name),
-                              color:
-                                  isSelected ? cs.primary : cs.onSurfaceVariant,
+                              color: isSelected
+                                  ? cs.primary
+                                  : cs.onSurfaceVariant,
                             ),
                             title: Text(cat.name),
                             trailing: isSelected
@@ -847,8 +857,9 @@ class _CategoryPickerSheetState extends ConsumerState<CategoryPickerSheet> {
                         return ListTile(
                           leading: Icon(
                             TransactionUIHelper.iconForCategory(cat.name),
-                            color:
-                                isSelected ? cs.primary : cs.onSurfaceVariant,
+                            color: isSelected
+                                ? cs.primary
+                                : cs.onSurfaceVariant,
                           ),
                           title: Text(cat.name),
                           trailing: isSelected

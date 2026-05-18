@@ -32,5 +32,5 @@ class NetWorthHistoryNotifier
 
 final netWorthHistoryProvider =
     StateNotifierProvider<NetWorthHistoryNotifier, AsyncValue<NetWorthHistory>>(
-  (ref) => NetWorthHistoryNotifier(ref),
-);
+      (ref) => NetWorthHistoryNotifier(ref),
+    );

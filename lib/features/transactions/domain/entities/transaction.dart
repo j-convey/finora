@@ -4,16 +4,16 @@ enum TransactionType {
   transfer;
 
   static TransactionType fromString(String value) => switch (value) {
-        'income' => TransactionType.income,
-        'transfer' => TransactionType.transfer,
-        _ => TransactionType.expense,
-      };
+    'income' => TransactionType.income,
+    'transfer' => TransactionType.transfer,
+    _ => TransactionType.expense,
+  };
 
   String toJson() => switch (this) {
-        TransactionType.income => 'income',
-        TransactionType.expense => 'expense',
-        TransactionType.transfer => 'transfer',
-      };
+    TransactionType.income => 'income',
+    TransactionType.expense => 'expense',
+    TransactionType.transfer => 'transfer',
+  };
 }
 
 class Transaction {
@@ -69,24 +69,23 @@ class Transaction {
     String? notes,
     bool? isSplitParent,
     bool? requiresUserReview,
-  }) =>
-      Transaction(
-        id: id,
-        title: title ?? this.title,
-        amount: amount ?? this.amount,
-        type: type ?? this.type,
-        category: category ?? this.category,
-        date: date ?? this.date,
-        accountId: accountId ?? this.accountId,
-        notes: notes ?? this.notes,
-        originalDescription: originalDescription,
-        merchantName: merchantName,
-        providerTransactionId: providerTransactionId,
-        pending: pending,
-        isSplitParent: isSplitParent ?? this.isSplitParent,
-        parentTransactionId: parentTransactionId,
-        requiresUserReview: requiresUserReview ?? this.requiresUserReview,
-        createdAt: createdAt,
-        updatedAt: updatedAt,
-      );
+  }) => Transaction(
+    id: id,
+    title: title ?? this.title,
+    amount: amount ?? this.amount,
+    type: type ?? this.type,
+    category: category ?? this.category,
+    date: date ?? this.date,
+    accountId: accountId ?? this.accountId,
+    notes: notes ?? this.notes,
+    originalDescription: originalDescription,
+    merchantName: merchantName,
+    providerTransactionId: providerTransactionId,
+    pending: pending,
+    isSplitParent: isSplitParent ?? this.isSplitParent,
+    parentTransactionId: parentTransactionId,
+    requiresUserReview: requiresUserReview ?? this.requiresUserReview,
+    createdAt: createdAt,
+    updatedAt: updatedAt,
+  );
 }

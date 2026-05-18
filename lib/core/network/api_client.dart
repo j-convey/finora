@@ -6,8 +6,9 @@ import '../providers/demo_mode_provider.dart';
 
 final apiClientProvider = Provider<Dio>((ref) {
   final serverUrl = ref.watch(authProvider).serverUrl;
-  final baseUrl =
-      serverUrl.startsWith('http') ? serverUrl : 'http://$serverUrl';
+  final baseUrl = serverUrl.startsWith('http')
+      ? serverUrl
+      : 'http://$serverUrl';
 
   final dio = Dio(
     BaseOptions(
@@ -29,10 +30,7 @@ class _DemoHeaderInterceptor extends Interceptor {
   final Ref _ref;
 
   @override
-  void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) {
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     final isDemoMode = _ref.read(demoModeProvider);
     // Don't send demo header for auth endpoints or the demo toggle itself
     final isAuthRequest = options.path.contains('/api/auth/');
@@ -43,19 +41,19 @@ class _DemoHeaderInterceptor extends Interceptor {
     } else {
       options.headers.remove('X-Demo-Mode');
     }
-    
+
     // Log headers for debugging (masked for security)
     final authHeader = options.headers['Authorization'] as String?;
     final maskedAuth = authHeader != null
         ? (authHeader.length > 20
-            ? '${authHeader.substring(0, 15)}...'
-            : 'present')
+              ? '${authHeader.substring(0, 15)}...'
+              : 'present')
         : 'missing';
 
     print('DEBUG [ApiClient]: Request ${options.method} ${options.path}');
     print('DEBUG [ApiClient]: X-Demo-Mode: ${options.headers['X-Demo-Mode']}');
     print('DEBUG [ApiClient]: Authorization: $maskedAuth');
-    
+
     handler.next(options);
   }
 }
@@ -73,10 +71,10 @@ class _AuthInterceptor extends Interceptor {
   ) async {
     final storage = _ref.read(tokenStorageProvider);
     final token = await storage.getAccessToken();
-    
+
     // If we're in demo mode, some backends might reject real user tokens.
-    // However, the user wants to stay "signed in". 
-    // We'll send the token unless we find it's causing 401s specifically 
+    // However, the user wants to stay "signed in".
+    // We'll send the token unless we find it's causing 401s specifically
     // in demo mode.
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
@@ -89,7 +87,8 @@ class _AuthInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     final isDemoMode = _ref.read(demoModeProvider);
     print(
-        'DEBUG [ApiClient]: Error ${err.response?.statusCode} on ${err.requestOptions.path}');
+      'DEBUG [ApiClient]: Error ${err.response?.statusCode} on ${err.requestOptions.path}',
+    );
 
     if (err.response?.statusCode == 401) {
       final notifier = _ref.read(authProvider.notifier);
@@ -100,11 +99,13 @@ class _AuthInterceptor extends Interceptor {
         try {
           print('DEBUG [ApiClient]: Attempting token refresh...');
           final baseUrl = _ref.read(authProvider).serverUrl;
-          final refreshDio = Dio(BaseOptions(
-            baseUrl: baseUrl,
-            connectTimeout: const Duration(seconds: 10),
-            receiveTimeout: const Duration(seconds: 10),
-          ));
+          final refreshDio = Dio(
+            BaseOptions(
+              baseUrl: baseUrl,
+              connectTimeout: const Duration(seconds: 10),
+              receiveTimeout: const Duration(seconds: 10),
+            ),
+          );
 
           final response = await refreshDio.post<Map<String, dynamic>>(
             '/api/auth/refresh',
@@ -126,11 +127,13 @@ class _AuthInterceptor extends Interceptor {
           retryOptions.headers['Authorization'] = 'Bearer $newAccess';
 
           // Use a new Dio instance for the retry to avoid interceptor recursion
-          final retryResponse = await Dio(BaseOptions(
-            baseUrl: baseUrl,
-            connectTimeout: const Duration(seconds: 10),
-            receiveTimeout: const Duration(seconds: 10),
-          )).fetch(retryOptions);
+          final retryResponse = await Dio(
+            BaseOptions(
+              baseUrl: baseUrl,
+              connectTimeout: const Duration(seconds: 10),
+              receiveTimeout: const Duration(seconds: 10),
+            ),
+          ).fetch(retryOptions);
 
           return handler.resolve(retryResponse);
         } catch (e) {

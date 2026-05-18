@@ -58,25 +58,27 @@ class SubscriptionModel {
   }
 
   String get statusLabel => switch (status) {
-        SubscriptionStatus.active => 'Active',
-        SubscriptionStatus.paused => 'Paused',
-        SubscriptionStatus.canceled => 'Canceled',
-      };
+    SubscriptionStatus.active => 'Active',
+    SubscriptionStatus.paused => 'Paused',
+    SubscriptionStatus.canceled => 'Canceled',
+  };
 
   Color get statusColor => switch (status) {
-        SubscriptionStatus.active => const Color(0xFF4CAF50),
-        SubscriptionStatus.paused => const Color(0xFFFFA726),
-        SubscriptionStatus.canceled => const Color(0xFFEF5350),
-      };
+    SubscriptionStatus.active => const Color(0xFF4CAF50),
+    SubscriptionStatus.paused => const Color(0xFFFFA726),
+    SubscriptionStatus.canceled => const Color(0xFFEF5350),
+  };
 
   static SubscriptionStatus _parseStatus(String value) {
-    return SubscriptionStatus.values
-        .firstWhere((s) => s.toString().split('.').last == value);
+    return SubscriptionStatus.values.firstWhere(
+      (s) => s.toString().split('.').last == value,
+    );
   }
 
   static RecurrenceUnit _parseRecurrenceUnit(String value) {
-    return RecurrenceUnit.values
-        .firstWhere((u) => u.toString().split('.').last == value);
+    return RecurrenceUnit.values.firstWhere(
+      (u) => u.toString().split('.').last == value,
+    );
   }
 
   SubscriptionModel copyWith({
@@ -97,26 +99,25 @@ class SubscriptionModel {
     String? matchingNotes,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) =>
-      SubscriptionModel(
-        id: id ?? this.id,
-        name: name ?? this.name,
-        merchantName: merchantName ?? this.merchantName,
-        category: category ?? this.category,
-        expectedAmount: expectedAmount ?? this.expectedAmount,
-        minAmount: minAmount ?? this.minAmount,
-        maxAmount: maxAmount ?? this.maxAmount,
-        recurrenceInterval: recurrenceInterval ?? this.recurrenceInterval,
-        recurrenceUnit: recurrenceUnit ?? this.recurrenceUnit,
-        startDate: startDate ?? this.startDate,
-        endDate: endDate ?? this.endDate,
-        nextDueDate: nextDueDate ?? this.nextDueDate,
-        status: status ?? this.status,
-        autoLinkEnabled: autoLinkEnabled ?? this.autoLinkEnabled,
-        matchingNotes: matchingNotes ?? this.matchingNotes,
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-      );
+  }) => SubscriptionModel(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    merchantName: merchantName ?? this.merchantName,
+    category: category ?? this.category,
+    expectedAmount: expectedAmount ?? this.expectedAmount,
+    minAmount: minAmount ?? this.minAmount,
+    maxAmount: maxAmount ?? this.maxAmount,
+    recurrenceInterval: recurrenceInterval ?? this.recurrenceInterval,
+    recurrenceUnit: recurrenceUnit ?? this.recurrenceUnit,
+    startDate: startDate ?? this.startDate,
+    endDate: endDate ?? this.endDate,
+    nextDueDate: nextDueDate ?? this.nextDueDate,
+    status: status ?? this.status,
+    autoLinkEnabled: autoLinkEnabled ?? this.autoLinkEnabled,
+    matchingNotes: matchingNotes ?? this.matchingNotes,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
 
   factory SubscriptionModel.fromJson(Map<String, dynamic> json) {
     return SubscriptionModel(
@@ -134,8 +135,9 @@ class SubscriptionModel {
           ? (json['max_amount'] as num).toDouble()
           : null,
       recurrenceInterval: json['recurrence_interval'] as int? ?? 1,
-      recurrenceUnit:
-          _parseRecurrenceUnit(json['recurrence_unit'] as String? ?? 'month'),
+      recurrenceUnit: _parseRecurrenceUnit(
+        json['recurrence_unit'] as String? ?? 'month',
+      ),
       startDate: json['start_date'] != null
           ? DateTime.parse(json['start_date'] as String)
           : null,
@@ -156,22 +158,22 @@ class SubscriptionModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'merchant_name': merchantName,
-        'category': category,
-        'expected_amount': expectedAmount,
-        'min_amount': minAmount,
-        'max_amount': maxAmount,
-        'recurrence_interval': recurrenceInterval,
-        'recurrence_unit': recurrenceUnit.toString().split('.').last,
-        'start_date': startDate?.toIso8601String(),
-        'end_date': endDate?.toIso8601String(),
-        'next_due_date': nextDueDate?.toIso8601String(),
-        'status': status.toString().split('.').last,
-        'auto_link_enabled': autoLinkEnabled,
-        'matching_notes': matchingNotes,
-        'created_at': createdAt.toIso8601String(),
-        'updated_at': updatedAt?.toIso8601String(),
-      };
+    'id': id,
+    'name': name,
+    'merchant_name': merchantName,
+    'category': category,
+    'expected_amount': expectedAmount,
+    'min_amount': minAmount,
+    'max_amount': maxAmount,
+    'recurrence_interval': recurrenceInterval,
+    'recurrence_unit': recurrenceUnit.toString().split('.').last,
+    'start_date': startDate?.toIso8601String(),
+    'end_date': endDate?.toIso8601String(),
+    'next_due_date': nextDueDate?.toIso8601String(),
+    'status': status.toString().split('.').last,
+    'auto_link_enabled': autoLinkEnabled,
+    'matching_notes': matchingNotes,
+    'created_at': createdAt.toIso8601String(),
+    'updated_at': updatedAt?.toIso8601String(),
+  };
 }

@@ -39,11 +39,7 @@ class BudgetsNotifier extends StateNotifier<List<BudgetModel>> {
   }
 
   /// PATCH /api/budgets/{id} — only sends fields that changed.
-  Future<void> update(
-    String id, {
-    double? allocated,
-    String? colorHex,
-  }) async {
+  Future<void> update(String id, {double? allocated, String? colorHex}) async {
     final dio = _ref.read(apiClientProvider);
     final body = <String, dynamic>{
       if (allocated != null) 'allocated': allocated,
@@ -70,5 +66,5 @@ class BudgetsNotifier extends StateNotifier<List<BudgetModel>> {
 
 final budgetsProvider =
     StateNotifierProvider<BudgetsNotifier, List<BudgetModel>>(
-  (ref) => BudgetsNotifier(ref),
-);
+      (ref) => BudgetsNotifier(ref),
+    );

@@ -42,7 +42,8 @@ class DemoModeService {
     final wasAuthenticated =
         _ref.read(authProvider).status == AuthStatus.authenticated;
     print(
-        'DEBUG [DemoModeService]: _enableDemo() - pre-demo wasAuthenticated (real): $wasAuthenticated');
+      'DEBUG [DemoModeService]: _enableDemo() - pre-demo wasAuthenticated (real): $wasAuthenticated',
+    );
 
     await _prefs.setBool(_kPreDemoAuthKey, wasAuthenticated);
     await _prefs.setBool(_kDemoModeKey, true);
@@ -51,21 +52,26 @@ class DemoModeService {
     try {
       final dio = _ref.read(apiClientProvider);
       print(
-          'DEBUG [DemoModeService]: _enableDemo() - Triggering POST /api/demo/enable');
+        'DEBUG [DemoModeService]: _enableDemo() - Triggering POST /api/demo/enable',
+      );
       final response = await dio.post('/api/demo/enable');
       print(
-          'DEBUG [DemoModeService]: _enableDemo() - Server response: ${response.statusCode} ${response.data}');
+        'DEBUG [DemoModeService]: _enableDemo() - Server response: ${response.statusCode} ${response.data}',
+      );
     } catch (e, st) {
       print(
-          'DEBUG [DemoModeService]: _enableDemo() - Server error during enable: $e');
+        'DEBUG [DemoModeService]: _enableDemo() - Server error during enable: $e',
+      );
     }
 
     _ref.read(demoModeProvider.notifier).updateState(true);
     print(
-        'DEBUG [DemoModeService]: _enableDemo() - Updated Riverpod state to true');
+      'DEBUG [DemoModeService]: _enableDemo() - Updated Riverpod state to true',
+    );
 
     print(
-        'DEBUG [DemoModeService]: _enableDemo() - Clearing caches and refetching data');
+      'DEBUG [DemoModeService]: _enableDemo() - Clearing caches and refetching data',
+    );
     try {
       await clearCachesAndRefetch();
     } catch (e) {
@@ -80,43 +86,53 @@ class DemoModeService {
     print('DEBUG [DemoModeService]: Entering _disableDemo()');
     final wasAuthBefore = _prefs.getBool(_kPreDemoAuthKey) ?? false;
     print(
-        'DEBUG [DemoModeService]: _disableDemo() - pre-demo wasAuthBefore: $wasAuthBefore');
+      'DEBUG [DemoModeService]: _disableDemo() - pre-demo wasAuthBefore: $wasAuthBefore',
+    );
 
     try {
       final dio = _ref.read(apiClientProvider);
       print(
-          'DEBUG [DemoModeService]: _disableDemo() - Triggering POST /api/demo/disable');
+        'DEBUG [DemoModeService]: _disableDemo() - Triggering POST /api/demo/disable',
+      );
       // Call disable while the header is still present so the server knows
       // which session to disable (if it's not purely stateless).
       final response = await dio.post('/api/demo/disable');
       print(
-          'DEBUG [DemoModeService]: _disableDemo() - Server response: ${response.statusCode}');
+        'DEBUG [DemoModeService]: _disableDemo() - Server response: ${response.statusCode}',
+      );
     } catch (e, st) {
       print(
-          'DEBUG [DemoModeService]: _disableDemo() - Server error (ignored): $e');
-      print('DEBUG [DemoModeService]: _disableDemo() - Server error stack: $st');
+        'DEBUG [DemoModeService]: _disableDemo() - Server error (ignored): $e',
+      );
+      print(
+        'DEBUG [DemoModeService]: _disableDemo() - Server error stack: $st',
+      );
       // Ignore errors.
     }
 
     await _prefs.setBool(_kDemoModeKey, false);
     print(
-        'DEBUG [DemoModeService]: _disableDemo() - Saved preference demo_mode_active = false');
+      'DEBUG [DemoModeService]: _disableDemo() - Saved preference demo_mode_active = false',
+    );
 
     _ref.read(demoModeProvider.notifier).updateState(false);
     print(
-        'DEBUG [DemoModeService]: _disableDemo() - Updated Riverpod state to false');
+      'DEBUG [DemoModeService]: _disableDemo() - Updated Riverpod state to false',
+    );
 
     await _clearAllCaches();
 
     if (wasAuthBefore) {
       print(
-          'DEBUG [DemoModeService]: _disableDemo() - User was authenticated before demo, refetching caches');
+        'DEBUG [DemoModeService]: _disableDemo() - User was authenticated before demo, refetching caches',
+      );
       try {
         await clearCachesAndRefetch();
       } catch (_) {}
     } else {
       print(
-          'DEBUG [DemoModeService]: _disableDemo() - User was NOT authenticated before demo, logging out');
+        'DEBUG [DemoModeService]: _disableDemo() - User was NOT authenticated before demo, logging out',
+      );
       await _ref.read(authProvider.notifier).logout();
     }
     print('DEBUG [DemoModeService]: _disableDemo() - Finished');
@@ -132,7 +148,8 @@ class DemoModeService {
 
   Future<void> clearCachesAndRefetch() async {
     print(
-        'DEBUG [DemoModeService]: clearCachesAndRefetch() called. Refreshing providers...');
+      'DEBUG [DemoModeService]: clearCachesAndRefetch() called. Refreshing providers...',
+    );
 
     // Clear local state first to avoid mixing real and demo data
     _ref.read(accountsProvider.notifier).clear();
@@ -152,7 +169,8 @@ class DemoModeService {
         _ref.read(netWorthHistoryProvider.notifier).fetch(),
       ]);
       print(
-          'DEBUG [DemoModeService]: clearCachesAndRefetch() finished successfully');
+        'DEBUG [DemoModeService]: clearCachesAndRefetch() finished successfully',
+      );
     } catch (e, st) {
       print('DEBUG [DemoModeService]: clearCachesAndRefetch() error: $e');
       print('DEBUG [DemoModeService]: clearCachesAndRefetch() stack: $st');

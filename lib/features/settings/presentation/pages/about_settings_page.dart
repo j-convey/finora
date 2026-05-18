@@ -17,9 +17,7 @@ class AboutSettingsPage extends StatelessWidget {
             child: Icon(Icons.account_balance, size: 64, color: cs.primary),
           ),
           const SizedBox(height: 16),
-          Center(
-            child: Text('Finora', style: tt.headlineMedium),
-          ),
+          Center(child: Text('Finora', style: tt.headlineMedium)),
           const SizedBox(height: 4),
           Center(
             child: Text(

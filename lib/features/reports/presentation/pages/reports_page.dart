@@ -49,7 +49,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage>
     final summary = ref.watch(reportSummaryProvider);
     final isMobilePlatform =
         Theme.of(context).platform == TargetPlatform.android ||
-            Theme.of(context).platform == TargetPlatform.iOS;
+        Theme.of(context).platform == TargetPlatform.iOS;
 
     return Scaffold(
       appBar: AppBar(
@@ -68,9 +68,11 @@ class _ReportsPageState extends ConsumerState<ReportsPage>
             builder: (context, ref, _) {
               final hidden = ref.watch(hideAmountsProvider);
               return IconButton(
-                icon: Icon(hidden
-                    ? Icons.visibility_off_outlined
-                    : Icons.visibility_outlined),
+                icon: Icon(
+                  hidden
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                ),
                 tooltip: hidden ? 'Show amounts' : 'Hide amounts',
                 onPressed: () =>
                     ref.read(hideAmountsProvider.notifier).state = !hidden,
@@ -176,8 +178,9 @@ class _CashFlowTab extends ConsumerWidget {
                     children: [
                       Text(
                         'Net Cash Flow',
-                        style: tt.labelMedium
-                            ?.copyWith(color: cs.onSurfaceVariant),
+                        style: tt.labelMedium?.copyWith(
+                          color: cs.onSurfaceVariant,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -264,12 +267,18 @@ class _InlineStat extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(label,
-            style: tt.labelSmall?.copyWith(color: color.withAlpha(180))),
+        Text(
+          label,
+          style: tt.labelSmall?.copyWith(color: color.withAlpha(180)),
+        ),
         const SizedBox(width: 4),
-        Text(value,
-            style: tt.labelSmall
-                ?.copyWith(color: color, fontWeight: FontWeight.bold)),
+        Text(
+          value,
+          style: tt.labelSmall?.copyWith(
+            color: color,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ],
     );
   }
@@ -381,7 +390,8 @@ class _CategoryTabState extends ConsumerState<_CategoryTab> {
                     const Divider(height: 8),
                     TextButton(
                       onPressed: () => setState(
-                          () => _showAllCategories = !_showAllCategories),
+                        () => _showAllCategories = !_showAllCategories,
+                      ),
                       child: Text(
                         _showAllCategories
                             ? 'Show less'
@@ -407,12 +417,14 @@ class _CategoryTabState extends ConsumerState<_CategoryTab> {
             style: tt.titleSmall,
           ),
           const SizedBox(height: 8),
-          ...widget.recentTransactions.map((t) => TransactionCard(
-                transaction: t,
-                account: t.accountId != null ? accountsById[t.accountId] : null,
-                onTap: () => showTransactionDetails(context, ref, t),
-                onCategoryTap: () => showCategoryPicker(context, ref, t),
-              )),
+          ...widget.recentTransactions.map(
+            (t) => TransactionCard(
+              transaction: t,
+              account: t.accountId != null ? accountsById[t.accountId] : null,
+              onTap: () => showTransactionDetails(context, ref, t),
+              onCategoryTap: () => showCategoryPicker(context, ref, t),
+            ),
+          ),
         ],
       ],
     );

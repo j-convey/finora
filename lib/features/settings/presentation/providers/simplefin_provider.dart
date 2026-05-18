@@ -29,14 +29,12 @@ class SimplefinState {
     List<String>? connectedInstitutions,
     DateTime? lastSyncedAt,
     String? errorMessage,
-  }) =>
-      SimplefinState(
-        status: status ?? this.status,
-        connectedInstitutions:
-            connectedInstitutions ?? this.connectedInstitutions,
-        lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
-        errorMessage: errorMessage,
-      );
+  }) => SimplefinState(
+    status: status ?? this.status,
+    connectedInstitutions: connectedInstitutions ?? this.connectedInstitutions,
+    lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+    errorMessage: errorMessage,
+  );
 }
 
 class SimplefinNotifier extends StateNotifier<SimplefinState> {
@@ -56,8 +54,9 @@ class SimplefinNotifier extends StateNotifier<SimplefinState> {
       if (data['connected'] == true) {
         state = state.copyWith(
           status: SimplefinConnectionStatus.connected,
-          connectedInstitutions:
-              List<String>.from(data['institutions'] as List? ?? []),
+          connectedInstitutions: List<String>.from(
+            data['institutions'] as List? ?? [],
+          ),
           lastSyncedAt: data['last_synced_at'] != null
               ? DateTime.tryParse(data['last_synced_at'] as String)
               : null,
@@ -84,8 +83,9 @@ class SimplefinNotifier extends StateNotifier<SimplefinState> {
       final data = res.data!;
       state = state.copyWith(
         status: SimplefinConnectionStatus.connected,
-        connectedInstitutions:
-            List<String>.from(data['institutions'] as List? ?? []),
+        connectedInstitutions: List<String>.from(
+          data['institutions'] as List? ?? [],
+        ),
         lastSyncedAt: DateTime.now(),
       );
     } catch (e) {
@@ -156,5 +156,5 @@ class SimplefinNotifier extends StateNotifier<SimplefinState> {
 
 final simplefinProvider =
     StateNotifierProvider<SimplefinNotifier, SimplefinState>(
-  (ref) => SimplefinNotifier(ref),
-);
+      (ref) => SimplefinNotifier(ref),
+    );

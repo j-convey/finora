@@ -67,9 +67,7 @@ class AuthState {
     if (isDemoModeActive) {
       // Use real user info if we have it, so the UI shows "You (Demo)"
       if (user != null) {
-        return user!.copyWith(
-          fullName: '${user!.fullName ?? 'User'} (Demo)',
-        );
+        return user!.copyWith(fullName: '${user!.fullName ?? 'User'} (Demo)');
       }
       return UserModel(
         id: 9999,
@@ -92,29 +90,24 @@ class AuthState {
     String? error,
     bool clearError = false,
     bool? isDemoModeActive,
-  }) =>
-      AuthState(
-        status: status ?? this.status,
-        serverUrl: serverUrl ?? this.serverUrl,
-        user: clearUser ? null : user ?? this.user,
-        isLoading: isLoading ?? this.isLoading,
-        error: clearError ? null : error ?? this.error,
-        isDemoModeActive: isDemoModeActive ?? this.isDemoModeActive,
-      );
+  }) => AuthState(
+    status: status ?? this.status,
+    serverUrl: serverUrl ?? this.serverUrl,
+    user: clearUser ? null : user ?? this.user,
+    isLoading: isLoading ?? this.isLoading,
+    error: clearError ? null : error ?? this.error,
+    isDemoModeActive: isDemoModeActive ?? this.isDemoModeActive,
+  );
 }
 
 // ── Notifier ──────────────────────────────────────────────────────────────────
 
 class AuthNotifier extends StateNotifier<AuthState> {
   AuthNotifier(this._ref)
-      : super(AuthState(isDemoModeActive: _ref.read(demoModeProvider))) {
-    _ref.listen<bool>(
-      demoModeProvider,
-      (previous, isDemoMode) {
-        state = state.copyWith(isDemoModeActive: isDemoMode);
-      },
-      fireImmediately: true,
-    );
+    : super(AuthState(isDemoModeActive: _ref.read(demoModeProvider))) {
+    _ref.listen<bool>(demoModeProvider, (previous, isDemoMode) {
+      state = state.copyWith(isDemoModeActive: isDemoMode);
+    }, fireImmediately: true);
   }
 
   final Ref _ref;
@@ -185,10 +178,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   /// POST /api/auth/login
-  Future<bool> login({
-    required String email,
-    required String password,
-  }) async {
+  Future<bool> login({required String email, required String password}) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final dio = _buildDio();
@@ -212,7 +202,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       return true;
     } on DioException catch (e) {
       print(
-          'DEBUG: DioException in login: ${e.message}, status: ${e.response?.statusCode}');
+        'DEBUG: DioException in login: ${e.message}, status: ${e.response?.statusCode}',
+      );
       state = state.copyWith(isLoading: false, error: _extractError(e));
       return false;
     } catch (e) {
@@ -272,9 +263,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
           ),
         });
       } else {
-        data = {
-          if (fullName != null) 'full_name': fullName,
-        };
+        data = {if (fullName != null) 'full_name': fullName};
       }
 
       final response = await dio.patch<Map<String, dynamic>>(
@@ -324,11 +313,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<ServerProbeResult> probeServer(String url) async {
     final normalised = url.startsWith('http') ? url : 'http://$url';
     try {
-      final dio = Dio(BaseOptions(
-        baseUrl: normalised,
-        connectTimeout: const Duration(seconds: 6),
-        receiveTimeout: const Duration(seconds: 6),
-      ));
+      final dio = Dio(
+        BaseOptions(
+          baseUrl: normalised,
+          connectTimeout: const Duration(seconds: 6),
+          receiveTimeout: const Duration(seconds: 6),
+        ),
+      );
       // Use a syntactically valid email so Pydantic passes validation and the
       // handler actually runs the user-count check.  If users exist → 409.
       // If no users yet → 422 (missing password field) after the count passes.
@@ -387,7 +378,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
     } on DioException catch (e) {
       print(
-          'DEBUG: DioException in _fetchCurrentUser: ${e.message}, status: ${e.response?.statusCode}, data: ${e.response?.data}');
+        'DEBUG: DioException in _fetchCurrentUser: ${e.message}, status: ${e.response?.statusCode}, data: ${e.response?.data}',
+      );
       if (e.response?.statusCode == 401) {
         final refreshed = await _tryRefreshTokens();
         if (refreshed) {
@@ -446,13 +438,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Dio _buildDio() => Dio(
-        BaseOptions(
-          baseUrl: state.serverUrl,
-          connectTimeout: const Duration(seconds: 10),
-          receiveTimeout: const Duration(seconds: 10),
-          headers: {'Content-Type': 'application/json'},
-        ),
-      );
+    BaseOptions(
+      baseUrl: state.serverUrl,
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+      headers: {'Content-Type': 'application/json'},
+    ),
+  );
 
   static String _extractError(DioException e) {
     final data = e.response?.data;

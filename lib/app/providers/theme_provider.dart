@@ -41,8 +41,9 @@ final prefsProvider = Provider<SharedPreferences>(
 );
 
 /// The main provider to watch/read throughout the app.
-final themeModeProvider =
-    StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
+final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((
+  ref,
+) {
   final prefs = ref.watch(prefsProvider);
   return ThemeModeNotifier(prefs);
 });

@@ -15,9 +15,9 @@ class SplitInputModel {
   final String? notes;
 
   Map<String, dynamic> toJson() => {
-        'title': title,
-        'amount': amount,
-        if (categoryId != null) 'category_id': categoryId,
-        if (notes != null && notes!.isNotEmpty) 'notes': notes,
-      };
+    'title': title,
+    'amount': amount,
+    if (categoryId != null) 'category_id': categoryId,
+    if (notes != null && notes!.isNotEmpty) 'notes': notes,
+  };
 }

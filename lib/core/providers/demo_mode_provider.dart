@@ -10,7 +10,7 @@ final demoModeProvider = StateNotifierProvider<DemoModeNotifier, bool>((ref) {
 
 class DemoModeNotifier extends StateNotifier<bool> {
   DemoModeNotifier(SharedPreferences prefs)
-      : super(prefs.getBool('demo_mode_active') ?? false);
+    : super(prefs.getBool('demo_mode_active') ?? false);
 
   void updateState(bool isActive) {
     state = isActive;

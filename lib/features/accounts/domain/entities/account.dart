@@ -8,21 +8,21 @@ enum AccountType {
   cash;
 
   static AccountType fromString(String value) => switch (value) {
-        'checking' => AccountType.checking,
-        'savings' => AccountType.savings,
-        'credit_card' => AccountType.creditCard,
-        'investment' => AccountType.investment,
-        'cash' => AccountType.cash,
-        _ => AccountType.checking,
-      };
+    'checking' => AccountType.checking,
+    'savings' => AccountType.savings,
+    'credit_card' => AccountType.creditCard,
+    'investment' => AccountType.investment,
+    'cash' => AccountType.cash,
+    _ => AccountType.checking,
+  };
 
   String toJson() => switch (this) {
-        AccountType.checking => 'checking',
-        AccountType.savings => 'savings',
-        AccountType.creditCard => 'credit_card',
-        AccountType.investment => 'investment',
-        AccountType.cash => 'cash',
-      };
+    AccountType.checking => 'checking',
+    AccountType.savings => 'savings',
+    AccountType.creditCard => 'credit_card',
+    AccountType.investment => 'investment',
+    AccountType.cash => 'cash',
+  };
 }
 
 class Account {
@@ -54,15 +54,14 @@ class Account {
     String? institutionName,
     Color? color,
     DateTime? updatedAt,
-  }) =>
-      Account(
-        id: id,
-        name: name ?? this.name,
-        type: type ?? this.type,
-        balance: balance ?? this.balance,
-        availableBalance: availableBalance ?? this.availableBalance,
-        institutionName: institutionName ?? this.institutionName,
-        color: color ?? this.color,
-        updatedAt: updatedAt ?? this.updatedAt,
-      );
+  }) => Account(
+    id: id,
+    name: name ?? this.name,
+    type: type ?? this.type,
+    balance: balance ?? this.balance,
+    availableBalance: availableBalance ?? this.availableBalance,
+    institutionName: institutionName ?? this.institutionName,
+    color: color ?? this.color,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
 }

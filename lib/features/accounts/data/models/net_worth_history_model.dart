@@ -1,8 +1,5 @@
 class NetWorthHistoryEntry {
-  const NetWorthHistoryEntry({
-    required this.date,
-    required this.netWorth,
-  });
+  const NetWorthHistoryEntry({required this.date, required this.netWorth});
 
   final DateTime date;
   final double netWorth;

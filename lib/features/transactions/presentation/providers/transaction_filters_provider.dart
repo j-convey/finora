@@ -53,5 +53,6 @@ class TransactionFilters {
       accountId != null || category != null || month != null || year != null;
 }
 
-final transactionFiltersProvider =
-    StateProvider<TransactionFilters>((ref) => const TransactionFilters());
+final transactionFiltersProvider = StateProvider<TransactionFilters>(
+  (ref) => const TransactionFilters(),
+);

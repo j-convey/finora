@@ -70,7 +70,10 @@ class ProfileSettingsPage extends ConsumerWidget {
   }
 
   void _showEditProfileSheet(
-      BuildContext context, WidgetRef ref, UserModel? user) {
+    BuildContext context,
+    WidgetRef ref,
+    UserModel? user,
+  ) {
     final nameController = TextEditingController(text: user?.fullName);
     String? selectedFilePath;
 
@@ -99,14 +102,17 @@ class ProfileSettingsPage extends ConsumerWidget {
                       backgroundImage: selectedFilePath != null
                           ? null
                           : (user?.profilePictureUrl != null
-                              ? NetworkImage(user!.profilePictureUrl!)
-                              : null),
+                                ? NetworkImage(user!.profilePictureUrl!)
+                                : null),
                       child: selectedFilePath != null
-                          ? const Icon(Icons.check,
-                              color: Colors.green, size: 40)
+                          ? const Icon(
+                              Icons.check,
+                              color: Colors.green,
+                              size: 40,
+                            )
                           : (user?.profilePictureUrl == null
-                              ? const Icon(Icons.person, size: 40)
-                              : null),
+                                ? const Icon(Icons.person, size: 40)
+                                : null),
                     ),
                     Positioned(
                       bottom: 0,
@@ -116,15 +122,21 @@ class ProfileSettingsPage extends ConsumerWidget {
                         backgroundColor: Theme.of(ctx).colorScheme.primary,
                         child: IconButton(
                           padding: EdgeInsets.zero,
-                          icon: const Icon(Icons.camera_alt,
-                              size: 16, color: Colors.white),
+                          icon: const Icon(
+                            Icons.camera_alt,
+                            size: 16,
+                            color: Colors.white,
+                          ),
                           onPressed: () async {
-                            final result = await FilePicker.platform
-                                .pickFiles(type: FileType.image);
+                            final result = await FilePicker.platform.pickFiles(
+                              type: FileType.image,
+                            );
                             if (result != null &&
                                 result.files.single.path != null) {
-                              setSheetState(() =>
-                                  selectedFilePath = result.files.single.path);
+                              setSheetState(
+                                () =>
+                                    selectedFilePath = result.files.single.path,
+                              );
                             }
                           },
                         ),
@@ -144,11 +156,12 @@ class ProfileSettingsPage extends ConsumerWidget {
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: () async {
-                  final success =
-                      await ref.read(authProvider.notifier).updateProfile(
-                            fullName: nameController.text.trim(),
-                            profilePicturePath: selectedFilePath,
-                          );
+                  final success = await ref
+                      .read(authProvider.notifier)
+                      .updateProfile(
+                        fullName: nameController.text.trim(),
+                        profilePicturePath: selectedFilePath,
+                      );
                   if (success && ctx.mounted) Navigator.pop(ctx);
                 },
                 child: const Text('Save Changes'),
@@ -216,7 +229,9 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
       _isLoading = true;
       _error = null;
     });
-    final err = await widget.ref.read(authProvider.notifier).changePassword(
+    final err = await widget.ref
+        .read(authProvider.notifier)
+        .changePassword(
           currentPassword: _currentCtrl.text,
           newPassword: _newCtrl.text,
         );
@@ -258,9 +273,11 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
               labelText: 'Current Password',
               border: const OutlineInputBorder(),
               suffixIcon: IconButton(
-                icon: Icon(_obscureCurrent
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined),
+                icon: Icon(
+                  _obscureCurrent
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                ),
                 onPressed: () =>
                     setState(() => _obscureCurrent = !_obscureCurrent),
               ),
@@ -275,9 +292,11 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
               labelText: 'New Password',
               border: const OutlineInputBorder(),
               suffixIcon: IconButton(
-                icon: Icon(_obscureNew
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined),
+                icon: Icon(
+                  _obscureNew
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                ),
                 onPressed: () => setState(() => _obscureNew = !_obscureNew),
               ),
             ),
@@ -291,9 +310,11 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
               labelText: 'Confirm New Password',
               border: const OutlineInputBorder(),
               suffixIcon: IconButton(
-                icon: Icon(_obscureConfirm
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined),
+                icon: Icon(
+                  _obscureConfirm
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                ),
                 onPressed: () =>
                     setState(() => _obscureConfirm = !_obscureConfirm),
               ),
@@ -301,10 +322,7 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
           ),
           if (_error != null) ...[
             const SizedBox(height: 12),
-            Text(
-              _error!,
-              style: TextStyle(color: cs.error, fontSize: 13),
-            ),
+            Text(_error!, style: TextStyle(color: cs.error, fontSize: 13)),
           ],
           const SizedBox(height: 24),
           FilledButton(

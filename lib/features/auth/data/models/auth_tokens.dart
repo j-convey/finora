@@ -10,8 +10,8 @@ class AuthTokens {
   final String tokenType;
 
   factory AuthTokens.fromJson(Map<String, dynamic> json) => AuthTokens(
-        accessToken: json['access_token'] as String,
-        refreshToken: json['refresh_token'] as String,
-        tokenType: json['token_type'] as String? ?? 'bearer',
-      );
+    accessToken: json['access_token'] as String,
+    refreshToken: json['refresh_token'] as String,
+    tokenType: json['token_type'] as String? ?? 'bearer',
+  );
 }

@@ -17,17 +17,12 @@ void main() async {
   await NotificationService.init();
 
   final container = ProviderContainer(
-    overrides: [
-      prefsProvider.overrideWithValue(prefs),
-    ],
+    overrides: [prefsProvider.overrideWithValue(prefs)],
   );
 
   await container.read(authProvider.notifier).initialize();
 
   runApp(
-    UncontrolledProviderScope(
-      container: container,
-      child: const FinoraApp(),
-    ),
+    UncontrolledProviderScope(container: container, child: const FinoraApp()),
   );
 }

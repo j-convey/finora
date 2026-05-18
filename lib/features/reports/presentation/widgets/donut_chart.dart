@@ -95,8 +95,11 @@ class _DonutChartState extends State<DonutChart> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.donut_large_outlined,
-                  size: 48, color: cs.onSurfaceVariant),
+              Icon(
+                Icons.donut_large_outlined,
+                size: 48,
+                color: cs.onSurfaceVariant,
+              ),
               const SizedBox(height: 8),
               Text(
                 'No data for this period',
@@ -133,13 +136,15 @@ class _DonutChartState extends State<DonutChart> {
                         children: [
                           Text(
                             _compact(widget.total),
-                            style: tt.titleMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
+                            style: tt.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           Text(
                             widget.centerLabel,
-                            style: tt.labelSmall
-                                ?.copyWith(color: cs.onSurfaceVariant),
+                            style: tt.labelSmall?.copyWith(
+                              color: cs.onSurfaceVariant,
+                            ),
                           ),
                         ],
                       ),

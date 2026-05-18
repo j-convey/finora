@@ -19,8 +19,9 @@ class _NotificationsSettingsPageState
   void initState() {
     super.initState();
     final prefs = ref.read(notificationPreferencesProvider);
-    _thresholdController =
-        TextEditingController(text: prefs.thresholdAmount.toStringAsFixed(0));
+    _thresholdController = TextEditingController(
+      text: prefs.thresholdAmount.toStringAsFixed(0),
+    );
   }
 
   @override
@@ -87,13 +88,16 @@ class _NotificationsSettingsPageState
                   width: 90,
                   child: TextField(
                     controller: _thresholdController,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     decoration: InputDecoration(
                       prefixText: '\$',
                       isDense: true,
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 8),
+                        horizontal: 8,
+                        vertical: 8,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -101,8 +105,9 @@ class _NotificationsSettingsPageState
                     onChanged: (val) {
                       final amount = double.tryParse(val);
                       if (amount != null && amount >= 0) {
-                        notifier
-                            .update(prefs.copyWith(thresholdAmount: amount));
+                        notifier.update(
+                          prefs.copyWith(thresholdAmount: amount),
+                        );
                       }
                     },
                   ),

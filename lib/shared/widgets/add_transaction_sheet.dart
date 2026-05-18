@@ -34,7 +34,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     final allItems = groups.expand((g) => g.categories).toList();
     final selectedItem =
         _category ?? (allItems.isNotEmpty ? allItems.first : null);
-    ref.read(transactionsProvider.notifier).addTransaction(
+    ref
+        .read(transactionsProvider.notifier)
+        .addTransaction(
           Transaction(
             id: 'u${DateTime.now().millisecondsSinceEpoch}',
             title: _titleCtrl.text.trim(),
@@ -64,8 +66,10 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Add Transaction',
-                    style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  'Add Transaction',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),
@@ -77,13 +81,17 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
             SegmentedButton<TransactionType>(
               segments: [
                 ButtonSegment(
-                    value: TransactionType.expense,
-                    label: const Text('Expense')),
+                  value: TransactionType.expense,
+                  label: const Text('Expense'),
+                ),
                 ButtonSegment(
-                    value: TransactionType.income, label: const Text('Income')),
+                  value: TransactionType.income,
+                  label: const Text('Income'),
+                ),
                 ButtonSegment(
-                    value: TransactionType.transfer,
-                    label: const Text('Transfer')),
+                  value: TransactionType.transfer,
+                  label: const Text('Transfer'),
+                ),
               ],
               selected: {_type},
               onSelectionChanged: (s) => setState(() => _type = s.first),
@@ -105,60 +113,69 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                 prefixText: '\$',
                 border: OutlineInputBorder(),
               ),
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
             ),
             const SizedBox(height: 12),
-            Consumer(builder: (context, ref, _) {
-              final groups = ref.watch(categoryGroupsProvider);
-              final allItems = groups.expand((g) => g.categories).toList();
-              final selectedName = _category?.name ??
-                  (allItems.isNotEmpty ? allItems.first.name : null);
+            Consumer(
+              builder: (context, ref, _) {
+                final groups = ref.watch(categoryGroupsProvider);
+                final allItems = groups.expand((g) => g.categories).toList();
+                final selectedName =
+                    _category?.name ??
+                    (allItems.isNotEmpty ? allItems.first.name : null);
 
-              final items = <DropdownMenuItem<String>>[];
-              for (final group in groups) {
-                items.add(DropdownMenuItem<String>(
-                  enabled: false,
-                  value: '__header__${group.group}',
-                  child: Text(
-                    group.group.toUpperCase(),
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                final items = <DropdownMenuItem<String>>[];
+                for (final group in groups) {
+                  items.add(
+                    DropdownMenuItem<String>(
+                      enabled: false,
+                      value: '__header__${group.group}',
+                      child: Text(
+                        group.group.toUpperCase(),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                           letterSpacing: 0.8,
                         ),
-                  ),
-                ));
-                for (final cat in group.categories) {
-                  items.add(DropdownMenuItem<String>(
-                    value: cat.name,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8),
-                      child: Text(cat.name),
+                      ),
                     ),
-                  ));
+                  );
+                  for (final cat in group.categories) {
+                    items.add(
+                      DropdownMenuItem<String>(
+                        value: cat.name,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: Text(cat.name),
+                        ),
+                      ),
+                    );
+                  }
                 }
-              }
 
-              return InputDecorator(
-                decoration: const InputDecoration(
-                  labelText: 'Category',
-                  border: OutlineInputBorder(),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: selectedName,
-                    isDense: true,
-                    items: items,
-                    onChanged: (name) {
-                      if (name == null) return;
-                      final item =
-                          allItems.where((c) => c.name == name).firstOrNull;
-                      if (item != null) setState(() => _category = item);
-                    },
+                return InputDecorator(
+                  decoration: const InputDecoration(
+                    labelText: 'Category',
+                    border: OutlineInputBorder(),
                   ),
-                ),
-              );
-            }),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: selectedName,
+                      isDense: true,
+                      items: items,
+                      onChanged: (name) {
+                        if (name == null) return;
+                        final item = allItems
+                            .where((c) => c.name == name)
+                            .firstOrNull;
+                        if (item != null) setState(() => _category = item);
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: 20),
             FilledButton(
               onPressed: _save,

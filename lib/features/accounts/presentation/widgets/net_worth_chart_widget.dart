@@ -17,8 +17,10 @@ class NetWorthChartWidget extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Center(
-            child: Text('No history data available',
-                style: Theme.of(context).textTheme.bodyMedium),
+            child: Text(
+              'No history data available',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
           ),
         ),
       );
@@ -26,9 +28,13 @@ class NetWorthChartWidget extends StatelessWidget {
 
     final netWorths = history.entries.map((e) => e.netWorth).toList();
     final minNetWorth = netWorths.fold<double>(
-        netWorths.first, (prev, v) => v < prev ? v : prev);
+      netWorths.first,
+      (prev, v) => v < prev ? v : prev,
+    );
     final maxNetWorth = netWorths.fold<double>(
-        netWorths.first, (prev, v) => v > prev ? v : prev);
+      netWorths.first,
+      (prev, v) => v > prev ? v : prev,
+    );
 
     final diff = maxNetWorth - minNetWorth;
     // Ensure we don't have too many labels. Aim for ~4-5 labels max.
@@ -114,9 +120,7 @@ class NetWorthChartWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-                  borderData: FlBorderData(
-                    show: false,
-                  ),
+                  borderData: FlBorderData(show: false),
                   minX: 0,
                   maxX: (history.entries.length - 1).toDouble(),
                   minY: minNetWorth == maxNetWorth
@@ -131,9 +135,7 @@ class NetWorthChartWidget extends StatelessWidget {
                       isCurved: true,
                       color: cs.primary,
                       barWidth: 2.5,
-                      dotData: FlDotData(
-                        show: false,
-                      ),
+                      dotData: FlDotData(show: false),
                       belowBarData: BarAreaData(
                         show: true,
                         color: cs.primary.withAlpha(76),

@@ -30,18 +30,17 @@ class NotificationPreferences {
   NotificationPreferences copyWith({
     NotifyOn? notifyOn,
     double? thresholdAmount,
-  }) =>
-      NotificationPreferences(
-        notifyOn: notifyOn ?? this.notifyOn,
-        thresholdAmount: thresholdAmount ?? this.thresholdAmount,
-      );
+  }) => NotificationPreferences(
+    notifyOn: notifyOn ?? this.notifyOn,
+    thresholdAmount: thresholdAmount ?? this.thresholdAmount,
+  );
 
   /// Returns true if [amount] should trigger a notification.
   bool shouldNotify(double amount) => switch (notifyOn) {
-        NotifyOn.never => false,
-        NotifyOn.always => true,
-        NotifyOn.aboveThreshold => amount >= thresholdAmount,
-      };
+    NotifyOn.never => false,
+    NotifyOn.always => true,
+    NotifyOn.aboveThreshold => amount >= thresholdAmount,
+  };
 
   Future<void> save() async {
     final prefs = await SharedPreferences.getInstance();
@@ -60,7 +59,9 @@ class NotificationPreferences {
         : NotifyOn.never;
     final threshold = prefs.getDouble(_keyThreshold) ?? 50.0;
     return NotificationPreferences(
-        notifyOn: notifyOn, thresholdAmount: threshold);
+      notifyOn: notifyOn,
+      thresholdAmount: threshold,
+    );
   }
 }
 
@@ -80,7 +81,8 @@ class NotificationPreferencesNotifier
   }
 }
 
-final notificationPreferencesProvider = StateNotifierProvider<
-    NotificationPreferencesNotifier, NotificationPreferences>(
-  (_) => NotificationPreferencesNotifier(),
-);
+final notificationPreferencesProvider =
+    StateNotifierProvider<
+      NotificationPreferencesNotifier,
+      NotificationPreferences
+    >((_) => NotificationPreferencesNotifier());

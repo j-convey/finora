@@ -120,5 +120,5 @@ class SubscriptionsNotifier extends StateNotifier<List<SubscriptionModel>> {
 
 final subscriptionsProvider =
     StateNotifierProvider<SubscriptionsNotifier, List<SubscriptionModel>>(
-  (ref) => SubscriptionsNotifier(ref),
-);
+      (ref) => SubscriptionsNotifier(ref),
+    );

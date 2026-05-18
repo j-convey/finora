@@ -15,8 +15,8 @@ import '../../data/datasources/reimbursement_service.dart';
 /// ```
 final reimbursementProvider = AsyncNotifierProvider.autoDispose
     .family<ReimbursementNotifier, ReimbursementListResponse, String>(
-  ReimbursementNotifier.new,
-);
+      ReimbursementNotifier.new,
+    );
 
 class ReimbursementNotifier
     extends AutoDisposeFamilyAsyncNotifier<ReimbursementListResponse, String> {

@@ -83,20 +83,26 @@ class MainShell extends ConsumerWidget {
               child: SafeArea(
                 bottom: false,
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 6,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.science_outlined,
-                          size: 14, color: Colors.white),
+                      const Icon(
+                        Icons.science_outlined,
+                        size: 14,
+                        color: Colors.white,
+                      ),
                       const SizedBox(width: 6),
                       Text(
                         'DEMO MODE — sample data only',
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5),
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ],
                   ),
@@ -104,7 +110,9 @@ class MainShell extends ConsumerWidget {
               ),
             ),
           ),
-          Expanded(child: IndexedStack(index: index, children: _pages)),
+          Expanded(
+            child: IndexedStack(index: index, children: _pages),
+          ),
         ],
       );
     }
@@ -277,11 +285,7 @@ class _SidebarItem extends StatelessWidget {
     final iconColor = selected ? cs.onSecondaryContainer : cs.onSurfaceVariant;
     final iconWidget = Transform.scale(
       scaleX: flipIcon ? -1 : 1,
-      child: Icon(
-        selected ? selectedIcon : icon,
-        color: iconColor,
-        size: 22,
-      ),
+      child: Icon(selected ? selectedIcon : icon, color: iconColor, size: 22),
     );
 
     return Tooltip(
@@ -299,16 +303,11 @@ class _SidebarItem extends StatelessWidget {
               color: selected ? cs.secondaryContainer : Colors.transparent,
               borderRadius: BorderRadius.circular(10),
             ),
-            padding: EdgeInsets.symmetric(
-              horizontal: expanded ? 12 : 0,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: expanded ? 12 : 0),
             child: expanded
                 ? Row(
                     children: [
-                      SizedBox(
-                        width: 28,
-                        child: Center(child: iconWidget),
-                      ),
+                      SizedBox(width: 28, child: Center(child: iconWidget)),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
@@ -319,8 +318,9 @@ class _SidebarItem extends StatelessWidget {
                             color: selected
                                 ? cs.onSecondaryContainer
                                 : cs.onSurfaceVariant,
-                            fontWeight:
-                                selected ? FontWeight.w600 : FontWeight.normal,
+                            fontWeight: selected
+                                ? FontWeight.w600
+                                : FontWeight.normal,
                             fontSize: 14,
                           ),
                         ),

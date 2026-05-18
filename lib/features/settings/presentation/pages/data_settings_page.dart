@@ -80,8 +80,9 @@ class _DataSettingsPageState extends ConsumerState<DataSettingsPage> {
           ListTile(
             leading: Icon(Icons.delete_forever_outlined, color: cs.error),
             title: Text('Clear Local Data', style: TextStyle(color: cs.error)),
-            subtitle:
-                const Text('Removes cached data — server data unaffected'),
+            subtitle: const Text(
+              'Removes cached data — server data unaffected',
+            ),
             onTap: () => _confirmClear(context),
           ),
           ListTile(
@@ -92,8 +93,10 @@ class _DataSettingsPageState extends ConsumerState<DataSettingsPage> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : Icon(Icons.warning_amber_outlined, color: cs.error),
-            title: Text('Reset Server Database',
-                style: TextStyle(color: cs.error)),
+            title: Text(
+              'Reset Server Database',
+              style: TextStyle(color: cs.error),
+            ),
             subtitle: const Text('Permanently deletes all server data'),
             onTap: _isResettingDatabase
                 ? null
@@ -106,15 +109,15 @@ class _DataSettingsPageState extends ConsumerState<DataSettingsPage> {
   }
 
   Widget _header(BuildContext context, String title) => Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-        child: Text(
-          title,
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-      );
+    padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+    child: Text(
+      title,
+      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+        color: Theme.of(context).colorScheme.primary,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+  );
 
   Future<void> _syncAll() async {
     setState(() => _isSyncing = true);
@@ -128,9 +131,9 @@ class _DataSettingsPageState extends ConsumerState<DataSettingsPage> {
         ref.read(categoryGroupsProvider.notifier).sync(),
       ]);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Sync complete')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Sync complete')));
       }
     } catch (e) {
       if (mounted) {
@@ -227,7 +230,8 @@ class _DataSettingsPageState extends ConsumerState<DataSettingsPage> {
       builder: (ctx) => AlertDialog(
         title: const Text('Clear Local Data?'),
         content: const Text(
-            'This will remove all locally cached data. Your server data is unaffected.'),
+          'This will remove all locally cached data. Your server data is unaffected.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),

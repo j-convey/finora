@@ -44,8 +44,8 @@ class SettingsPage extends ConsumerWidget {
 
     final bankLabel = simplefin.isConnected
         ? (simplefin.connectedInstitutions.isEmpty
-            ? 'Connected'
-            : simplefin.connectedInstitutions.join(', '))
+              ? 'Connected'
+              : simplefin.connectedInstitutions.join(', '))
         : 'Not connected';
 
     return Scaffold(
@@ -139,7 +139,8 @@ class SettingsPage extends ConsumerWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (_) => const NotificationsSettingsPage()),
+                builder: (_) => const NotificationsSettingsPage(),
+              ),
             ),
           ),
           const Divider(),
@@ -165,12 +166,13 @@ class SettingsPage extends ConsumerWidget {
             ),
             title: Text(
               'Demo Mode',
-              style:
-                  isDemoMode ? const TextStyle(color: Color(0xFFE65100)) : null,
+              style: isDemoMode
+                  ? const TextStyle(color: Color(0xFFE65100))
+                  : null,
             ),
-            subtitle: Text(isDemoMode
-                ? 'Active — tap to exit'
-                : 'Explore with sample data'),
+            subtitle: Text(
+              isDemoMode ? 'Active — tap to exit' : 'Explore with sample data',
+            ),
             trailing: isDemoMode
                 ? const Icon(Icons.circle, color: Color(0xFFE65100), size: 10)
                 : const Icon(Icons.chevron_right),

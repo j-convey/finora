@@ -56,16 +56,18 @@ class AccountSettingsPage extends ConsumerWidget {
                             const SizedBox(height: 2),
                             Text(
                               auth.serverUrl,
-                              style: tt.bodySmall
-                                  ?.copyWith(color: cs.onSurfaceVariant),
+                              style: tt.bodySmall?.copyWith(
+                                color: cs.onSurfaceVariant,
+                              ),
                             ),
                           ],
                           if (auth.user?.email != null) ...[
                             const SizedBox(height: 2),
                             Text(
                               auth.user!.email,
-                              style: tt.bodySmall
-                                  ?.copyWith(color: cs.onSurfaceVariant),
+                              style: tt.bodySmall?.copyWith(
+                                color: cs.onSurfaceVariant,
+                              ),
                             ),
                           ],
                         ],
