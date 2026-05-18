@@ -19,6 +19,25 @@ class UserModel {
 
   String get displayName => fullName?.isNotEmpty == true ? fullName! : email;
 
+  UserModel copyWith({
+    int? id,
+    int? householdId,
+    String? email,
+    String? fullName,
+    String? profilePictureUrl,
+    bool? isActive,
+    DateTime? createdAt,
+  }) =>
+      UserModel(
+        id: id ?? this.id,
+        householdId: householdId ?? this.householdId,
+        email: email ?? this.email,
+        fullName: fullName ?? this.fullName,
+        profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
+        isActive: isActive ?? this.isActive,
+        createdAt: createdAt ?? this.createdAt,
+      );
+
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
         id: json['id'] as int,
         householdId: json['household_id'] as int,

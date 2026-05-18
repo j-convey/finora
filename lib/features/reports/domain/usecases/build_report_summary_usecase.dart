@@ -86,10 +86,16 @@ class BuildReportSummaryUseCase {
 
     final largestExpense = expenseList.isEmpty
         ? null
-        : expenseList.reduce((a, b) => a.amount > b.amount ? a : b);
+        : expenseList.fold<Transaction>(
+            expenseList.first,
+            (prev, e) => e.amount > prev.amount ? e : prev,
+          );
     final largestIncome = incomeList.isEmpty
         ? null
-        : incomeList.reduce((a, b) => a.amount > b.amount ? a : b);
+        : incomeList.fold<Transaction>(
+            incomeList.first,
+            (prev, e) => e.amount > prev.amount ? e : prev,
+          );
 
     // ── Spending by category ─────────────────────────────────────────────────
     final spendMap = <String, (double, int)>{};

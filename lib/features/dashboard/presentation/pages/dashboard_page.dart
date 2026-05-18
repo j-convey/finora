@@ -669,7 +669,8 @@ class _LineChartPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (data.isEmpty) return;
-    final maxVal = data.reduce((a, b) => a > b ? a : b);
+    final maxVal = data.fold<double>(
+        data.first, (prev, v) => v > prev ? v : prev);
     if (maxVal == 0) return;
 
     final chartLeft = _yPadLeft;

@@ -65,6 +65,12 @@ class AuthState {
 
   UserModel? get activeUser {
     if (isDemoModeActive) {
+      // Use real user info if we have it, so the UI shows "You (Demo)"
+      if (user != null) {
+        return user!.copyWith(
+          fullName: '${user!.fullName ?? 'User'} (Demo)',
+        );
+      }
       return UserModel(
         id: 9999,
         householdId: 1,

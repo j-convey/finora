@@ -14,6 +14,18 @@ class DemoModeSettingsPage extends ConsumerStatefulWidget {
 
 class _DemoModeSettingsPageState extends ConsumerState<DemoModeSettingsPage> {
   bool _isLoading = false;
+  String? _serverStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkServerStatus();
+  }
+
+  Future<void> _checkServerStatus() async {
+    final status = await ref.read(demoModeServiceProvider).getServerDemoStatus();
+    if (mounted) setState(() => _serverStatus = status);
+  }
 
   Future<void> _toggle(bool enable) async {
     setState(() => _isLoading = true);
@@ -126,10 +138,20 @@ class _DemoModeSettingsPageState extends ConsumerState<DemoModeSettingsPage> {
             const SizedBox(height: 32),
             const Divider(),
             const SizedBox(height: 8),
-            Text(
-              'Demo data',
-              style: tt.labelMedium
-                  ?.copyWith(color: cs.primary, fontWeight: FontWeight.w600),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Demo data',
+                  style: tt.labelMedium?.copyWith(
+                      color: cs.primary, fontWeight: FontWeight.w600),
+                ),
+                if (_serverStatus != null)
+                  Text(
+                    'Server: $_serverStatus',
+                    style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
+                  ),
+              ],
             ),
             const SizedBox(height: 8),
             _demoInfoRow(

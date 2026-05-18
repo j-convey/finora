@@ -24,10 +24,15 @@ class NetWorthChartWidget extends StatelessWidget {
       );
     }
 
-    final minNetWorth =
-        history.entries.map((e) => e.netWorth).reduce((a, b) => a < b ? a : b);
-    final maxNetWorth =
-        history.entries.map((e) => e.netWorth).reduce((a, b) => a > b ? a : b);
+    final netWorths = history.entries.map((e) => e.netWorth).toList();
+    final minNetWorth = netWorths.fold<double>(
+        netWorths.first, (prev, v) => v < prev ? v : prev);
+    final maxNetWorth = netWorths.fold<double>(
+        netWorths.first, (prev, v) => v > prev ? v : prev);
+
+    final diff = maxNetWorth - minNetWorth;
+    // Ensure we don't have too many labels. Aim for ~4-5 labels max.
+    final chartInterval = diff > 1000 ? diff / 4 : 500.0;
 
     final spots = history.entries.asMap().entries.map((entry) {
       return FlSpot(entry.key.toDouble(), entry.value.netWorth);
@@ -45,13 +50,13 @@ class NetWorthChartWidget extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             SizedBox(
-              height: 200,
+              height: 240, // Increased height for better visibility
               child: LineChart(
                 LineChartData(
                   gridData: FlGridData(
                     show: true,
                     drawVerticalLine: false,
-                    horizontalInterval: (maxNetWorth - minNetWorth) / 4,
+                    horizontalInterval: chartInterval,
                     getDrawingHorizontalLine: (value) {
                       return FlLine(
                         color: cs.outlineVariant.withAlpha(76),
@@ -70,14 +75,16 @@ class NetWorthChartWidget extends StatelessWidget {
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
+                        reservedSize: 32,
+                        interval: (history.entries.length / 5).clamp(1, 100),
                         getTitlesWidget: (value, meta) {
                           final index = value.toInt();
                           if (index < 0 || index >= history.entries.length) {
-                            return const Text('');
+                            return const SizedBox.shrink();
                           }
                           final date = history.entries[index].date;
                           return Padding(
-                            padding: const EdgeInsets.only(top: 8),
+                            padding: const EdgeInsets.only(top: 10),
                             child: Text(
                               '${date.month}/${date.day}',
                               style: Theme.of(context).textTheme.labelSmall,
@@ -89,13 +96,21 @@ class NetWorthChartWidget extends StatelessWidget {
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
+                        reservedSize: 52, // Give space for labels like "$17.5K"
+                        interval: chartInterval,
                         getTitlesWidget: (value, meta) {
-                          return Text(
-                            '\$${(value / 1000).toStringAsFixed(0)}K',
-                            style: Theme.of(context).textTheme.labelSmall,
+                          // Skip labels that are too close to avoid clutter
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: Text(
+                              value >= 1000
+                                  ? '\$${(value / 1000).toStringAsFixed(1)}K'
+                                  : '\$${value.toStringAsFixed(0)}',
+                              style: Theme.of(context).textTheme.labelSmall,
+                              textAlign: TextAlign.right,
+                            ),
                           );
                         },
-                        interval: (maxNetWorth - minNetWorth) / 4,
                       ),
                     ),
                   ),
@@ -104,8 +119,12 @@ class NetWorthChartWidget extends StatelessWidget {
                   ),
                   minX: 0,
                   maxX: (history.entries.length - 1).toDouble(),
-                  minY: minNetWorth * 0.98,
-                  maxY: maxNetWorth * 1.02,
+                  minY: minNetWorth == maxNetWorth
+                      ? minNetWorth - 5000
+                      : minNetWorth - (diff * 0.1), // Add 10% padding
+                  maxY: minNetWorth == maxNetWorth
+                      ? maxNetWorth + 5000
+                      : maxNetWorth + (diff * 0.1), // Add 10% padding
                   lineBarsData: [
                     LineChartBarData(
                       spots: spots,
